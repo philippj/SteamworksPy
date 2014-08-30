@@ -12,15 +12,15 @@
 
 extern "C"
 {
-	__declspec(dllexport) bool SteamInit();
-	__declspec(dllexport) const char* GetPersonaName();
-	__declspec(dllexport) int GetFriendCount();
-	__declspec(dllexport) const char* GetFriendNameByIndex(int index, int flag);
-	__declspec(dllexport) int GetFriendStateByIndex(int index, int flag);
-	__declspec(dllexport) int GetPersonaState();
-	__declspec(dllexport) uint32 GetFriendGame(int index, int flag);
-	__declspec(dllexport) bool IsFriendInGame(int index, int flag);
-	__declspec(dllexport) void SetPersonaName(const char* newname);
+	DLL_PUBLIC bool SteamInit();
+	DLL_PUBLIC const char* GetPersonaName();
+	DLL_PUBLIC int GetFriendCount();
+	DLL_PUBLIC const char* GetFriendNameByIndex(int index, int flag);
+	DLL_PUBLIC int GetFriendStateByIndex(int index, int flag);
+	DLL_PUBLIC int GetPersonaState();
+	DLL_PUBLIC uint32 GetFriendGame(int index, int flag);
+	DLL_PUBLIC bool IsFriendInGame(int index, int flag);
+	DLL_PUBLIC void SetPersonaName(const char* newname);
 }
 
 bool SteamInit()
