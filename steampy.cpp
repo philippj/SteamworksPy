@@ -4,6 +4,12 @@
 #include <steam/isteamfriends.h>
 #include <steam/isteamugc.h>
 
+#if defined _WIN32
+	#define DLL_PUBLIC __declspec(dllexport)
+#else
+	#define DLL_PUBLIC __attribute__ ((visibility("default")))
+#endif
+
 extern "C"
 {
 	__declspec(dllexport) bool SteamInit();
@@ -16,6 +22,7 @@ extern "C"
 	__declspec(dllexport) bool IsFriendInGame(int index, int flag);
 	__declspec(dllexport) void SetPersonaName(const char* newname);
 }
+
 bool SteamInit()
 {
 	return SteamAPI_Init();
