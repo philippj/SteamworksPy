@@ -5,23 +5,29 @@
 #include <steam/isteamugc.h>
 
 #if defined _WIN32
-	#define DLL_PUBLIC __declspec(dllexport)
+	extern "C"
+	{
+		DLL_PUBLIC bool SteamInit();
+		DLL_PUBLIC const char* GetPersonaName();
+		DLL_PUBLIC int GetFriendCount();
+		DLL_PUBLIC const char* GetFriendNameByIndex(int index, int flag);
+		DLL_PUBLIC int GetFriendStateByIndex(int index, int flag);
+		DLL_PUBLIC int GetPersonaState();
+		DLL_PUBLIC uint32 GetFriendGame(int index, int flag);
+		DLL_PUBLIC bool IsFriendInGame(int index, int flag);
+		DLL_PUBLIC void SetPersonaName(const char* newname);
+	}
 #else
-	#define DLL_PUBLIC __attribute__ ((visibility("default")))
+	bool SteamInit();
+	const char* GetPersonaName();
+	int GetFriendCount();
+	const char* GetFriendNameByIndex(int index, int flag);
+	int GetFriendStateByIndex(int index, int flag);
+	int GetPersonaState();
+	uint32 GetFriendGame(int index, int flag);
+	bool IsFriendInGame(int index, int flag);
+	void SetPersonaName(const char* newname);
 #endif
-
-extern "C"
-{
-	DLL_PUBLIC bool SteamInit();
-	DLL_PUBLIC const char* GetPersonaName();
-	DLL_PUBLIC int GetFriendCount();
-	DLL_PUBLIC const char* GetFriendNameByIndex(int index, int flag);
-	DLL_PUBLIC int GetFriendStateByIndex(int index, int flag);
-	DLL_PUBLIC int GetPersonaState();
-	DLL_PUBLIC uint32 GetFriendGame(int index, int flag);
-	DLL_PUBLIC bool IsFriendInGame(int index, int flag);
-	DLL_PUBLIC void SetPersonaName(const char* newname);
-}
 
 bool SteamInit()
 {
