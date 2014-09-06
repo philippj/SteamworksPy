@@ -48,6 +48,25 @@ class Steam:
 			Steam.warn = True
 			return
 		Steam.cdll.SteamInit()
+		Steam.cdll.SetPersonaName.restype = None
+		Steam.cdll.IsFriendInGame.restype = bool
+		Steam.cdll.GetPersonaName.restype = c_char_p
+		Steam.cdll.GetFriendNameByIndex.restype = c_char_p
+		Steam.cdll.GetFriendGame.restype = long
+		Steam.cdll.IsOverlayEnabled.restype = bool
+		Steam.cdll.GetIPCountry.restype = c_char_p
+		Steam.cdll.IsSteamRunningInVR.restype = bool
+
+	@staticmethod 
+	def Call(method):
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return method()
+
+class SteamFriends:
 	@staticmethod 
 	def GetPlayerName():
 		if not Steam.cdll and (not Steam.warn):
@@ -55,7 +74,6 @@ class Steam:
 			Steam.warn = True
 			return False
 		else:
-			Steam.cdll.GetPersonaName.restype = c_char_p
 			name = Steam.cdll.GetPersonaName() if not Steam.player_un else Steam.player_un
 			Steam.player_un = name if not Steam.player_un else Steam.player_un
 			return(name)
@@ -77,7 +95,6 @@ class Steam:
 			return False
 		else:
 			if type(index) is int:
-				Steam.cdll.GetFriendNameByIndex.restype = c_char_p
 				return Steam.cdll.GetFriendNameByIndex(index, flag)
 
 	@staticmethod 
@@ -114,7 +131,6 @@ class Steam:
 			Steam.warn = True
 			return False
 		else:
-			Steam.cdll.GetFriendGame.restype = long
 			return Steam.cdll.GetFriendGame(index, flag)
 
 	@staticmethod 
@@ -124,7 +140,6 @@ class Steam:
 			Steam.warn = True
 			return False
 		else:
-			Steam.cdll.IsFriendInGame.restype = bool
 			return Steam.cdll.IsFriendInGame(index, flag)
 
 	@staticmethod 
@@ -134,5 +149,64 @@ class Steam:
 			Steam.warn = True
 			return False
 		else:
-			Steam.cdll.SetPersonaName.restype = None
 			Steam.cdll.SetPersonaName(newname)
+
+class SteamUtils:
+	@staticmethod 
+	def IsOverlayEnabled():
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.IsOverlayEnabled()
+	@staticmethod 
+	def GetCurrentBatteryPower():
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.GetCurrentBatteryPower()
+	@staticmethod 
+	def GetSecondsSinceAppActive():
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.GetSecondsSinceAppActive()
+	@staticmethod 
+	def GetSecondsSinceComputerActive():
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.GetSecondsSinceComputerActive()
+	@staticmethod 
+	def GetServerRealTime():
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.GetServerRealTime()
+
+	@staticmethod 
+	def GetIPCountry():
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.GetIPCountry()
+
+	@staticmethod 
+	def IsSteamRunningInVR():
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.IsSteamRunningInVR()
