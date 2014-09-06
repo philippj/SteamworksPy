@@ -1,5 +1,5 @@
 all:
-	gcc -shared -o libsteampy.so -lsteam_api steampy.cpp
+	g++ -shared -fPIC -o libsteampy.so steampy.cpp -lsteam_api 
 clean:
 	rm libsteampy.so
 install:
