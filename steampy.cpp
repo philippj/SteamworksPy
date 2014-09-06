@@ -30,25 +30,28 @@
 		
 	}
 #else
-	//Steam
-	__attribute__ ((visibility ("default"))) bool SteamInit(void);
-	//SteamFriends
-	__attribute__ ((visibility ("default"))) const char* GetPersonaName(void);
-	__attribute__ ((visibility ("default"))) int GetFriendCount(void);
-	__attribute__ ((visibility ("default"))) const char* GetFriendNameByIndex(int index, int flag);
-	__attribute__ ((visibility ("default"))) int GetFriendStateByIndex(int index, int flag);
-	__attribute__ ((visibility ("default"))) int GetPersonaState(void);
-	__attribute__ ((visibility ("default"))) uint32 GetFriendGame(int index, int flag);
-	__attribute__ ((visibility ("default"))) bool IsFriendInGame(int index, int flag);
-	__attribute__ ((visibility ("default"))) void SetPersonaName(const char* newname);
-	//SteamUtils
-	__attribute__ ((visibility ("default"))) bool IsOverlayEnabled(void);
-	__attribute__ ((visibility ("default"))) uint8 GetCurrentBatteryPower(void);
-	__attribute__ ((visibility ("default"))) uint32 GetSecondsSinceAppActive(void);
-	__attribute__ ((visibility ("default"))) uint32 GetSecondsSinceComputerActive(void);
-	__attribute__ ((visibility ("default"))) uint32 GetServerRealTime(void);
-	__attribute__ ((visibility ("default"))) const char* GetIPCountry();
-	__attribute__ ((visibility ("default"))) bool IsSteamRunningInVR();
+    extern "C"
+	{
+	   //Steam
+	   __attribute__((__visibility__("default"))) bool SteamInit(void);
+	   //SteamFriends
+        __attribute__((__visibility__("default"))) const char* GetPersonaName(void);
+        __attribute__((__visibility__("default"))) int GetFriendCount(void);
+	   __attribute__((__visibility__("default"))) const char* GetFriendNameByIndex(int index, int flag);
+        __attribute__((__visibility__("default"))) int GetFriendStateByIndex(int index, int flag);
+	   __attribute__((__visibility__("default"))) int GetPersonaState(void);
+        __attribute__((__visibility__("default"))) uint32 GetFriendGame(int index, int flag);
+        __attribute__((__visibility__("default"))) bool IsFriendInGame(int index, int flag);
+	   __attribute__((__visibility__("default"))) void SetPersonaName(const char* newname);
+        //SteamUtils
+	   __attribute__((__visibility__("default"))) bool IsOverlayEnabled(void);
+        __attribute__((__visibility__("default"))) uint8 GetCurrentBatteryPower(void);
+        __attribute__((__visibility__("default"))) uint32 GetSecondsSinceAppActive(void);
+        __attribute__((__visibility__("default"))) uint32 GetSecondsSinceComputerActive(void);
+	   __attribute__((__visibility__("default"))) uint32 GetServerRealTime(void);
+        __attribute__((__visibility__("default"))) const char* GetIPCountry();
+	   __attribute__((__visibility__("default"))) bool IsSteamRunningInVR();
+    }
 #endif
 
 bool SteamInit()
