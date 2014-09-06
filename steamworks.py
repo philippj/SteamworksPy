@@ -48,7 +48,6 @@ class Steam:
 			Steam.warn = True
 			return
 		Steam.cdll.SteamInit()
-		Steam.cdll.SetPersonaName.restype = None
 		Steam.cdll.IsFriendInGame.restype = bool
 		Steam.cdll.GetPersonaName.restype = c_char_p
 		Steam.cdll.GetFriendNameByIndex.restype = c_char_p
@@ -56,6 +55,10 @@ class Steam:
 		Steam.cdll.IsOverlayEnabled.restype = bool
 		Steam.cdll.GetIPCountry.restype = c_char_p
 		Steam.cdll.IsSteamRunningInVR.restype = bool
+
+		Steam.cdll.MusicIsEnabled.restype = bool
+		Steam.cdll.MusicIsPlaying.restype = bool
+		Steam.cdll.MusicGetVolume.restype = float
 
 	@staticmethod 
 	def Call(method):
@@ -210,3 +213,69 @@ class SteamUtils:
 			return False
 		else:
 			return Steam.cdll.IsSteamRunningInVR()
+
+class SteamMusic:
+	@staticmethod 
+	def Play():
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.MusicPlay()
+	@staticmethod 
+	def Pause():
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.MusicPause()
+	@staticmethod 
+	def PlayNext():
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.MusicPlayNext()
+	@staticmethod 
+	def PlayPrevious():
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.MusicPlayPrev()
+	@staticmethod 
+	def GetVolume():
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.MusicGetVolume()
+	@staticmethod 
+	def SetVolume(vol):
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.MusicSetVolume()
+	@staticmethod 
+	def IsEnabled():
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.MusicIsEnabled()
+	@staticmethod 
+	def IsPlaying():
+		if not Steam.cdll and (not Steam.warn):
+			print("steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.MusicIsPlaying()

@@ -4,6 +4,7 @@
 #include <steam/isteamfriends.h>
 #include <steam/isteamugc.h>
 #include <steam/isteamutils.h>
+#include <steam/isteammusic.h>
 
 #if defined _WIN32
 	extern "C"
@@ -27,7 +28,15 @@
 		__declspec(dllexport) uint32 GetServerRealTime(void);
 		__declspec(dllexport) const char* GetIPCountry();
 		__declspec(dllexport) bool IsSteamRunningInVR();
-		
+		//Steam Music
+		__declspec(dllexport) bool MusicIsEnabled(void);
+		__declspec(dllexport) bool MusicIsPlaying(void);
+		__declspec(dllexport) void MusicPlay(void);
+		__declspec(dllexport) void MusicPause(void);
+		__declspec(dllexport) void MusicPlayNext(void);
+		__declspec(dllexport) void MusicPlayPrev(void);
+		__declspec(dllexport) void MusicSetVolume(float vol);
+		__declspec(dllexport) float MusicGetVolume(void);
 	}
 #else
     extern "C"
@@ -51,6 +60,15 @@
 	   __attribute__((__visibility__("default"))) uint32 GetServerRealTime(void);
         __attribute__((__visibility__("default"))) const char* GetIPCountry();
 	   __attribute__((__visibility__("default"))) bool IsSteamRunningInVR();
+	   //Steam Music
+		__attribute__((__visibility__("default"))) bool MusicIsEnabled(void);
+		__attribute__((__visibility__("default"))) bool MusicIsPlaying(void);
+		__attribute__((__visibility__("default"))) void MusicPlay(void);
+		__attribute__((__visibility__("default"))) void MusicPause(void);
+		__attribute__((__visibility__("default"))) void MusicPlayNext(void);
+		__attribute__((__visibility__("default"))) void MusicPlayPrev(void);
+		__attribute__((__visibility__("default"))) void MusicSetVolume(float vol);
+		__attribute__((__visibility__("default"))) float MusicGetVolume(void);
     }
 #endif
 
@@ -135,4 +153,46 @@ uint32 GetServerRealTime()
 bool IsSteamRunningInVR()
 {
 	return SteamUtils()->IsSteamRunningInVR();
+}
+
+//Steam Music
+
+bool MusicIsEnabled()
+{
+	return SteamMusic()->BIsEnabled();
+}
+
+bool MusicIsPlaying()
+{
+	return SteamMusic()->BIsPlaying();
+}
+
+void MusicPlay()
+{
+	return SteamMusic()->Play();
+}
+
+void MusicPause()
+{
+	return SteamMusic()->Pause();
+}
+
+float MusicGetVolume()
+{
+	return SteamMusic()->GetVolume();
+}
+
+void MusicSetVolume(float vol)
+{
+	return SteamMusic()->SetVolume(vol);
+}
+
+void MusicPlayPrev()
+{
+	return SteamMusic()->PlayPrevious();
+}
+
+void MusicPlayNext()
+{
+	return SteamMusic()->PlayNext();
 }
