@@ -116,3 +116,23 @@ const char* GetIPCountry()
 {
 	return SteamUtils()->GetIPCountry();
 }
+
+uint32 GetSecondsSinceAppActive()
+{
+	return SteamUtils()->GetSecondsSinceAppActive();
+}
+
+uint32 GetSecondsSinceComputerActive()
+{
+	return SteamUtils()->GetSecondsSinceComputerActive();
+}
+
+uint32 GetServerRealTime()
+{
+	return SteamUtils()->GetServerRealTime();
+}
+
+bool IsSteamRunningInVR()
+{
+	return SteamUtils()->IsSteamRunningInVR();
+}
