@@ -306,3 +306,16 @@ class SteamMusic:
             return Steam.cdll.MusicIsPlaying()
 
 
+class SteamUserStats: #!!!TODO!!!
+	def GetStat(name):
+		pass
+	def SetStat(name, value):
+		pass
+	def GetAchievement(name):
+		pass
+	def SetAchievement(name, value):
+		pass
+	def RequestCurrentStats():
+		pass
+	def StoreStats():
+		pass

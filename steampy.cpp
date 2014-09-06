@@ -6,7 +6,7 @@
 #include <steam/isteamutils.h>
 #include <steam/isteammusic.h>
 
-#if defined _WIN32
+#if defined(_WIN32)
 	extern "C"
 	{
 		//Steam
@@ -38,7 +38,7 @@
 		__declspec(dllexport) void MusicSetVolume(float vol);
 		__declspec(dllexport) float MusicGetVolume(void);
 	}
-#else
+#elif defined(GNUC) || defined(COMPILER_GCC)
     extern "C"
 	{
 	   //Steam
@@ -70,6 +70,8 @@
 		__attribute__((__visibility__("default"))) void MusicSetVolume(float vol);
 		__attribute__((__visibility__("default"))) float MusicGetVolume(void);
     }
+#else
+	#error "Unsupported platform"
 #endif
 
 bool SteamInit()
