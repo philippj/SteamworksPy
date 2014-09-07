@@ -63,7 +63,16 @@ class Steam:
 
         Steam.cdll.MusicIsEnabled.restype = bool
         Steam.cdll.MusicIsPlaying.restype = bool
-        Steam.cdll.MusicGetVolume.restype = float
+        Steam.cdll.MusicGetVolume.restype = c_float
+
+        Steam.cdll.GetStatInt.restype = int
+        Steam.cdll.GetStatFloat.restype = float
+        Steam.cdll.SetStatInt.restype = bool
+        Steam.cdll.SetStatFloat.restype = bool
+        Steam.cdll.StoreStats.restype = bool
+        Steam.cdll.RequestCurrentStats = bool
+        Steam.cdll.SetAchievement = bool
+        Steam.cdll.GetAchievement = bool
 
     @staticmethod
     def Call(method):
@@ -112,8 +121,8 @@ class SteamFriends:
     @staticmethod
     def GetFriendList(flag=FriendFlags['All']):
         l = list()
-        for i in range(0x00, Steam.GetFriendCount(flag) - 0x01):
-            l.append(Steam.GetFriendNameByIndex(i, flag))
+        for i in range(0x00, SteamFriends.GetFriendCount(flag) - 0x01):
+            l.append(SteamFriends.GetFriendNameByIndex(i, flag))
         return l
 
     @staticmethod
@@ -306,16 +315,58 @@ class SteamMusic:
             return Steam.cdll.MusicIsPlaying()
 
 
-class SteamUserStats: #!!!TODO!!!
+class SteamUserStats:
 	def GetStat(name):
-		pass
+		if not Steam.cdll and not Steam.warn:
+            print 'steam is not loaded'
+            Steam.warn = True
+            return False
+        else:
+        	return Steam.cdll.GetStat(name)
+
 	def SetStat(name, value):
-		pass
+		if not Steam.cdll and not Steam.warn:
+            print 'steam is not loaded'
+            Steam.warn = True
+            return False
+        else:
+			if isinstance(value, float):
+				return Steam.cdll.SetStatFloat(name, value)
+			elif isinstance(value, int):
+				return Steam.cdll.SetStatInt(name, value)
+			else:
+				raise Exception("SteamUserStats: SetStat value can be only int or float.")
+	
 	def GetAchievement(name):
-		pass
-	def SetAchievement(name, value):
-		pass
+		if not Steam.cdll and not Steam.warn:
+            print 'steam is not loaded'
+            Steam.warn = True
+            return False
+        else:
+        	return Steam.cdll.GetAchievement(name)
+
+
+	def SetAchievement(name):
+		if not Steam.cdll and not Steam.warn:
+            print 'steam is not loaded'
+            Steam.warn = True
+            return False
+        else:
+        	return Steam.cdll.SetAchievement(name)
+
 	def RequestCurrentStats():
-		pass
+		if not Steam.cdll and not Steam.warn:
+            print 'steam is not loaded'
+            Steam.warn = True
+            return False
+        else:
+        	return Steam.cdll.RequestCurrentStats()
+
 	def StoreStats():
-		pass
+		if not Steam.cdll and not Steam.warn:
+            print 'steam is not loaded'
+            Steam.warn = True
+            return False
+        else:
+        	return Steam.cdll.StoreStats()
+

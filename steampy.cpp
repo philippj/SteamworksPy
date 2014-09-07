@@ -5,6 +5,7 @@
 #include <steam/isteamugc.h>
 #include <steam/isteamutils.h>
 #include <steam/isteammusic.h>
+#include <steam/isteamuserstats.h>
 
 #if defined(_WIN32)
 	extern "C"
@@ -28,7 +29,7 @@
 		__declspec(dllexport) uint32 GetServerRealTime(void);
 		__declspec(dllexport) const char* GetIPCountry();
 		__declspec(dllexport) bool IsSteamRunningInVR();
-		//Steam Music
+		//SteamMusic
 		__declspec(dllexport) bool MusicIsEnabled(void);
 		__declspec(dllexport) bool MusicIsPlaying(void);
 		__declspec(dllexport) void MusicPlay(void);
@@ -37,6 +38,7 @@
 		__declspec(dllexport) void MusicPlayPrev(void);
 		__declspec(dllexport) void MusicSetVolume(float vol);
 		__declspec(dllexport) float MusicGetVolume(void);
+		//SteamUserStats
 	}
 #elif defined(GNUC) || defined(COMPILER_GCC)
     extern "C"
@@ -197,4 +199,50 @@ void MusicPlayPrev()
 void MusicPlayNext()
 {
 	return SteamMusic()->PlayNext();
+}
+
+int32* GetStatInt(const char* name)
+{
+	int32* statval = 0;
+	SteamUserStats()->GetStat(name, statval);
+	return statval;
+}
+
+float* GetStatFloat(const char* name)
+{
+	float* statval = 0;
+	SteamUserStats()->GetStat(name, statval);
+	return statval;
+}
+
+bool SetStatInt(const char* name, int32 value)
+{
+	return SteamUserStats()->SetStat(name, value);
+}
+
+bool SetStatFloat(const char* name, float value)
+{
+	return SteamUserStats()->SetStat(name, value);
+}
+
+bool StoreStats()
+{
+	return SteamUserStats()->StoreStats();
+}
+
+bool RequestCurrentStats()
+{
+	return SteamUserStats()->RequestCurrentStats();
+}
+
+bool* GetAchievement(const char* name)
+{
+	bool* achieved = false;
+	SteamUserStats()->GetAchievement(name, achieved);
+	return achieved;
+}
+
+bool SetAchievement(const char* name)
+{
+	return SteamUserStats()->SetAchievement(name);
 }
