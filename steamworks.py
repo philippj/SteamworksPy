@@ -316,57 +316,66 @@ class SteamMusic:
 
 
 class SteamUserStats:
-	def GetStat(name):
-		if not Steam.cdll and not Steam.warn:
+    @staticmethod
+    def GetStatInt(name):
+        if not Steam.cdll and not Steam.warn:
             print 'steam is not loaded'
             Steam.warn = True
             return False
         else:
-        	return Steam.cdll.GetStat(name)
+            return Steam.cdll.GetStatInt(name)
+    @staticmethod
+    def GetStatFloat(name):
+        if not Steam.cdll and not Steam.warn:
+            print 'steam is not loaded'
+            Steam.warn = True
+            return False
+        else:
+            return Steam.cdll.GetStatFloat(name)
+    @staticmethod
+    def SetStat(name, value):
+        if not Steam.cdll and not Steam.warn:
+            print 'steam is not loaded'
+            Steam.warn = True
+            return False
+        else:
+            if isinstance(value, float):
+                return Steam.cdll.SetStatFloat(name, value)
+            elif isinstance(value, int):
+                return Steam.cdll.SetStatInt(name, value)
+            else:
+                raise Exception("SteamUserStats: SetStat value can be only int or float.")
+    @staticmethod
+    def GetAchievement(name):
+        if not Steam.cdll and not Steam.warn:
+            print 'steam is not loaded'
+            Steam.warn = True
+            return False
+        else:
+            return Steam.cdll.GetAchievement(name)
 
-	def SetStat(name, value):
-		if not Steam.cdll and not Steam.warn:
+    @staticmethod
+    def SetAchievement(name):
+        if not Steam.cdll and not Steam.warn:
             print 'steam is not loaded'
             Steam.warn = True
             return False
         else:
-			if isinstance(value, float):
-				return Steam.cdll.SetStatFloat(name, value)
-			elif isinstance(value, int):
-				return Steam.cdll.SetStatInt(name, value)
-			else:
-				raise Exception("SteamUserStats: SetStat value can be only int or float.")
-	
-	def GetAchievement(name):
-		if not Steam.cdll and not Steam.warn:
+            return Steam.cdll.SetAchievement(name)
+    @staticmethod
+    def RequestCurrentStats():
+        if not Steam.cdll and not Steam.warn:
             print 'steam is not loaded'
             Steam.warn = True
             return False
         else:
-        	return Steam.cdll.GetAchievement(name)
-
-
-	def SetAchievement(name):
-		if not Steam.cdll and not Steam.warn:
+            return Steam.cdll.RequestCurrentStats()
+    @staticmethod
+    def StoreStats():
+        if not Steam.cdll and not Steam.warn:
             print 'steam is not loaded'
             Steam.warn = True
             return False
         else:
-        	return Steam.cdll.SetAchievement(name)
-
-	def RequestCurrentStats():
-		if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
-            Steam.warn = True
-            return False
-        else:
-        	return Steam.cdll.RequestCurrentStats()
-
-	def StoreStats():
-		if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
-            Steam.warn = True
-            return False
-        else:
-        	return Steam.cdll.StoreStats()
+            return Steam.cdll.StoreStats()
 

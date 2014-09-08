@@ -39,8 +39,16 @@
 		__declspec(dllexport) void MusicSetVolume(float vol);
 		__declspec(dllexport) float MusicGetVolume(void);
 		//SteamUserStats
+        __declspec(dllexport) int32* GetStatInt(const char* name);
+        __declspec(dllexport) float* GetStatFloat(const char* name);
+        __declspec(dllexport) bool SetStatInt(const char* name, int32 value);
+        __declspec(dllexport) bool SetStatFloat(const char* name, float value);
+        __declspec(dllexport) bool StoreStats();
+        __declspec(dllexport) bool RequestCurrentStats();
+        __declspec(dllexport) bool* GetAchievement(const char* name);
+        __declspec(dllexport) bool SetAchievement(const char* name);
 	}
-#elif defined(GNUC) || defined(COMPILER_GCC)
+#elif __linux__
     extern "C"
 	{
 	   //Steam
@@ -71,6 +79,15 @@
 		__attribute__((__visibility__("default"))) void MusicPlayPrev(void);
 		__attribute__((__visibility__("default"))) void MusicSetVolume(float vol);
 		__attribute__((__visibility__("default"))) float MusicGetVolume(void);
+        //SteamUserStats
+        __attribute__((__visibility__("default"))) int32 GetStatInt(const char* name);
+        __attribute__((__visibility__("default"))) float GetStatFloat(const char* name);
+        __attribute__((__visibility__("default"))) bool SetStatInt(const char* name, int32 value);
+        __attribute__((__visibility__("default"))) bool SetStatFloat(const char* name, float value);
+        __attribute__((__visibility__("default"))) bool StoreStats();
+        __attribute__((__visibility__("default"))) bool RequestCurrentStats();
+        __attribute__((__visibility__("default"))) bool GetAchievement(const char* name);
+        __attribute__((__visibility__("default"))) bool SetAchievement(const char* name);
     }
 #else
 	#error "Unsupported platform"
@@ -201,17 +218,17 @@ void MusicPlayNext()
 	return SteamMusic()->PlayNext();
 }
 
-int32* GetStatInt(const char* name)
+int32 GetStatInt(const char* name)
 {
-	int32* statval = 0;
-	SteamUserStats()->GetStat(name, statval);
+	int32 statval = 0;
+	SteamUserStats()->GetStat(name, &statval);
 	return statval;
 }
 
-float* GetStatFloat(const char* name)
+float GetStatFloat(const char* name)
 {
-	float* statval = 0;
-	SteamUserStats()->GetStat(name, statval);
+	float statval = 0;
+	SteamUserStats()->GetStat(name, &statval);
 	return statval;
 }
 
@@ -235,10 +252,10 @@ bool RequestCurrentStats()
 	return SteamUserStats()->RequestCurrentStats();
 }
 
-bool* GetAchievement(const char* name)
+bool GetAchievement(const char* name)
 {
-	bool* achieved = false;
-	SteamUserStats()->GetAchievement(name, achieved);
+	bool achieved = false;
+	SteamUserStats()->GetAchievement(name, &achieved);
 	return achieved;
 }
 
