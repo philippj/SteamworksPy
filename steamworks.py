@@ -42,14 +42,14 @@ class Steam:
     def Init():
         if platform.system() == 'Windows':
             Steam.cdll = CDLL('SteamPy.dll')
-            print 'steam loaded for windows'
+            print('Steam loaded for Windows')
             Steam.loaded = True
         elif platform.system() == 'Linux':
             Steam.cdll = CDLL('libsteampy.so')
-            print 'steam loaded for linux'
+            print('Steam loaded for Linux')
             Steam.loaded = True
         else:
-            print 'steam load fail (unsupported platform)'
+            print('Steam load fail (unsupported platform)')
             Steam.warn = True
             return
         Steam.cdll.SteamInit()
@@ -77,7 +77,7 @@ class Steam:
     @staticmethod
     def Call(method):
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -89,7 +89,7 @@ class SteamFriends:
     @staticmethod
     def GetPlayerName():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -102,7 +102,7 @@ class SteamFriends:
     @staticmethod
     def GetFriendCount(flag=FriendFlags['All']):
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -111,7 +111,7 @@ class SteamFriends:
     @staticmethod
     def GetFriendNameByIndex(index, flag=FriendFlags['All']):
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -129,7 +129,7 @@ class SteamFriends:
     def GetFriendPersonaStateByIndex(index, string=True,
             flag=FriendFlags['All']):
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -139,7 +139,7 @@ class SteamFriends:
     @staticmethod
     def GetPersonaState(string=True):
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -149,7 +149,7 @@ class SteamFriends:
     @staticmethod
     def GetFriendGameByIndex(index, flag=FriendFlags['All']):
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -158,7 +158,7 @@ class SteamFriends:
     @staticmethod
     def IsFriendInGameByIndex(index, flag=FriendFlags['All']):
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -167,7 +167,7 @@ class SteamFriends:
     @staticmethod
     def SetPersonaName(newname):
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -179,7 +179,7 @@ class SteamUtils:
     @staticmethod
     def IsOverlayEnabled():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -188,7 +188,7 @@ class SteamUtils:
     @staticmethod
     def GetCurrentBatteryPower():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -197,7 +197,7 @@ class SteamUtils:
     @staticmethod
     def GetSecondsSinceAppActive():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -206,7 +206,7 @@ class SteamUtils:
     @staticmethod
     def GetSecondsSinceComputerActive():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -215,7 +215,7 @@ class SteamUtils:
     @staticmethod
     def GetServerRealTime():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -224,7 +224,7 @@ class SteamUtils:
     @staticmethod
     def GetIPCountry():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -233,7 +233,7 @@ class SteamUtils:
     @staticmethod
     def IsSteamRunningInVR():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -245,7 +245,7 @@ class SteamMusic:
     @staticmethod
     def Play():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -254,7 +254,7 @@ class SteamMusic:
     @staticmethod
     def Pause():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -263,7 +263,7 @@ class SteamMusic:
     @staticmethod
     def PlayNext():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -272,7 +272,7 @@ class SteamMusic:
     @staticmethod
     def PlayPrevious():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -281,7 +281,7 @@ class SteamMusic:
     @staticmethod
     def GetVolume():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -290,7 +290,7 @@ class SteamMusic:
     @staticmethod
     def SetVolume(vol):
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -299,7 +299,7 @@ class SteamMusic:
     @staticmethod
     def IsEnabled():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -308,7 +308,7 @@ class SteamMusic:
     @staticmethod
     def IsPlaying():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -319,7 +319,7 @@ class SteamUserStats:
     @staticmethod
     def GetStatInt(name):
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -327,7 +327,7 @@ class SteamUserStats:
     @staticmethod
     def GetStatFloat(name):
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -335,7 +335,7 @@ class SteamUserStats:
     @staticmethod
     def SetStat(name, value):
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -348,7 +348,7 @@ class SteamUserStats:
     @staticmethod
     def GetAchievement(name):
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -357,7 +357,7 @@ class SteamUserStats:
     @staticmethod
     def SetAchievement(name):
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -365,7 +365,7 @@ class SteamUserStats:
     @staticmethod
     def RequestCurrentStats():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
@@ -373,7 +373,7 @@ class SteamUserStats:
     @staticmethod
     def StoreStats():
         if not Steam.cdll and not Steam.warn:
-            print 'steam is not loaded'
+            print('Steam is not loaded')
             Steam.warn = True
             return False
         else:
