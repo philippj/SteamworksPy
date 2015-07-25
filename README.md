@@ -18,9 +18,11 @@ While I am still tinkering away with this, here are some things to note:
 4. Place the libsteampy.so, steamworks.py in your project's folder
   - These files must be together unless you modify the steamworks.py to find the libsteampy.so
 5. Like the examples, add this to your project main file:
-  from steamworks import *
-  #Initialize Steam
-  Steam.Init()
+```
+from steamworks import *
+#Initialize Steam
+Steam.Init()
+```
 6. From here you should be able to call various functions of the steamworks.py
 
 # More To Come
