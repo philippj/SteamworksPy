@@ -1,11 +1,17 @@
 //SteamPy
-
-#include <steam/steam_api.h>
-#include <steam/isteamfriends.h>
-#include <steam/isteamugc.h>
-#include <steam/isteamutils.h>
-#include <steam/isteammusic.h>
-#include <steam/isteamuserstats.h>
+// Modified for compiling from within Steamworks SDK
+//#include <steam/steam_api.h>
+//#include <steam/isteamfriends.h>
+//#include <steam/isteamugc.h>
+//#include <steam/isteamutils.h>
+//#include <steam/isteammusic.h>
+//#include <steam/isteamuserstats.h>
+#include "steam/steam_api.h"
+#include "steam/isteamfriends.h"
+#include "steam/isteamugc.h"
+#include "steam/isteamutils.h"
+#include "steam/isteammusic.h"
+#include "steam/isteamuserstats.h"
 
 #if defined(_WIN32)
 	extern "C"
