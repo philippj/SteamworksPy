@@ -23,7 +23,7 @@ from steamworks import *
 #Initialize Steam
 Steam.Init()
 ```
-6. From here you should be able to call various functions of the steamworks.py
+From here you should be able to call various functions of the steamworks.py; use the steamworks.py to see what you can call from your Python project.
 
 # More To Come
 I am still digging through the code and trying to get more functions like setting achievements and stats, but these definitely require a Steamworks account and AppID.  Without your game on Steam, I don't think you can really use those functions but I haven't actually tested it yet.  I will update more later, especially the Windows how-to as I have not spent time on it.
