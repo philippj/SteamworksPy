@@ -8,6 +8,7 @@ While I am still tinkering away with this, here are some things to note:
 
 - You will need the Steamworks SDK
 - You will most likely need a Steamworks account, with a valid AppID, to use more advanced functions (set achievements, set stats, etc.)
+- You will need to be logged into Steam for anything to function, obviously.  As it assumes the game is run from Steam itself and is online.
 
 # How To (Linux)
 1. Download and unpacked the Steamworks SDK
