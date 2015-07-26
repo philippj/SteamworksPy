@@ -26,5 +26,12 @@ Steam.Init()
 ```
 From here you should be able to call various functions of the steamworks.py; use the steamworks.py to see what you can call from your Python project.
 
+# Advanced Features
+- Achievements
+  Setting achievements works fine. Calling SteamUserStats.SetAchievement(ACHIEVEMENT-NAME) will set the Steam achievement with ease; 'ACHIEVEMENT-NAME' needs to be set to whatever you named the achievement in Steamworks.
+- Statistics
+  Much like achievements, calling SteamUserStats.SetStat(STAT-NAME, STAT-INCREMENT) will set the Steam statistic appropriately. Much like above, STAT-NAME needs to be whatever was set for your statistic in Steamworks.
+- Getting User Statistics
+  Calling SteamUserStats.RequestCurrentStats seems to respond with False. Not sure if I am implementing it wrong currently or perhaps it is coming back in an unexpected format.
 # More To Come
 I am still digging through the code and trying to get more functions like setting achievements and stats, but these definitely require a Steamworks account and AppID.  Without your game on Steam, I don't think you can really use those functions but I haven't actually tested it yet.  I will update more later, especially the Windows how-to as I have not spent time on it.
