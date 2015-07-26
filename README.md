@@ -32,7 +32,7 @@ From here you should be able to call various functions of the steamworks.py; use
 2. Statistics
   - Much like achievements, calling SteamUserStats.SetStat(STAT-NAME, STAT-INCREMENT) will set the Steam statistic appropriately. Much like above, STAT-NAME needs to be whatever was set for your statistic in Steamworks.
 3. Getting User Statistics
-  - Calling SteamUserStats.RequestCurrentStats seems to respond with False. Not sure if I am implementing it wrong currently or perhaps it is coming back in an unexpected format.  Steam should respond with True when the data is ready.  However, pulling data seems to work okay regardless.
+  - Calling SteamUserStats.RequestCurrentStats seems to respond with False. Steam should respond with True when the data is ready.  However, pulling data seems to work okay regardless.
   - Calling SteamUserStats.GetAhievement(ACHIEVEMENT-NAME) will respond with True if the user has this achievement unlocked
   - Calling SteamUserStats.GetStatInt(STAT-NAME) or SteamUserStats.GetStatFloat(STAT-NAME) will respond with the corresponding value stored on Steam's servers
 
