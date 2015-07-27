@@ -28,13 +28,15 @@ From here you should be able to call various functions of the steamworks.py; use
 
 # Advanced Features
 1. Achievements
-  - Setting achievements works fine. Calling SteamUserStats.SetAchievement(ACHIEVEMENT-NAME) will set the Steam achievement with ease; 'ACHIEVEMENT-NAME' needs to be set to whatever you named the achievement in Steamworks.
+  - Setting achievements does not seem to work. Original testing wasn't thorough enough as the achievements were setting based on statistics saved in Steam not calls sent to it from the client.  This may only be failing based on the way it is set up, but currently it does not seem to work for me.
 2. Statistics
-  - Much like achievements, calling SteamUserStats.SetStat(STAT-NAME, STAT-INCREMENT) will set the Steam statistic appropriately. Much like above, STAT-NAME needs to be whatever was set for your statistic in Steamworks.
+  - Calling SteamUserStats.SetStat(STAT-NAME, STAT-VALUE) will set the Steam statistic appropriately. STAT-NAME needs to be whatever was set for your statistic in Steamworks, obviously. This will push the value to Steam, which should be handled mainly by your game and only stored on Steam when needed.
 3. Getting User Statistics
   - Calling SteamUserStats.RequestCurrentStats seems to respond with False. Steam should respond with True when the data is ready.  However, pulling data seems to work okay regardless.
-  - Calling SteamUserStats.GetAhievement(ACHIEVEMENT-NAME) will respond with True if the user has this achievement unlocked
-  - Calling SteamUserStats.GetStatInt(STAT-NAME) or SteamUserStats.GetStatFloat(STAT-NAME) will respond with the corresponding value stored on Steam's servers
+  - Calling SteamUserStats.GetAhievement(ACHIEVEMENT-NAME) will respond with True if the user has this achievement unlocked or not.
+  - Calling SteamUserStats.GetStatInt(STAT-NAME) or SteamUserStats.GetStatFloat(STAT-NAME) will respond with the corresponding value stored on Steam's servers.
 
 # More To Come
 I am still digging through the code and trying to get more functions like setting achievements and stats, but these definitely require a Steamworks account and AppID.  Without your game on Steam, I don't think you can really use those functions but I haven't actually tested it yet.  I will update more later, especially the Windows how-to as I have not spent time on it.
+
+One thing I wish this library did do was procure the user's Steam ID.  It will pull the name, but that can be changed by the user at will and isn't a good way to keep track of users outside of Steam itself.  This can be achieved by adding more functions into the steampy.cpp for compiling.  There are actually a LOT more functions not implemented in here yet.
