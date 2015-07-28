@@ -10,12 +10,17 @@ While I am still tinkering away with this, here are some things to note:
 - You will most likely need a Steamworks account, with a valid AppID, to use more advanced functions (set achievements, set stats, etc.)
 - You will need to be logged into Steam for anything to function, obviously.  As it assumes the game is run from Steam itself and is online.
 
+# To Do
+- Get steampy.dll compiled on Windows
+- Add in additional features like getting Steam ID of user, clearing statistics, matchmaking, etc.
+
 # How To (Linux)
 1. Download and unpacked the Steamworks SDK
   - In Linux, I have placed it in the home folder
 2. Download this repo and unpack it inside the Steamworks SDK
   - Place it in /sdk/public/
 3. On Linux, run make and it should create the libsteampy.so
+  - This file has now been included so it does not need to be compiled (uses Steamworks 1.33b)
 4. Place the libsteampy.so, steamworks.py in your project's folder
   - These files must be together unless you modify the steamworks.py to find the libsteampy.so
 5. Like the examples, add this to your project main file:
