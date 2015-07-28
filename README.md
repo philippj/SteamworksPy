@@ -13,6 +13,7 @@ While I am still tinkering away with this, here are some things to note:
 # To Do
 - Get steampy.dll compiled on Windows
 - Add in additional features like getting Steam ID of user, clearing statistics, matchmaking, etc.
+- Fix achievement functions, provided they are really broken
 
 # How To (Linux)
 1. Download and unpacked the Steamworks SDK
