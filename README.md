@@ -29,7 +29,7 @@ from steamworks import *
 #Initialize Steam
 Steam.Init()
 ```
-From here you should be able to call various functions of the steamworks.py; and for now, open the steamworks.py to see what you can call from your Python project.  A list of available features will be added in the near future.  In addition, you should be able to read the Steamworks API documentation to see what all is available and cross-reference with the steamworks.py!
+From here you should be able to call various functions of the steamworks.py.  A list of available functions is listed below; take a closer look at the steamworks.py for a better understanding.  In addition, you should be able to read the Steamworks API documentation to see what all is available and cross-reference with the steamworks.py!
 
 # Features / Functions
 1. Init()
