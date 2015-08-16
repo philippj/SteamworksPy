@@ -4,7 +4,7 @@
 from ctypes import *
 import sys, os
 
-# User's status
+# User status
 #------------------------------------------------
 PersonaState = {
 	0x00: 'Offline',
@@ -14,6 +14,21 @@ PersonaState = {
 	0x04: 'Snooze',
 	5: 'Looking to Trade',
 	6: 'Looking to Play',
+	}
+
+FriendFlags = {  # regular friend
+	'None': 0x00,
+	'Blocked': 0x01,
+	'FriendshipRequested': 0x02,
+	'Immediate': 0x04,
+	'ClanMember': 0x08,
+	'OnGameServer': 0x10,
+	'RequestingFriendship': 0x80,
+	'RequestingInfo': 0x100,
+	'Ignored': 0x200,
+	'IgnoredFriend': 0x400,
+	'Suggested': 0x800,
+	'All': 0xFFFF,
 	}
 
 # Main Steam Class, obviously
