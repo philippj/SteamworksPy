@@ -65,39 +65,44 @@ From here you should be able to call various functions of the steamworks.py.  A 
 15. GetPlayerID()
   - Get the user's Steam ID number
   - Currently just returns 0
-16. GetAchievement()
+16. ClearAchievement()
+  - Clear the specified achievement from the user
+  - Must pass achievement's name in Steam (eg. STEAM_ACHIEVE_1)
+17. GetAchievement()
   - Find whether or not the specified achievement is earned
   - Must pass achievement's name in Steam (eg. STEAM_ACHIEVE_1)
-17. GetStatFloat()
+18. GetStatFloat()
   - Get value of specified float statistic
   - Must pass statistic's name in Steam (eg. TOTAL_GAMES)
-18. GetStatInt()
+19. GetStatInt()
   - Get value of specified integer statistic
   - Must pass statistic's name in Steam (eg. TOTAL_GAMES)
-19. RequestCurrentStats()
+20. ResetAllStats()
+  - Resets all of the user's statistics, perhaps also achievements
+21. RequestCurrentStats()
   - Pulls all of the user's statistics and achievements
   - Should be called before calling any Get stats/achievement functions
-20. SetAchievement()
+22. SetAchievement()
   - Set a particular achievement for the user
   - Must pass achievement's name in Steam (eg. STEAM_ACHIEVE_1)
-21. SetStat()
+23. SetStat()
   - Set a particular statistic for the user
   - Must pass statistics's name and value in Steam (eg. TOTAL_GAMES, 4)
-22. StoreStats()
+24. StoreStats()
   - Sends all the statistics and achievements to Steam servers
-23. GetCurrentBatteryPower()
+25. GetCurrentBatteryPower()
   - Get the user's battery power level
-24. GetIPCountry()
+26. GetIPCountry()
   - Get the two-digit code for the user's IP address
-25. GetSecondsSinceAppActive()
+27. GetSecondsSinceAppActive()
   - Get the number of seconds since the game started up
-26. GetSecondsSinceComputerActive()
+28. GetSecondsSinceComputerActive()
   - Get the number of seconds since the user's computer was started
-27. GetServerRealTime()
+29. GetServerRealTime()
   - Get the time from the server, probably
-28. IsOverlayEnabled()
+30. IsOverlayEnabled()
   - Is the Steam overlay enabled
-29. IsSteamRunningInVR()
+31. IsSteamRunningInVR()
   - Is Steam's VR service running
 
 # More To Come

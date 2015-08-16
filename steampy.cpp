@@ -71,6 +71,9 @@ SW_PY CSteamID GetSteamID(){
 	return SteamUser()->GetSteamID();
 }
 // Steam User Stats
+SW_PY bool ClearAchievement(const char* name){
+	return SteamUserStats()->ClearAchievement(name);
+}
 SW_PY bool GetAchievement(const char* name){
 	bool achieved = false;
 	SteamUserStats()->GetAchievement(name, &achieved);
@@ -85,6 +88,9 @@ SW_PY int32 GetStatInt(const char* name){
 	int32 statval = 0;
 	SteamUserStats()->GetStat(name, &statval);
 	return statval;
+}
+SW_PY bool ResetAllStats(){
+	return SteamUserStats()->ResetAllStats();
 }
 SW_PY bool RequestCurrentStats(){
 	return SteamUserStats()->RequestCurrentStats();

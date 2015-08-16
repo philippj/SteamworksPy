@@ -77,7 +77,7 @@ class Steam:
 
 		# Set restype for App functions
 		Steam.cdll.GetDLCCount.restype = int
-		Steam.cdll.IsDlcInstalled = bool
+		Steam.cdll.IsDlcInstalled.restype = bool
 		# Set restype for Friends functions
 		Steam.cdll.GetFriendCount.restype = int
 		Steam.cdll.GetPersonaName.restype = c_char_p
@@ -89,9 +89,11 @@ class Steam:
 		# Set restype for User functions		
 		Steam.cdll.GetSteamID.restype = int
 		# Set restype for User Statistic functions
-		Steam.cdll.GetAchievement = bool
+		Steam.cdll.ClearAchievement.restype = bool
+		Steam.cdll.GetAchievement.restype = bool
 		Steam.cdll.GetStatFloat.restype = float
 		Steam.cdll.GetStatInt.restype = int
+		Steam.cdll.ResetAllStats.restype = bool
 		Steam.cdll.RequestCurrentStats.restype = bool
 		Steam.cdll.SetAchievement.restype = bool
 		Steam.cdll.SetStatFloat.restype = bool
@@ -264,6 +266,15 @@ class SteamUser:
 class SteamUserStats:
 
 	@staticmethod
+	def ClearAchievement(name):
+		if not Steam.cdll and not Steam.warn:
+			print("Steam is not loaded")
+			Steam.warm = True
+			return False
+		else:
+			return Steam.cdll.ClearAchievement(name)
+
+	@staticmethod
 	def GetAchievement(name):
 		if not Steam.cdll and not Steam.warn:
 			print("Steam is not loaded")
@@ -289,6 +300,15 @@ class SteamUserStats:
 			return False
 		else:
 			return Steam.cdll.GetStatInt(name)
+
+	@staticmethod
+	def ResetAllStats():
+		if not Steam.cdll and not Steam.warn:
+			print("Steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.ResetAllStats()
 
 	@staticmethod
 	def RequestCurrentStats():
