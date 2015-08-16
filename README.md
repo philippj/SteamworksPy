@@ -64,7 +64,7 @@ From here you should be able to call various functions of the steamworks.py.  A 
   - Must pass a float between 0.0 and 1.0
 15. GetPlayerID()
   - Get the user's Steam ID number
-  - Currently just returns 0
+  - Currently returns some part of the SteamID
 16. GetAchievement()
   - Find whether or not the specified achievement is earned
   - Must pass achievement's name in Steam (eg. STEAM_ACHIEVE_1)
