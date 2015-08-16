@@ -302,13 +302,13 @@ class SteamUserStats:
 			return Steam.cdll.GetStatInt(name)
 
 	@staticmethod
-	def ResetAllStats():
+	def ResetAllStats(achievesToo):
 		if not Steam.cdll and not Steam.warn:
 			print("Steam is not loaded")
 			Steam.warn = True
 			return False
 		else:
-			return Steam.cdll.ResetAllStats()
+			return Steam.cdll.ResetAllStats(achievesToo)
 
 	@staticmethod
 	def RequestCurrentStats():

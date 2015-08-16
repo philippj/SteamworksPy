@@ -89,8 +89,8 @@ SW_PY int32 GetStatInt(const char* name){
 	SteamUserStats()->GetStat(name, &statval);
 	return statval;
 }
-SW_PY bool ResetAllStats(){
-	return SteamUserStats()->ResetAllStats();
+SW_PY bool ResetAllStats(bool achievesToo){
+	return SteamUserStats()->ResetAllStats(achievesToo);
 }
 SW_PY bool RequestCurrentStats(){
 	return SteamUserStats()->RequestCurrentStats();
