@@ -13,15 +13,15 @@ from ctypes import *
 os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 # Loading Steam API for Linux
 if sys.platform == 'linux' or sys.platform == 'linux2':
-	S_API = CDLL(os.path.join(os.getcwd(), "libsteampy.so"))
+	S_API = CDLL(os.path.join(os.getcwd(), "SteamworksPy.so"))
 	print("Steam API loaded for Linux")
 # Loading Steam API for Mac
 elif sys.platform == 'darwin':
-	S_API = CDLL(os.path.join(os.getcwd(), "libsteampy.dylib"))
+	S_API = CDLL(os.path.join(os.getcwd(), "SteamworksPy.dylib"))
 	print("Steam API loaded for Mac")
 # Loading Steam API for Windows
 elif sys.platform == 'win32':
-	S_API = CDLL(os.path.join(os.getcwd(), "steampy.dll"))
+	S_API = CDLL(os.path.join(os.getcwd(), "SteamworksPy.dll"))
 	print("Steam API loaded for Windows")
 # Unrecognized platform, warn user and do not load Steam API
 else:
@@ -29,9 +29,9 @@ else:
 
 # Set restype for various functions
 #------------------------------------------------
-S_API.SteamAPI_IsSteamRunning.restype = c_bool
+S_API.IsSteamRunning.restype = c_bool
 # Steam Apps
-S_API.GetDLCCount.restype = int
+S_API.GetDlcCount.restype = int
 S_API.IsDlcInstalled.restype = bool
 # Steam Friends
 S_API.GetFriendCount.restype = int
@@ -64,7 +64,7 @@ S_API.IsSteamRunningInVR.restype = bool
 # Begin testing
 #------------------------------------------------
 # Check if Steam is running
-if S_API.SteamAPI_IsSteamRunning():
+if S_API.IsSteamRunning():
 	print("Steam is running.")
 else:
 	print("Steam is not running.")
@@ -73,7 +73,7 @@ S_API.SteamInit()
 
 # Test that ish
 #------------------------------------------------
-print(S_API.GetDLCCount())
+print(S_API.GetDlcCount())
 print(S_API.GetPersonaName())
 print(S_API.GetIPCountry())
 print(S_API.MusicIsEnabled())
