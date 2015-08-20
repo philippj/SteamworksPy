@@ -11,19 +11,33 @@ While I am still tinkering away with this, here are some things to note:
 - You will need to be logged into Steam for anything to function, obviously.  As it assumes the game is run from Steam itself and is online.
 
 # To Do
-- Add in additional features like getting Steam ID of user, clearing statistics, matchmaking, etc.
+- Add in more features from the Steamworks SDK
+- Create a Mac version
 
 # How To
 1. Download this repo and unpack
-2. Download and unpacked the Steamworks SDK
-3. Move the Steam header folder from /sdk/public/ into the unpacked repo for compiling
-  - Run the make file for Linux, other OS's compile in a similar manner (until new makefile is written)
-4. Move the Steam API file from /sdk/redistributable_bin to your project (in their respective folders)
-  - For Windows, find steam_api.dll or steam_api64.dll
+2. Download and unpack the Steamworks SDK
+3. Move the Steam header (steam) folder from /sdk/public/ into the unpacked repo for compiling
+4. Move the Steam API file from /sdk/redistributable_bin into the unpacked repo
   - For Linux, find libsteam_api.so
-  - For Mac, find libsteam_api.dylib
-5. Move the steamworks.py and new compiled .dll/.so from the unpacked repo into your project
-6. Add the following to your to your main file or whichever file you plan on calling Steam from:
+  - For Windows, find steam_api.dll or steam_api64.dll as well as steam_api.lib or steam_api64.lib
+5. Create the new DLL or SO file
+  - For Linux:
+    - Run the makefile from the repo
+    - Alternately, you could just run something like gcc -o SteamworksPy.so -shared -fPIC steampy.cpp -lsteam_api
+  - For Windows:
+    - Create a new DLL project in Visual Studio
+    - New > Project
+    - Templates > Visual C++ > Win32 > Win32 Project
+    - Follow the wizard and pick the DLL Application Type
+    - Add steampy.cpp to Source Files and steam_api.h from /steam/ folder to Header Files
+    - Go to Project > Properties in the toolbar
+    - Under C/C++ > Precompiled Headers, turn off Precompiled Header option
+    - Under Linker > Input, add steam_api.lib or steam_api64.lib to Additional Dependenices
+    - Clean and build
+6. Move the steamworks.py and new compiled SteamworkPy.so or SteamworksPy.dll from the unpacked repo into your project
+  - You may also want to move over the libsteam_api.so as well
+7. Add the following to your to your main file or whichever file you plan on calling Steam from:
 ```
 from steamworks import *
 #Initialize Steam
@@ -64,16 +78,11 @@ From here you should be able to call various functions of the steamworks.py.  A 
   - Must pass a float between 0.0 and 1.0
 15. GetPlayerID()
   - Get the user's Steam ID number
-<<<<<<< HEAD
   - Currently just returns 0
 16. ClearAchievement()
   - Clear the specified achievement from the user
   - Must pass achievement's name in Steam (eg. STEAM_ACHIEVE_1)
 17. GetAchievement()
-=======
-  - Currently returns some part of the SteamID
-16. GetAchievement()
->>>>>>> 09b2598a1081f3ef0189058c06b1f127a12c723d
   - Find whether or not the specified achievement is earned
   - Must pass achievement's name in Steam (eg. STEAM_ACHIEVE_1)
 18. GetStatFloat()
