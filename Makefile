@@ -1,8 +1,4 @@
-make-lin:
-	gcc -o libsteampy.so -shared -fPIC steampy.cpp -lsteam_api 
-make-win:
-	# not made yet
-make-mac:
-	# not made yet
+makeall:
+	gcc -o SteamworksPy.so -shared -fPIC steampy.cpp -lsteam_api 
 clean:
-	rm libsteampy.so
+	rm SteamworksPy.so

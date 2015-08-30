@@ -6,30 +6,20 @@ import sys, os
 
 # User status
 #------------------------------------------------
-PersonaState = {
-	0x00: 'Offline',
-	0x01: 'Online',
-	0x02: 'Busy',
-	3: 'Away',
-	0x04: 'Snooze',
-	5: 'Looking to Trade',
-	6: 'Looking to Play',
-	}
-
 FriendFlags = {  # regular friend
-	'None': 0x00,
-	'Blocked': 0x01,
-	'FriendshipRequested': 0x02,
-	'Immediate': 0x04,
-	'ClanMember': 0x08,
-	'OnGameServer': 0x10,
-	'RequestingFriendship': 0x80,
-	'RequestingInfo': 0x100,
-	'Ignored': 0x200,
-	'IgnoredFriend': 0x400,
-	'Suggested': 0x800,
-	'All': 0xFFFF,
-	}
+    'None': 0x00,
+    'Blocked': 0x01,
+    'FriendshipRequested': 0x02,
+    'Immediate': 0x04,
+    'ClanMember': 0x08,
+    'OnGameServer': 0x10,
+    'RequestingFriendship': 0x80,
+    'RequestingInfo': 0x100,
+    'Ignored': 0x200,
+    'IgnoredFriend': 0x400,
+    'Suggested': 0x800,
+    'All': 0xFFFF,
+    }
 
 # Main Steam Class, obviously
 #------------------------------------------------
@@ -43,6 +33,11 @@ class Steam:
 	@staticmethod
 	def Init():
 		os.environ['LD_LIBRARY_PATH'] = os.getcwd()
+		# Check system architecture
+		if sys.maxsize > 2**32 is False:
+			OS_BIT = '32bits'
+		else:
+			OS_BIT = '64bits'
 		# Loading SteamPy API for Linux
 		if sys.platform == 'linux' or sys.platform == 'linux2':
 			Steam.cdll = CDLL(os.path.join(os.getcwd(), "libsteampy.so"))
@@ -53,10 +48,14 @@ class Steam:
 			Steam.cdll = CDLL(os.path.join(os.getcwd(), "libsteampy.dylib" ))
 			print("SteamPy loaded for Mac")
 			Steam.loaded = True
-		# Loading SteamPy API for Windows
+		# Loading Steamworks API for Windows
 		elif sys.platform == 'win32':
-			Steam.cdll = CDLL(os.path.join(os.getcwd(), "steampy.dll"))
-			print("SteamPy loaded for Windows")
+			# Check Windows architecture
+			if OS_BIT == '32bits':
+				Steam.cdll = CDLL(os.path.join(os.getcwd(), "SteamworksPy.dll"))
+			else:
+				Steam.cdll = CDLL(os.path.join(os.getcwd(), "SteamworksPy64.dll"))
+			print("Steamworks loaded for Windows")
 			Steam.loaded = True
 		# Unrecognized platform, warn user and do not load Steam API
 		else:
@@ -65,9 +64,9 @@ class Steam:
 			return
 
 		# Set restype for initialization
-		Steam.cdll.SteamAPI_IsSteamRunning.restype = c_bool
+		Steam.cdll.IsSteamRunning.restype = c_bool
 		# Check that Steam is running
-		if Steam.cdll.SteamAPI_IsSteamRunning():
+		if Steam.cdll.IsSteamRunning():
 			print("Steam is running!")
 		else:
 			print("Steam is not running!")
@@ -75,36 +74,21 @@ class Steam:
 		# Boot up the Steam API
 		Steam.cdll.SteamInit()
 
-		# Set restype for App functions
-		Steam.cdll.GetDLCCount.restype = int
-		Steam.cdll.IsDlcInstalled = bool
 		# Set restype for Friends functions
 		Steam.cdll.GetFriendCount.restype = int
 		Steam.cdll.GetPersonaName.restype = c_char_p
-		Steam.cdll.GetPersonaState.restype = int
-		# Set restype for Music functions
-		Steam.cdll.MusicIsEnabled.restype = bool
-		Steam.cdll.MusicIsPlaying.restype = bool
-		Steam.cdll.MusicGetVolume.restype = c_float
 		# Set restype for User functions		
 		Steam.cdll.GetSteamID.restype = int
 		# Set restype for User Statistic functions
-		Steam.cdll.GetAchievement = bool
-		Steam.cdll.GetStatFloat.restype = float
+		Steam.cdll.GetAchievement.restype = bool
 		Steam.cdll.GetStatInt.restype = int
+		Steam.cdll.GetStatFloat.restype = c_float
+		Steam.cdll.ResetAllStats.restype = bool
 		Steam.cdll.RequestCurrentStats.restype = bool
 		Steam.cdll.SetAchievement.restype = bool
-		Steam.cdll.SetStatFloat.restype = bool
 		Steam.cdll.SetStatInt.restype = bool
+		Steam.cdll.SetStatFloat.restype = bool
 		Steam.cdll.StoreStats.restype = bool
-		# Set restype for Utility functions
-		Steam.cdll.GetCurrentBatteryPower.restype = int
-		Steam.cdll.GetIPCountry.restype = c_char_p
-		Steam.cdll.GetSecondsSinceAppActive.restype = int
-		Steam.cdll.GetSecondsSinceComputerActive.restype = int
-		Steam.cdll.GetServerRealTime.restype = int
-		Steam.cdll.IsOverlayEnabled.restype = bool
-		Steam.cdll.IsSteamRunningInVR.restype = bool
 
 	@staticmethod
 	def Call(method):
@@ -114,29 +98,6 @@ class Steam:
 			return False
 		else:
 			return method()
-
-# Class for Steam Apps
-#------------------------------------------------
-class SteamApps:
-
-	@staticmethod
-	def GetDLCCount():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.GetDLCCount()
-
-	# The App ID of the DLC itself
-	@staticmethod
-	def IsDlcInstalled(appID):
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.IsDlcInstalled(appID)
 
 # Class for Steam Friends
 #------------------------------------------------
@@ -159,92 +120,6 @@ class SteamFriends:
 			return False
 		else:
 			return Steam.cdll.GetPersonaName()
-
-	@staticmethod
-	def GetPersonaState(string=True):
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			state = Steam.cdll.GetPersonaState()
-			return (PersonaState[state] if string else state)
-
-# Class for Steam Music
-#------------------------------------------------
-class SteamMusic:
-
-	@staticmethod
-	def IsEnabled():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.MusicIsEnabled()
-
-	@staticmethod
-	def IsPlaying():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.MusicIsPlaying()
-
-	@staticmethod
-	def GetVolume():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.MusicGetVolume()
-
-	@staticmethod
-	def Pause():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.MusicPause()
-
-	@staticmethod
-	def Play():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.MusicPlay()
-
-	@staticmethod
-	def PlayNext():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.MusicPlayNext()
-
-	@staticmethod
-	def PlayPrevious():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.MusicPlayPrev()
-
-	@staticmethod
-	def SetVolume(vol):
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.MusicSetVolume(vol)
 
 # Class for Steam Users
 #------------------------------------------------
@@ -291,6 +166,15 @@ class SteamUserStats:
 			return Steam.cdll.GetStatInt(name)
 
 	@staticmethod
+	def ResetAllStats(achievesToo):
+		if not Steam.cdll and not Steam.warn:
+			print("Steam is not loaded")
+			Steam.warn = True
+			return False
+		else:
+			return Steam.cdll.ResetAllStats(achievesToo)
+
+	@staticmethod
 	def RequestCurrentStats():
 		if not Steam.cdll and not Steam.warn:
 			print("Steam is not loaded")
@@ -330,70 +214,3 @@ class SteamUserStats:
 			return False
 		else:
 			return Steam.cdll.StoreStats()
-
-# Class for Steam Utilties
-#------------------------------------------------
-class SteamUtils:
-
-	@staticmethod
-	def GetCurrentBatteryPower():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.GetCurrentBatteryPower()
-
-	@staticmethod
-	def GetIPCountry():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.GetIPCountry()
-
-	@staticmethod
-	def GetSecondsSinceAppActive():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.GetSecondsSinceAppActive()
-
-	@staticmethod
-	def GetSecondsSinceComputerActive():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.GetSecondsSinceComputerActive()
-
-	@staticmethod
-	def GetServerRealTime():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.GetServerRealTime()
-
-	@staticmethod
-	def IsOverlayEnabled():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.IsOverlayEnabled()
-
-	@staticmethod
-	def IsSteamRunningInVR():
-		if not Steam.cdll and not Steam.warn:
-			print("Steam is not loaded")
-			Steam.warn = True
-			return False
-		else:
-			return Steam.cdll.IsSteamRunningInVR()
