@@ -20,114 +20,129 @@
 
 // Steamworks functions
 //-----------------------------------------------
-SW_PY bool SteamInit(void) {
+SW_PY bool SteamInit(void){
 	return SteamAPI_Init();
 }
-SW_PY bool IsSteamRunning(void) {
+SW_PY bool IsSteamRunning(void){
 	return SteamAPI_IsSteamRunning();
 }
 // Steam Apps
 SW_PY int GetDlcCount(){
 	return SteamApps()->GetDLCCount();
 }
-SW_PY bool IsDlcInstalled(int32 value) {
+SW_PY bool IsDlcInstalled(int32 value){
 	return SteamApps()->BIsDlcInstalled(value);
 }
+SW_PY void RequestAppProofOfPurchaseKey(int32 value){
+	return SteamApps()->RequestAppProofOfPurchaseKey(value);
+}
 // Steam Friends
-SW_PY int GetFriendCount(int flag) {
+SW_PY int GetFriendCount(int flag){
 	return SteamFriends()->GetFriendCount(flag);
 }
-SW_PY const char* GetPersonaName() {
+SW_PY const char* GetPersonaName(){
 	return SteamFriends()->GetPersonaName();
 }
-SW_PY int GetPersonaState() {
+SW_PY int GetPersonaState(){
 	return SteamFriends()->GetPersonaState();
 }
+SW_PY void ActivateGameOverlay(const char* name){
+	return SteamFriends()->ActivateGameOverlay(name);	
+}
 // Steam Music
-SW_PY bool MusicIsEnabled() {
+SW_PY bool MusicIsEnabled(){
 	return SteamMusic()->BIsEnabled();
 }
-SW_PY bool MusicIsPlaying() {
+SW_PY bool MusicIsPlaying(){
 	return SteamMusic()->BIsPlaying();
 }
-SW_PY float MusicGetVolume() {
+SW_PY float MusicGetVolume(){
 	return SteamMusic()->GetVolume();
 }
-SW_PY void MusicPause() {
+SW_PY void MusicPause(){
 	return SteamMusic()->Pause();
 }
-SW_PY void MusicPlay() {
+SW_PY void MusicPlay(){
 	return SteamMusic()->Play();
 }
-SW_PY void MusicPlayNext() {
+SW_PY void MusicPlayNext(){
 	return SteamMusic()->PlayNext();
 }
-SW_PY void MusicPlayPrev() {
+SW_PY void MusicPlayPrev(){
 	return SteamMusic()->PlayPrevious();
 }
-SW_PY void MusicSetVolume(float value) {
+SW_PY void MusicSetVolume(float value){
 	return SteamMusic()->SetVolume(value);
 }
 // Steam User
-SW_PY CSteamID GetSteamID() {
+SW_PY CSteamID GetSteamID(){
 	return SteamUser()->GetSteamID();
 }
+SW_PY int GetPlayerSteamLevel(){
+	return SteamUser()->GetPlayerSteamLevel(); 
+}
 // Steam User Stats
-SW_PY bool ClearAchievement(const char* name) {
+SW_PY bool ClearAchievement(const char* name){
 	return SteamUserStats()->ClearAchievement(name);
 }
-SW_PY bool GetAchievement(const char* name) {
+SW_PY bool GetAchievement(const char* name){
 	bool achieved = false;
 	SteamUserStats()->GetAchievement(name, &achieved);
 	return achieved;
 }
-SW_PY float GetStatFloat(const char* name) {
+SW_PY float GetStatFloat(const char* name){
 	float statval = 0;
 	SteamUserStats()->GetStat(name, &statval);
 	return statval;
 }
-SW_PY int32 GetStatInt(const char* name) {
+SW_PY int32 GetStatInt(const char* name){
 	int32 statval = 0;
 	SteamUserStats()->GetStat(name, &statval);
 	return statval;
 }
-SW_PY bool ResetAllStats(bool achievesToo) {
+SW_PY bool ResetAllStats(bool achievesToo){
 	return SteamUserStats()->ResetAllStats(achievesToo);
 }
-SW_PY bool RequestCurrentStats() {
+SW_PY bool RequestCurrentStats(){
 	return SteamUserStats()->RequestCurrentStats();
 }
-SW_PY bool SetAchievement(const char* name) {
+SW_PY bool SetAchievement(const char* name){
 	return SteamUserStats()->SetAchievement(name);
 }
-SW_PY bool SetStatFloat(const char* name, float value) {
+SW_PY bool SetStatFloat(const char* name, float value){
 	return SteamUserStats()->SetStat(name, value);
 }
-SW_PY bool SetStatInt(const char* name, int32 value) {
+SW_PY bool SetStatInt(const char* name, int32 value){
 	return SteamUserStats()->SetStat(name, value);
 }
-SW_PY bool StoreStats() {
+SW_PY bool StoreStats(){
 	return SteamUserStats()->StoreStats();
 }
 // Steam Utilities
-SW_PY uint8 GetCurrentBatteryPower() {
+SW_PY uint8 GetCurrentBatteryPower(){
 	return SteamUtils()->GetCurrentBatteryPower();
 }
-SW_PY const char* GetIPCountry() {
+SW_PY const char* GetIPCountry(){
 	return SteamUtils()->GetIPCountry();
 }
-SW_PY uint32 GetSecondsSinceAppActive() {
+SW_PY uint32 GetSecondsSinceAppActive(){
 	return SteamUtils()->GetSecondsSinceAppActive();
 }
-SW_PY uint32 GetSecondsSinceComputerActive() {
+SW_PY uint32 GetSecondsSinceComputerActive(){
 	return SteamUtils()->GetSecondsSinceComputerActive();
 }
-SW_PY uint32 GetServerRealTime() {
+SW_PY uint32 GetServerRealTime(){
 	return SteamUtils()->GetServerRealTime();
 }
-SW_PY bool IsOverlayEnabled() {
+SW_PY bool IsOverlayEnabled(){
 	return SteamUtils()->IsOverlayEnabled();
 }
-SW_PY bool IsSteamRunningInVR() {
+SW_PY bool IsSteamRunningInVR(){
 	return SteamUtils()->IsSteamRunningInVR();
+}
+SW_PY const char* GetSteamUILanguage(){
+	return SteamUtils()->GetSteamUILanguage();
+}
+SW_PY uint32 GetAppID(){
+	return SteamUtils()->GetAppID();
 }
