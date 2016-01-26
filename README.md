@@ -3,6 +3,8 @@ Howdy!  This is a branch of Easimer's SteamworksForPython in an attempt to bring
 
 Feel free to fork or contribute to this module.
 
+For a fuller tutorial, with images, on SteamworksPy please read our post: http://coaguco.tumblr.com/post/128240756897/steamworks-for-python-tutorial-linux.
+
 # Some Notes
 While I am still tinkering away with this, here are some things to note:
 
