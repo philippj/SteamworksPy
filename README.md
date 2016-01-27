@@ -3,6 +3,10 @@ Howdy!  This is a branch of Easimer's SteamworksForPython in an attempt to bring
 
 Feel free to fork or contribute to this module.
 
+For a fuller tutorial, with images, on SteamworksPy please read our post: http://coaguco.tumblr.com/post/128240756897/steamworks-for-python-tutorial-linux.
+
+NOTE: Pre-built DLLs only works with last build of SteamworksPy.  Please compile from scratch until these files are updated.
+
 # Some Notes
 While I am still tinkering away with this, here are some things to note:
 
@@ -34,7 +38,7 @@ While I am still tinkering away with this, here are some things to note:
     - New > Project
     - Templates > Visual C++ > Win32 > Win32 Project
     - Follow the wizard and pick the DLL Application Type
-    - Add steampy.cpp to Source Files and steam_api.h from /steam/ folder to Header Files
+    - Add SteamworksPy.cpp to Source Files and steam_api.h from /steam/ folder to Header Files
     - Go to Project > Properties in the toolbar
     - Under C/C++ > Precompiled Headers, turn off Precompiled Header option
     - Under Linker > Input, add steam_api.lib or steam_api64.lib to Additional Dependenices
