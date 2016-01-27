@@ -38,7 +38,7 @@ While I am still tinkering away with this, here are some things to note:
     - New > Project
     - Templates > Visual C++ > Win32 > Win32 Project
     - Follow the wizard and pick the DLL Application Type
-    - Add steampy.cpp to Source Files and steam_api.h from /steam/ folder to Header Files
+    - Add SteamworksPy.cpp to Source Files and steam_api.h from /steam/ folder to Header Files
     - Go to Project > Properties in the toolbar
     - Under C/C++ > Precompiled Headers, turn off Precompiled Header option
     - Under Linker > Input, add steam_api.lib or steam_api64.lib to Additional Dependenices
