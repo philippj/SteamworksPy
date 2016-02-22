@@ -11,7 +11,7 @@ While I am still tinkering away with this, here are some things to note:
 - You will need the Steamworks SDK
 - You will most likely need a Steamworks account, with a valid AppID, to use more advanced functions (set achievements, set stats, etc.)
 - You will need to be logged into Steam for anything to function, obviously.  As it assumes the game is run from Steam itself and is online.
-- Steam Overlay will only work if your game is using OpenGL or D3D!
+- Steam Overlay will only work if your game is using OpenGL or D3D!  Overlay will only work if the game is actually launched from Steam itself.  Possible if the SteamRestart command is fired; however, this is not implemented yet in SteamworksPy.
 
 # To Do
 - Add in more features from the Steamworks SDK
