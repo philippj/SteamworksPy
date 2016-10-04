@@ -34,7 +34,7 @@ class Steam:
 	def Init():
 		os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 		# Check system architecture
-		if sys.maxsize > 2**32 is False:
+		if (sys.maxsize > 2**32) is False:
 			OS_BIT = '32bits'
 		else:
 			OS_BIT = '64bits'
