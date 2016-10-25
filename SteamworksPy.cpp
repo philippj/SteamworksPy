@@ -6,179 +6,297 @@
 //-----------------------------------------------
 #if defined( _WIN32 )
 	#include "steam\steam_api.h"
-	#define SW_PY __declspec( dllexport )
+	#define SW_PY extern "C" __declspec( dllexport )
 #elif defined( __APPLE__ )
 	#include "steam/steam_api.h"
 	#include "TargetConditionals.h"
-	#define SW_PY __attribute__ ((visibility("default")))
+	#define SW_PY extern "C" __attribute__ ((visibility("default")))
 #elif defined( __linux__ )
 	#include "steam/steam_api.h"
-	#define SW_PY __attribute__ ((visibility("default")))
+#include "STEAMWORKSPY.H"
+#define SW_PY extern "C" __attribute__ ((visibility("default")))
 #else
 	#error "Unsupported platform"
 #endif
 
-#include <functional> 
+#define UGC_MAX_TITLE_CHARS 128
+#define UGC_MAX_DESC_CHARS 8000
+#define UGC_MAX_METADATA_CHARS 5000
 
 // Steamworks functions
 //-----------------------------------------------
-extern "C" SW_PY bool SteamInit(void){
+SW_PY bool SteamInit(void){
 	return SteamAPI_Init();
 }
-extern "C" SW_PY bool IsSteamRunning(void){
+SW_PY bool IsSteamRunning(void){
 	return SteamAPI_IsSteamRunning();
 }
 // Steam Apps
-extern "C" SW_PY int GetDlcCount(){
+SW_PY int GetDlcCount(){
 	return SteamApps()->GetDLCCount();
 }
-extern "C" SW_PY bool IsDlcInstalled(int32 value){
+SW_PY bool IsDlcInstalled(int32 value){
 	return SteamApps()->BIsDlcInstalled(value);
 }
-extern "C" SW_PY void RequestAppProofOfPurchaseKey(int32 value){
+SW_PY void RequestAppProofOfPurchaseKey(int32 value){
 	return SteamApps()->RequestAppProofOfPurchaseKey(value);
 }
 // Steam Friends
-extern "C" SW_PY int GetFriendCount(int flag){
+SW_PY int GetFriendCount(int flag){
 	return SteamFriends()->GetFriendCount(flag);
 }
-extern "C" SW_PY const char* GetPersonaName(){
+SW_PY const char* GetPersonaName(){
 	return SteamFriends()->GetPersonaName();
 }
-extern "C" SW_PY int GetPersonaState(){
+SW_PY int GetPersonaState(){
 	return SteamFriends()->GetPersonaState();
 }
-extern "C" SW_PY void ActivateGameOverlay(const char* name){
+SW_PY void ActivateGameOverlay(const char* name){
 	return SteamFriends()->ActivateGameOverlay(name);	
 }
 // Steam Music
-extern "C" SW_PY bool MusicIsEnabled(){
+SW_PY bool MusicIsEnabled(){
 	return SteamMusic()->BIsEnabled();
 }
-extern "C" SW_PY bool MusicIsPlaying(){
+SW_PY bool MusicIsPlaying(){
 	return SteamMusic()->BIsPlaying();
 }
-extern "C" SW_PY float MusicGetVolume(){
+SW_PY float MusicGetVolume(){
 	return SteamMusic()->GetVolume();
 }
-extern "C" SW_PY void MusicPause(){
+SW_PY void MusicPause(){
 	return SteamMusic()->Pause();
 }
-extern "C" SW_PY void MusicPlay(){
+SW_PY void MusicPlay(){
 	return SteamMusic()->Play();
 }
-extern "C" SW_PY void MusicPlayNext(){
+SW_PY void MusicPlayNext(){
 	return SteamMusic()->PlayNext();
 }
-extern "C" SW_PY void MusicPlayPrev(){
+SW_PY void MusicPlayPrev(){
 	return SteamMusic()->PlayPrevious();
 }
-extern "C" SW_PY void MusicSetVolume(float value){
+SW_PY void MusicSetVolume(float value){
 	return SteamMusic()->SetVolume(value);
 }
 // Steam User
-extern "C" SW_PY CSteamID GetSteamID(){
+SW_PY CSteamID GetSteamID(){
 	return SteamUser()->GetSteamID();
 }
-extern "C" SW_PY int GetPlayerSteamLevel(){
+SW_PY int GetPlayerSteamLevel(){
 	return SteamUser()->GetPlayerSteamLevel(); 
 }
 // Steam User Stats
-extern "C" SW_PY bool ClearAchievement(const char* name){
+SW_PY bool ClearAchievement(const char* name){
 	return SteamUserStats()->ClearAchievement(name);
 }
-extern "C" SW_PY bool GetAchievement(const char* name){
+SW_PY bool GetAchievement(const char* name){
 	bool achieved = false;
 	SteamUserStats()->GetAchievement(name, &achieved);
 	return achieved;
 }
-extern "C" SW_PY float GetStatFloat(const char* name){
+SW_PY float GetStatFloat(const char* name){
 	float statval = 0;
 	SteamUserStats()->GetStat(name, &statval);
 	return statval;
 }
-extern "C" SW_PY int32 GetStatInt(const char* name){
+SW_PY int32 GetStatInt(const char* name){
 	int32 statval = 0;
 	SteamUserStats()->GetStat(name, &statval);
 	return statval;
 }
-extern "C" SW_PY bool ResetAllStats(bool achievesToo){
+SW_PY bool ResetAllStats(bool achievesToo){
 	return SteamUserStats()->ResetAllStats(achievesToo);
 }
-extern "C" SW_PY bool RequestCurrentStats(){
+SW_PY bool RequestCurrentStats(){
 	return SteamUserStats()->RequestCurrentStats();
 }
-extern "C" SW_PY bool SetAchievement(const char* name){
+SW_PY bool SetAchievement(const char* name){
 	return SteamUserStats()->SetAchievement(name);
 }
-extern "C" SW_PY bool SetStatFloat(const char* name, float value){
+SW_PY bool SetStatFloat(const char* name, float value){
 	return SteamUserStats()->SetStat(name, value);
 }
-extern "C" SW_PY bool SetStatInt(const char* name, int32 value){
+SW_PY bool SetStatInt(const char* name, int32 value){
 	return SteamUserStats()->SetStat(name, value);
 }
-extern "C" SW_PY bool StoreStats(){
+SW_PY bool StoreStats(){
 	return SteamUserStats()->StoreStats();
 }
 // Steam Utilities
-extern "C" SW_PY uint8 GetCurrentBatteryPower(){
+SW_PY uint8 GetCurrentBatteryPower(){
 	return SteamUtils()->GetCurrentBatteryPower();
 }
-extern "C" SW_PY const char* GetIPCountry(){
+SW_PY const char* GetIPCountry(){
 	const char* c_ptr = SteamUtils()->GetIPCountry();
 	printf("SteamworksPy: %s", c_ptr);
 
 	return c_ptr;
 }
-extern "C" SW_PY uint32 GetSecondsSinceAppActive(){
+SW_PY uint32 GetSecondsSinceAppActive(){
 	return SteamUtils()->GetSecondsSinceAppActive();
 }
-extern "C" SW_PY uint32 GetSecondsSinceComputerActive(){
+SW_PY uint32 GetSecondsSinceComputerActive(){
 	return SteamUtils()->GetSecondsSinceComputerActive();
 }
-extern "C" SW_PY uint32 GetServerRealTime(){
+SW_PY uint32 GetServerRealTime(){
 	return SteamUtils()->GetServerRealTime();
 }
-extern "C" SW_PY bool IsOverlayEnabled(){
+SW_PY bool IsOverlayEnabled(){
 	return SteamUtils()->IsOverlayEnabled();
 }
-extern "C" SW_PY bool IsSteamRunningInVR(){
+SW_PY bool IsSteamRunningInVR(){
 	return SteamUtils()->IsSteamRunningInVR();
 }
-extern "C" SW_PY const char* GetSteamUILanguage(){
+SW_PY const char* GetSteamUILanguage(){
 	return SteamUtils()->GetSteamUILanguage();
 }
-extern "C" SW_PY uint32 GetAppID(){
+SW_PY uint32 GetAppID(){
 	return SteamUtils()->GetAppID();
 }
+
+// Callbacks
+SW_PY void RunCallbacks()
+{
+	SteamAPI_RunCallbacks();
+}
+
+// Workshop
+typedef void(*CreateItemResultCallback_t) (CreateItemResult_t*);
+typedef void(*SubmitItemUpdateResultCallback_t) (SubmitItemUpdateResult_t*);
 
 class Workshop
 {
 public:
-	void (*workshopItemCreatedCallback)(CreateItemResult_t);
+	CreateItemResultCallback_t _pyItemCreatedCallback;
+	SubmitItemUpdateResultCallback_t _pyItemUpdatedCallback;
 
-	_declspec(dllexport) void SetWorkshopItemCreatedCallback(void(*callback)(CreateItemResult_t))
+	CCallResult<Workshop, CreateItemResult_t> _itemCreatedCallback;
+	CCallResult<Workshop, SubmitItemUpdateResult_t> _itemUpdatedCallback;
+
+	void SetItemCreatedCallback(CreateItemResultCallback_t callback)
 	{
-		workshopItemCreatedCallback = callback;
+		_pyItemCreatedCallback = callback;
+	}
+
+	void SetItemUpdatedCallback(SubmitItemUpdateResultCallback_t callback)
+	{
+		_pyItemUpdatedCallback = callback;
 	}
 	
-	// Steam UGC (Workshop)
-	_declspec( dllexport ) void CreateItem(AppId_t consumerAppId, EWorkshopFileType fileType, void(*callback)(CreateItemResult_t) = NULL)
+	void CreateItem(AppId_t consumerAppId, EWorkshopFileType fileType)
 	{
 		//TODO: Check if fileType is a valid value?
 
-		if (&callback != NULL) {
-			SetWorkshopItemCreatedCallback(callback);
-		}
+		SteamAPICall_t createItemCall = SteamUGC()->CreateItem(consumerAppId, fileType);
+		_itemCreatedCallback.Set(createItemCall, this, &Workshop::OnWorkshopItemCreated);
+	}
 
-		SteamUGC()->CreateItem(consumerAppId, fileType);
+	void SubmitItemUpdate(UGCUpdateHandle_t updateHandle, const char *pChangeNote)
+	{
+		SteamAPICall_t submitItemUpdateCall = SteamUGC()->SubmitItemUpdate(updateHandle, pChangeNote);
+		_itemUpdatedCallback.Set(submitItemUpdateCall, this, &Workshop::OnItemUpdateSubmitted);
 	}
 
 private:
-	STEAM_CALLBACK(Workshop, OnWorkshopItemCreated, CreateItemResult_t);
-
-	void OnWorkshopItemCreated(CreateItemResult_t createItemResult)
+	void OnWorkshopItemCreated(CreateItemResult_t* createItemResult, bool bIOFailure)
 	{
-		workshopItemCreatedCallback(createItemResult);
+		if (_pyItemCreatedCallback != nullptr) 
+		{
+			_pyItemCreatedCallback(createItemResult);
+		}
+	}
+
+	void OnItemUpdateSubmitted(SubmitItemUpdateResult_t* submitItemUpdateResult, bool bIOFailure)
+	{
+		if (_pyItemUpdatedCallback != nullptr)
+		{
+			_pyItemUpdatedCallback(submitItemUpdateResult);
+		}
 	}
 };
+
+static Workshop workshop;
+
+SW_PY void Workshop_SetItemCreatedCallback(CreateItemResultCallback_t callback)
+{
+	workshop.SetItemCreatedCallback(callback);
+}
+
+SW_PY void Workshop_CreateItem(AppId_t consumerAppId, EWorkshopFileType fileType)
+{
+	workshop.CreateItem(consumerAppId, fileType);
+}
+
+SW_PY UGCUpdateHandle_t Workshop_StartItemUpdate(AppId_t consumerAppId, PublishedFileId_t publishedFileId)
+{
+	return SteamUGC()->StartItemUpdate(consumerAppId, publishedFileId);
+}
+
+SW_PY bool Workshop_SetItemTitle(UGCUpdateHandle_t updateHandle, const char *pTitle)
+{
+	if (strlen(pTitle) > UGC_MAX_TITLE_CHARS)
+	{
+		printf("Title cannot have more than %d ASCII characters. Title not set.", UGC_MAX_TITLE_CHARS);
+		return false;
+	}
+
+	return SteamUGC()->SetItemTitle(updateHandle, pTitle);
+}
+
+SW_PY bool Workshop_SetItemDescription(UGCUpdateHandle_t updateHandle, const char *pDescription)
+{
+	if (strlen(pDescription) > UGC_MAX_DESC_CHARS)
+	{
+		printf("Description cannot have more than %d ASCII characters. Description not set.", UGC_MAX_DESC_CHARS);
+		return false;
+	}
+
+	return SteamUGC()->SetItemDescription(updateHandle, pDescription);
+}
+
+SW_PY bool Workshop_SetItemUpdateLanguage(UGCUpdateHandle_t updateHandle, const char *pLanguage)
+{
+	return SteamUGC()->SetItemUpdateLanguage(updateHandle, pLanguage);
+}
+
+SW_PY bool Workshop_SetItemMetadata(UGCUpdateHandle_t updateHandle, const char *pMetadata)
+{
+	if (strlen(pMetadata) > UGC_MAX_METADATA_CHARS)
+	{
+		printf("Metadata cannot have more than %d ASCII characters. Metadata not set.", UGC_MAX_METADATA_CHARS);
+	}
+	return SteamUGC()->SetItemMetadata(updateHandle, pMetadata);
+}
+
+SW_PY bool Workshop_SetItemVisibility(UGCUpdateHandle_t updateHandle, ERemoteStoragePublishedFileVisibility visibility)
+{
+	return SteamUGC()->SetItemVisibility(updateHandle, visibility);
+}
+
+SW_PY bool Workshop_SetItemTags(UGCUpdateHandle_t updateHandle, const char ** stringArray, const int32 stringCount)
+{
+	SteamParamStringArray_t tags = { stringArray, stringCount };
+	
+	return SteamUGC()->SetItemTags(updateHandle, &tags);
+}
+
+SW_PY bool Workshop_SetItemContent(UGCUpdateHandle_t updateHandle, const char *pContentFolder)
+{
+	return SteamUGC()->SetItemContent(updateHandle, pContentFolder);
+}
+
+SW_PY bool Workshop_SetItemPreview(UGCUpdateHandle_t updateHandle, const char *pPreviewFile)
+{
+	return SteamUGC()->SetItemPreview(updateHandle, pPreviewFile);
+}
+
+SW_PY void Workshop_SetItemUpdatedCallback(SubmitItemUpdateResultCallback_t callback)
+{
+	workshop.SetItemUpdatedCallback(callback);
+}
+
+SW_PY void Workshop_SubmitItemUpdate(UGCUpdateHandle_t updateHandle, const char *pChangeNote)
+{
+	workshop.SubmitItemUpdate(updateHandle, pChangeNote);
+}
