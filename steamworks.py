@@ -116,14 +116,24 @@ class Steam:
 		Steam.cdll.GetSteamUILanguage.restype = c_char_p
 		Steam.cdll.GetAppID.restype = int
 
+		import ipdb
+		ipdb.set_trace()
+
 	@staticmethod
-	def Call(method):
+	def _isSteamLoaded():
 		if not Steam.cdll and not Steam.warn:
 			print("Steam is not loaded")
 			Steam.warn = True
 			return False
 		else:
+			return True
+
+	@staticmethod
+	def Call(method):
+		if _isSteamLoaded():
 			return method()
+		else:
+			return False
 
 # Class for Steam Apps
 #------------------------------------------------
@@ -382,6 +392,32 @@ class SteamUserStats:
 			return False
 		else:
 			return Steam.cdll.ClearAchievement(name)
+
+# Class for Steam Workshop
+#------------------------------------------------
+class SteamWorkshop:
+
+	@staticmethod
+	def CreateItem(appId, filetype, callback = None):
+		"""Create a UGC (Workshop) item
+
+		Arguments:
+		
+		appId -- The app ID of the game on Steam. 
+		Do not use the creation tool app ID if they are separate.
+
+		filetype -- Can be a community file type or microtransactions.
+		Use predefined `WorkshopFileType` values.
+
+		callback -- The function to call once the item creation is finished.
+		"""
+		if _isSteamLoaded():
+			Steam.cdll.Workshop.CreateItem(appId, filetype, callback)
+			return True
+		else:
+			return False
+		
+
 
 # Class for Steam Utilities
 #------------------------------------------------
