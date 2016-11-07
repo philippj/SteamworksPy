@@ -141,6 +141,8 @@ class Steam:
 		Steam.cdll.Workshop_GetNumSubscribedItems.restype = c_uint32
 		Steam.cdll.Workshop_GetSubscribedItems.restype = c_uint32
 		Steam.cdll.Workshop_GetSubscribedItems.argtypes = [POINTER(c_uint64), c_uint32]
+		Steam.cdll.Workshop_GetItemInstallInfo.restype = bool
+		Steam.cdll.Workshop_GetItemInstallInfo.argtypes = [c_uint64, POINTER(c_uint64), c_char_p, c_uint32,  POINTER(c_uint32)]
 
 	@staticmethod
 	def isSteamLoaded():
@@ -668,9 +670,41 @@ class SteamWorkshop:
 		else:
 			return False
 
+	@staticmethod
+	def GetItemInstallInfo(publishedFileId, maxFolderPathLength=1024):
+		"""Get info about an installed item
 
+		Arguments:
 
+		publishedFileId -- the id of the item to look up,
+		maxFolderPathLength -- maximum length of the folder path in characters.
 
+		Return Value:
+
+		If the item is installed: an object with the following attributes
+		-- 'sizeOnDisk'
+		-- 'folder'
+		-- 'timestamp'
+
+		If the item is not installed, or the method fails it returns: False
+		"""
+		if Steam.isSteamLoaded():
+			pSizeOnDisk = pointer(c_uint64(0))
+			pTimestamp = pointer(c_uint32(0))
+			pFolder = create_string_buffer(maxFolderPathLength)
+
+			isInstalled = Steam.cdll.Workshop_GetItemInstallInfo(publishedFileId, pSizeOnDisk, pFolder, maxFolderPathLength, pTimestamp)
+
+			if isInstalled:
+				itemInfo = {
+					'sizeOnDisk' : pSizeOnDisk.contents.value,
+					'folder' : pFolder.value.decode(),
+					'timestamp' : pTimestamp.contents.value
+				}
+
+				return itemInfo
+
+		return False
 
 # Class for Steam Utilities
 #------------------------------------------------
