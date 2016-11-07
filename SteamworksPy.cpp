@@ -162,8 +162,8 @@ SW_PY void RunCallbacks()
 }
 
 // Workshop
-typedef void(*CreateItemResultCallback_t) (CreateItemResult_t*);
-typedef void(*SubmitItemUpdateResultCallback_t) (SubmitItemUpdateResult_t*);
+typedef void(*CreateItemResultCallback_t) (CreateItemResult_t);
+typedef void(*SubmitItemUpdateResultCallback_t) (SubmitItemUpdateResult_t);
 
 class Workshop
 {
@@ -203,7 +203,7 @@ private:
 	{
 		if (_pyItemCreatedCallback != nullptr) 
 		{
-			_pyItemCreatedCallback(createItemResult);
+			_pyItemCreatedCallback(*createItemResult);
 		}
 	}
 
@@ -211,7 +211,7 @@ private:
 	{
 		if (_pyItemUpdatedCallback != nullptr)
 		{
-			_pyItemUpdatedCallback(submitItemUpdateResult);
+			_pyItemUpdatedCallback(*submitItemUpdateResult);
 		}
 	}
 };
