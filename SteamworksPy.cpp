@@ -300,3 +300,13 @@ SW_PY void Workshop_SubmitItemUpdate(UGCUpdateHandle_t updateHandle, const char 
 {
 	workshop.SubmitItemUpdate(updateHandle, pChangeNote);
 }
+
+SW_PY uint32 Workshop_GetNumSubscribedItems()
+{
+	return SteamUGC()->GetNumSubscribedItems();
+}
+
+SW_PY uint32 Workshop_GetSubscribedItems(PublishedFileId_t* pvecPublishedFileID, uint32 maxEntries)
+{
+	return SteamUGC()->GetSubscribedItems(pvecPublishedFileID, maxEntries);
+}
