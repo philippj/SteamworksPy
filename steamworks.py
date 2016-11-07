@@ -138,6 +138,9 @@ class Steam:
 		Steam.cdll.Workshop_SetItemPreview.restype = bool
 		Steam.cdll.Workshop_SetItemPreview.argtypes = [c_uint64, c_char_p]
 		Steam.cdll.Workshop_SubmitItemUpdate.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.Workshop_GetNumSubscribedItems.restype = c_uint32
+		Steam.cdll.Workshop_GetSubscribedItems.restype = c_uint32
+		Steam.cdll.Workshop_GetSubscribedItems.argtypes = [POINTER(c_uint64), c_uint32]
 
 	@staticmethod
 	def isSteamLoaded():
@@ -614,6 +617,59 @@ class SteamWorkshop:
 			return Steam.cdll.Workshop_SubmitItemUpdate(updateHandle, changeNote.encode())
 		else:
 			return False
+
+	@staticmethod
+	def GetNumSubscribedItems():
+		"""Get the total number of items the user is subscribed to for this game or application.
+
+		Return value:
+
+		On success: The number of subscribed items,
+		Otherwise: False.
+		"""
+		if Steam.isSteamLoaded():
+			return Steam.cdll.Workshop_GetNumSubscribedItems()
+		else:
+			return False
+
+	@staticmethod
+	def GetSubscribedItems(maxEntries=-1):
+		"""Get a list of published file IDs that the user is subscribed to
+
+		Arguments:
+
+		maxEntries -- the maximum number of entries to fetch. If omitted
+		the function will try to fetch as much items as the user is 
+		subscribed to.
+
+		Return Value:
+
+		On success: A list of published file IDs that the user is subscribed to.
+		Otherwise: False.
+		"""
+		if Steam.isSteamLoaded():
+			if maxEntries < 0:
+				maxEntries = SteamWorkshop.GetNumSubscribedItems()
+
+			# Published file IDs are stored as uint64 values
+			PublishedFileIdsArrayCType = c_uint64 * maxEntries
+			pvecPublishedFileIds = PublishedFileIdsArrayCType()
+
+			# TODO: We might need to add an exception check here to catch any errors while
+			# writing to the 'pvecPublishedFileIds' array.
+			numItems = Steam.cdll.Workshop_GetSubscribedItems(pvecPublishedFileIds, maxEntries)
+			# According to steam's example, it is possible for numItems to be greater than maxEntries
+			# so we crop.
+			if numItems > maxEntries:
+				numItems = maxEntries
+
+			publishedFileIdsList = [pvecPublishedFileIds[i] for i in range(numItems)]
+			return publishedFileIdsList
+		else:
+			return False
+
+
+
 
 
 # Class for Steam Utilities
