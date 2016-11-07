@@ -21,6 +21,14 @@ FriendFlags = {  # regular friend
     'All': 0xFFFF,
     }
 
+WorkshopFileType = {
+	'Community': 0x00,			# normal Workshop item that can be subscribed to
+	'Microtransaction': 0x01,	# Workshop item that is meant to be voted on for the purpose of selling in-game
+
+	# NOTE: There are more workshop file types defined "in isteamremotestorage.h",
+	# but we do not need them for now.
+}
+
 # Main Steam Class, obviously
 #------------------------------------------------
 class Steam:
