@@ -115,12 +115,24 @@ class Steam:
 		Steam.cdll.IsSteamRunningInVR.restype = bool
 		Steam.cdll.GetSteamUILanguage.restype = c_char_p
 		Steam.cdll.GetAppID.restype = int
-
-		import ipdb
-		ipdb.set_trace()
+		# Set argtypes and restype for Workshop functions
+		Steam.cdll.Workshop_StartItemUpdate.restype = c_uint64
+		Steam.cdll.Workshop_SetItemTitle.restype = bool
+		Steam.cdll.Workshop_SetItemTitle.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.Workshop_SetItemDescription.restype = bool
+		Steam.cdll.Workshop_SetItemDescription.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.Workshop_SetItemUpdateLanguage.restype = bool
+		Steam.cdll.Workshop_SetItemMetadata.restype = bool
+		Steam.cdll.Workshop_SetItemVisibility.restype = bool
+		Steam.cdll.Workshop_SetItemTags.restype = bool
+		Steam.cdll.Workshop_SetItemContent.restype = bool
+		Steam.cdll.Workshop_SetItemContent.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.Workshop_SetItemPreview.restype = bool
+		Steam.cdll.Workshop_SetItemPreview.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.Workshop_SubmitItemUpdate.argtypes = [c_uint64, c_char_p]
 
 	@staticmethod
-	def _isSteamLoaded():
+	def isSteamLoaded():
 		if not Steam.cdll and not Steam.warn:
 			print("Steam is not loaded")
 			Steam.warn = True
@@ -130,8 +142,16 @@ class Steam:
 
 	@staticmethod
 	def Call(method):
-		if _isSteamLoaded():
+		if Steam.isSteamLoaded():
 			return method()
+		else:
+			return False
+
+	@staticmethod
+	def RunCallbacks():
+		if Steam.isSteamLoaded():
+			Steam.cdll.RunCallbacks()
+			return True
 		else:
 			return False
 
@@ -396,6 +416,46 @@ class SteamUserStats:
 # Class for Steam Workshop
 #------------------------------------------------
 class SteamWorkshop:
+	class CreateItemResult_t(Structure):
+		"""A class that describes Steam's CreateItemResult_t C struct"""
+		_fields_ = [
+			("result", c_int),
+			("publishedFileId", c_uint64),
+			("userNeedsToAcceptWorkshopLegalAgreement", c_bool)
+		]
+
+	class SubmitItemUpdateResult_t(Structure):
+		"""A class that describes Steam's SubmitItemUpdateResult_t C struct"""
+		_fields_ = [
+			("result", c_int),
+			("userNeedsToAcceptWorkshopLegalAgreement", c_bool)
+		]
+
+	# We want to keep callbacks in the class scope, so that they don't get
+	# garbage collected while we still need them.
+	ITEM_CREATED_CALLBACK = CFUNCTYPE(None, CreateItemResult_t)
+	itemCreatedCallback = None
+
+	ITEM_UPDATED_CALLBACK = CFUNCTYPE(None, SubmitItemUpdateResult_t)
+	itemUpdatedCallback = None
+
+	@staticmethod
+	def SetItemCreatedCallback(callback):
+		if Steam.isSteamLoaded():
+			SteamWorkshop.itemCreatedCallback = SteamWorkshop.ITEM_CREATED_CALLBACK(callback)
+
+			Steam.cdll.Workshop_SetItemCreatedCallback(SteamWorkshop.itemCreatedCallback)
+		else:
+			return False
+
+	@staticmethod
+	def SetItemUpdatedCallback(callback):
+		if Steam.isSteamLoaded():
+			SteamWorkshop.itemUpdatedCallback = SteamWorkshop.ITEM_UPDATED_CALLBACK(callback)
+
+			Steam.cdll.Workshop_SetItemUpdatedCallback(SteamWorkshop.itemUpdatedCallback)
+		else:
+			return False
 
 	@staticmethod
 	def CreateItem(appId, filetype, callback = None):
@@ -411,12 +471,141 @@ class SteamWorkshop:
 
 		callback -- The function to call once the item creation is finished.
 		"""
-		if _isSteamLoaded():
-			Steam.cdll.Workshop.CreateItem(appId, filetype, callback)
+		if Steam.isSteamLoaded():
+			if callback != None:
+				SteamWorkshop.SetItemCreatedCallback(callback)
+
+			Steam.cdll.Workshop_CreateItem(appId, filetype)
 			return True
 		else:
 			return False
+
+	@staticmethod
+	def StartItemUpdate(appId, publishedFileId):
+		"""Start the item update process and receive an update handle.
+
+		Arguments:
+
+		appId -- The app ID of the game on Steam. 
+		Do not use the creation tool app ID if they are separate
+
+		publishedFileId -- The ID of the Workshop file you are updating
+
+		Return value:
 		
+		If sucessful: update handle - an ID of the current update transaction
+		Otherwise: False
+		"""
+		if Steam.isSteamLoaded():
+			return Steam.cdll.Workshop_StartItemUpdate(appId, c_uint64(publishedFileId))
+		else:
+			return False
+
+	@staticmethod
+	def SetItemTitle(updateHandle, title):
+		"""Set the title of a Workshop item
+
+		Arguments:
+
+		updateHandle -- the handle returned by 'StartItemUpdate'
+
+		title -- the desired title of the item.
+
+		Return value:
+
+		True on succes,
+		False otherwise.
+		"""
+		if Steam.isSteamLoaded():
+			if len(title) > 128:
+				print("ERROR: Your title is longer than 128 characters.")
+				return False
+
+			return Steam.cdll.Workshop_SetItemTitle(updateHandle, title.encode())
+		else:
+			return False
+
+	@staticmethod
+	def SetItemDescription(updateHandle, description):
+		"""Set the description of a Workshop item
+
+		Arguments:
+
+		updateHandle -- the handle returned by 'StartItemUpdate'
+
+		description -- the desired description of the item.
+
+		Return value:
+
+		True on succes,
+		False otherwise.
+		"""
+		if Steam.isSteamLoaded():
+			if len(description) > 8000:
+				print("ERROR: Your description is longer than 8000 characters.")
+				return False
+
+			return Steam.cdll.Workshop_SetItemDescription(updateHandle, description.encode())
+		else:
+			return False
+
+	@staticmethod
+	def SetItemContent(updateHandle, contentDirectory):
+		"""Set the directory containing the content you wish to upload to Workshop.
+
+		Arguments:
+
+		updateHandle -- the handle returned by 'StartItemUpdate'
+
+		contentDirectory -- path to the directory containing the content of the workshop item.
+
+		Return value:
+
+		True on succes,
+		False otherwise.
+		"""
+		if Steam.isSteamLoaded():
+			return Steam.cdll.Workshop_SetItemContent(updateHandle, contentDirectory.encode())
+		else:
+			return False
+
+	@staticmethod
+	def SetItemPreview(updateHandle, previewImage):
+		"""Set the preview image of the Workshop item.
+
+		Arguments:
+
+		updateHandle -- the handle returned by 'StartItemUpdate'
+
+		previewImage -- path to the preview image file.
+
+		Return value:
+
+		True on succes,
+		False otherwise.
+		"""
+		if Steam.isSteamLoaded():
+			return Steam.cdll.Workshop_SetItemPreview(updateHandle, previewImage.encode())
+		else:
+			return False
+
+	@staticmethod
+	def SubmitItemUpdate(updateHandle, changeNote, callback = None):
+		"""Submit the item update with the given handle to Steam.
+
+		Arguments:
+
+		updateHandle -- the handle returned by 'StartItemUpdate'
+
+		changeNote -- a string containing change notes for the current update.
+		"""
+		if Steam.isSteamLoaded():
+			if callback != None:
+				SteamWorkshop.SetItemUpdatedCallback(callback)
+
+			return Steam.cdll.Workshop_SubmitItemUpdate(updateHandle, changeNote.encode())
+		else:
+			return False
 
 
 # Class for Steam Utilities
