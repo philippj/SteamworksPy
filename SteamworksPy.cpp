@@ -127,10 +127,7 @@ SW_PY uint8 GetCurrentBatteryPower(){
 	return SteamUtils()->GetCurrentBatteryPower();
 }
 SW_PY const char* GetIPCountry(){
-	const char* c_ptr = SteamUtils()->GetIPCountry();
-	printf("SteamworksPy: %s", c_ptr);
-
-	return c_ptr;
+	return SteamUtils()->GetIPCountry();
 }
 SW_PY uint32 GetSecondsSinceAppActive(){
 	return SteamUtils()->GetSecondsSinceAppActive();
