@@ -13,7 +13,6 @@
 	#define SW_PY extern "C" __attribute__ ((visibility("default")))
 #elif defined( __linux__ )
 	#include "steam/steam_api.h"
-	#include "STEAMWORKSPY.H"
 	#define SW_PY extern "C" __attribute__ ((visibility("default")))
 #else
 	#error "Unsupported platform"
