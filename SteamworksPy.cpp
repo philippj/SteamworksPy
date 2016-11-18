@@ -18,6 +18,10 @@
 	#error "Unsupported platform"
 #endif
 
+#define UGC_MAX_TITLE_CHARS 128
+#define UGC_MAX_DESC_CHARS 8000
+#define UGC_MAX_METADATA_CHARS 5000
+
 // Steamworks functions
 //-----------------------------------------------
 SW_PY bool SteamInit(void){
@@ -145,4 +149,165 @@ SW_PY const char* GetSteamUILanguage(){
 }
 SW_PY uint32 GetAppID(){
 	return SteamUtils()->GetAppID();
+}
+
+// Callbacks
+SW_PY void RunCallbacks()
+{
+	SteamAPI_RunCallbacks();
+}
+
+// Workshop
+typedef void(*CreateItemResultCallback_t) (CreateItemResult_t);
+typedef void(*SubmitItemUpdateResultCallback_t) (SubmitItemUpdateResult_t);
+
+class Workshop
+{
+public:
+	CreateItemResultCallback_t _pyItemCreatedCallback;
+	SubmitItemUpdateResultCallback_t _pyItemUpdatedCallback;
+
+	CCallResult<Workshop, CreateItemResult_t> _itemCreatedCallback;
+	CCallResult<Workshop, SubmitItemUpdateResult_t> _itemUpdatedCallback;
+
+	void SetItemCreatedCallback(CreateItemResultCallback_t callback)
+	{
+		_pyItemCreatedCallback = callback;
+	}
+
+	void SetItemUpdatedCallback(SubmitItemUpdateResultCallback_t callback)
+	{
+		_pyItemUpdatedCallback = callback;
+	}
+	
+	void CreateItem(AppId_t consumerAppId, EWorkshopFileType fileType)
+	{
+		//TODO: Check if fileType is a valid value?
+
+		SteamAPICall_t createItemCall = SteamUGC()->CreateItem(consumerAppId, fileType);
+		_itemCreatedCallback.Set(createItemCall, this, &Workshop::OnWorkshopItemCreated);
+	}
+
+	void SubmitItemUpdate(UGCUpdateHandle_t updateHandle, const char *pChangeNote)
+	{
+		SteamAPICall_t submitItemUpdateCall = SteamUGC()->SubmitItemUpdate(updateHandle, pChangeNote);
+		_itemUpdatedCallback.Set(submitItemUpdateCall, this, &Workshop::OnItemUpdateSubmitted);
+	}
+
+private:
+	void OnWorkshopItemCreated(CreateItemResult_t* createItemResult, bool bIOFailure)
+	{
+		if (_pyItemCreatedCallback != nullptr) 
+		{
+			_pyItemCreatedCallback(*createItemResult);
+		}
+	}
+
+	void OnItemUpdateSubmitted(SubmitItemUpdateResult_t* submitItemUpdateResult, bool bIOFailure)
+	{
+		if (_pyItemUpdatedCallback != nullptr)
+		{
+			_pyItemUpdatedCallback(*submitItemUpdateResult);
+		}
+	}
+};
+
+static Workshop workshop;
+
+SW_PY void Workshop_SetItemCreatedCallback(CreateItemResultCallback_t callback)
+{
+	workshop.SetItemCreatedCallback(callback);
+}
+
+SW_PY void Workshop_CreateItem(AppId_t consumerAppId, EWorkshopFileType fileType)
+{
+	workshop.CreateItem(consumerAppId, fileType);
+}
+
+SW_PY UGCUpdateHandle_t Workshop_StartItemUpdate(AppId_t consumerAppId, PublishedFileId_t publishedFileId)
+{
+	return SteamUGC()->StartItemUpdate(consumerAppId, publishedFileId);
+}
+
+SW_PY bool Workshop_SetItemTitle(UGCUpdateHandle_t updateHandle, const char *pTitle)
+{
+	if (strlen(pTitle) > UGC_MAX_TITLE_CHARS)
+	{
+		printf("Title cannot have more than %d ASCII characters. Title not set.", UGC_MAX_TITLE_CHARS);
+		return false;
+	}
+
+	return SteamUGC()->SetItemTitle(updateHandle, pTitle);
+}
+
+SW_PY bool Workshop_SetItemDescription(UGCUpdateHandle_t updateHandle, const char *pDescription)
+{
+	if (strlen(pDescription) > UGC_MAX_DESC_CHARS)
+	{
+		printf("Description cannot have more than %d ASCII characters. Description not set.", UGC_MAX_DESC_CHARS);
+		return false;
+	}
+
+	return SteamUGC()->SetItemDescription(updateHandle, pDescription);
+}
+
+SW_PY bool Workshop_SetItemUpdateLanguage(UGCUpdateHandle_t updateHandle, const char *pLanguage)
+{
+	return SteamUGC()->SetItemUpdateLanguage(updateHandle, pLanguage);
+}
+
+SW_PY bool Workshop_SetItemMetadata(UGCUpdateHandle_t updateHandle, const char *pMetadata)
+{
+	if (strlen(pMetadata) > UGC_MAX_METADATA_CHARS)
+	{
+		printf("Metadata cannot have more than %d ASCII characters. Metadata not set.", UGC_MAX_METADATA_CHARS);
+	}
+	return SteamUGC()->SetItemMetadata(updateHandle, pMetadata);
+}
+
+SW_PY bool Workshop_SetItemVisibility(UGCUpdateHandle_t updateHandle, ERemoteStoragePublishedFileVisibility visibility)
+{
+	return SteamUGC()->SetItemVisibility(updateHandle, visibility);
+}
+
+SW_PY bool Workshop_SetItemTags(UGCUpdateHandle_t updateHandle, const char ** stringArray, const int32 stringCount)
+{
+	SteamParamStringArray_t tags = { stringArray, stringCount };
+	
+	return SteamUGC()->SetItemTags(updateHandle, &tags);
+}
+
+SW_PY bool Workshop_SetItemContent(UGCUpdateHandle_t updateHandle, const char *pContentFolder)
+{
+	return SteamUGC()->SetItemContent(updateHandle, pContentFolder);
+}
+
+SW_PY bool Workshop_SetItemPreview(UGCUpdateHandle_t updateHandle, const char *pPreviewFile)
+{
+	return SteamUGC()->SetItemPreview(updateHandle, pPreviewFile);
+}
+
+SW_PY void Workshop_SetItemUpdatedCallback(SubmitItemUpdateResultCallback_t callback)
+{
+	workshop.SetItemUpdatedCallback(callback);
+}
+
+SW_PY void Workshop_SubmitItemUpdate(UGCUpdateHandle_t updateHandle, const char *pChangeNote)
+{
+	workshop.SubmitItemUpdate(updateHandle, pChangeNote);
+}
+
+SW_PY uint32 Workshop_GetNumSubscribedItems()
+{
+	return SteamUGC()->GetNumSubscribedItems();
+}
+
+SW_PY uint32 Workshop_GetSubscribedItems(PublishedFileId_t* pvecPublishedFileID, uint32 maxEntries)
+{
+	return SteamUGC()->GetSubscribedItems(pvecPublishedFileID, maxEntries);
+}
+
+SW_PY bool Workshop_GetItemInstallInfo(PublishedFileId_t nPublishedFileID, uint64 *punSizeOnDisk, char *pchFolder, uint32 cchFolderSize, uint32 *punTimeStamp)
+{
+	return SteamUGC()->GetItemInstallInfo(nPublishedFileID, punSizeOnDisk, pchFolder, cchFolderSize, punTimeStamp);
 }

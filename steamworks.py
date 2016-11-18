@@ -21,6 +21,14 @@ FriendFlags = {  # regular friend
     'All': 0xFFFF,
     }
 
+WorkshopFileType = {
+	'Community': 0x00,			# normal Workshop item that can be subscribed to
+	'Microtransaction': 0x01,	# Workshop item that is meant to be voted on for the purpose of selling in-game
+
+	# NOTE: There are more workshop file types defined "in isteamremotestorage.h",
+	# but we do not need them for now.
+}
+
 # Main Steam Class, obviously
 #------------------------------------------------
 class Steam:
@@ -115,15 +123,50 @@ class Steam:
 		Steam.cdll.IsSteamRunningInVR.restype = bool
 		Steam.cdll.GetSteamUILanguage.restype = c_char_p
 		Steam.cdll.GetAppID.restype = int
+		# Set argtypes and restype for Workshop functions
+		Steam.cdll.Workshop_StartItemUpdate.restype = c_uint64
+		Steam.cdll.Workshop_SetItemTitle.restype = bool
+		Steam.cdll.Workshop_SetItemTitle.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.Workshop_SetItemDescription.restype = bool
+		Steam.cdll.Workshop_SetItemDescription.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.Workshop_SetItemUpdateLanguage.restype = bool
+		Steam.cdll.Workshop_SetItemMetadata.restype = bool
+		Steam.cdll.Workshop_SetItemVisibility.restype = bool
+		Steam.cdll.Workshop_SetItemTags.restype = bool
+		Steam.cdll.Workshop_SetItemContent.restype = bool
+		Steam.cdll.Workshop_SetItemContent.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.Workshop_SetItemPreview.restype = bool
+		Steam.cdll.Workshop_SetItemPreview.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.Workshop_SubmitItemUpdate.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.Workshop_GetNumSubscribedItems.restype = c_uint32
+		Steam.cdll.Workshop_GetSubscribedItems.restype = c_uint32
+		Steam.cdll.Workshop_GetSubscribedItems.argtypes = [POINTER(c_uint64), c_uint32]
+		Steam.cdll.Workshop_GetItemInstallInfo.restype = bool
+		Steam.cdll.Workshop_GetItemInstallInfo.argtypes = [c_uint64, POINTER(c_uint64), c_char_p, c_uint32,  POINTER(c_uint32)]
 
 	@staticmethod
-	def Call(method):
+	def isSteamLoaded():
 		if not Steam.cdll and not Steam.warn:
 			print("Steam is not loaded")
 			Steam.warn = True
 			return False
 		else:
+			return True
+
+	@staticmethod
+	def Call(method):
+		if Steam.isSteamLoaded():
 			return method()
+		else:
+			return False
+
+	@staticmethod
+	def RunCallbacks():
+		if Steam.isSteamLoaded():
+			Steam.cdll.RunCallbacks()
+			return True
+		else:
+			return False
 
 # Class for Steam Apps
 #------------------------------------------------
@@ -382,6 +425,286 @@ class SteamUserStats:
 			return False
 		else:
 			return Steam.cdll.ClearAchievement(name)
+
+# Class for Steam Workshop
+#------------------------------------------------
+class SteamWorkshop:
+	class CreateItemResult_t(Structure):
+		"""A class that describes Steam's CreateItemResult_t C struct"""
+		_fields_ = [
+			("result", c_int),
+			("publishedFileId", c_uint64),
+			("userNeedsToAcceptWorkshopLegalAgreement", c_bool)
+		]
+
+	class SubmitItemUpdateResult_t(Structure):
+		"""A class that describes Steam's SubmitItemUpdateResult_t C struct"""
+		_fields_ = [
+			("result", c_int),
+			("userNeedsToAcceptWorkshopLegalAgreement", c_bool)
+		]
+
+	# We want to keep callbacks in the class scope, so that they don't get
+	# garbage collected while we still need them.
+	ITEM_CREATED_CALLBACK = CFUNCTYPE(None, CreateItemResult_t)
+	itemCreatedCallback = None
+
+	ITEM_UPDATED_CALLBACK = CFUNCTYPE(None, SubmitItemUpdateResult_t)
+	itemUpdatedCallback = None
+
+	@staticmethod
+	def SetItemCreatedCallback(callback):
+		if Steam.isSteamLoaded():
+			SteamWorkshop.itemCreatedCallback = SteamWorkshop.ITEM_CREATED_CALLBACK(callback)
+
+			Steam.cdll.Workshop_SetItemCreatedCallback(SteamWorkshop.itemCreatedCallback)
+		else:
+			return False
+
+	@staticmethod
+	def SetItemUpdatedCallback(callback):
+		if Steam.isSteamLoaded():
+			SteamWorkshop.itemUpdatedCallback = SteamWorkshop.ITEM_UPDATED_CALLBACK(callback)
+
+			Steam.cdll.Workshop_SetItemUpdatedCallback(SteamWorkshop.itemUpdatedCallback)
+		else:
+			return False
+
+	@staticmethod
+	def CreateItem(appId, filetype, callback = None):
+		"""Create a UGC (Workshop) item
+
+		Arguments:
+		
+		appId -- The app ID of the game on Steam. 
+		Do not use the creation tool app ID if they are separate.
+
+		filetype -- Can be a community file type or microtransactions.
+		Use predefined `WorkshopFileType` values.
+
+		callback -- The function to call once the item creation is finished.
+		"""
+		if Steam.isSteamLoaded():
+			if callback != None:
+				SteamWorkshop.SetItemCreatedCallback(callback)
+
+			Steam.cdll.Workshop_CreateItem(appId, filetype)
+			return True
+		else:
+			return False
+
+	@staticmethod
+	def StartItemUpdate(appId, publishedFileId):
+		"""Start the item update process and receive an update handle.
+
+		Arguments:
+
+		appId -- The app ID of the game on Steam. 
+		Do not use the creation tool app ID if they are separate
+
+		publishedFileId -- The ID of the Workshop file you are updating
+
+		Return value:
+		
+		If sucessful: update handle - an ID of the current update transaction
+		Otherwise: False
+		"""
+		if Steam.isSteamLoaded():
+			return Steam.cdll.Workshop_StartItemUpdate(appId, c_uint64(publishedFileId))
+		else:
+			return False
+
+	@staticmethod
+	def SetItemTitle(updateHandle, title):
+		"""Set the title of a Workshop item
+
+		Arguments:
+
+		updateHandle -- the handle returned by 'StartItemUpdate'
+
+		title -- the desired title of the item.
+
+		Return value:
+
+		True on succes,
+		False otherwise.
+		"""
+		if Steam.isSteamLoaded():
+			if len(title) > 128:
+				print("ERROR: Your title is longer than 128 characters.")
+				return False
+
+			return Steam.cdll.Workshop_SetItemTitle(updateHandle, title.encode())
+		else:
+			return False
+
+	@staticmethod
+	def SetItemDescription(updateHandle, description):
+		"""Set the description of a Workshop item
+
+		Arguments:
+
+		updateHandle -- the handle returned by 'StartItemUpdate'
+
+		description -- the desired description of the item.
+
+		Return value:
+
+		True on succes,
+		False otherwise.
+		"""
+		if Steam.isSteamLoaded():
+			if len(description) > 8000:
+				print("ERROR: Your description is longer than 8000 characters.")
+				return False
+
+			return Steam.cdll.Workshop_SetItemDescription(updateHandle, description.encode())
+		else:
+			return False
+
+	@staticmethod
+	def SetItemContent(updateHandle, contentDirectory):
+		"""Set the directory containing the content you wish to upload to Workshop.
+
+		Arguments:
+
+		updateHandle -- the handle returned by 'StartItemUpdate'
+
+		contentDirectory -- path to the directory containing the content of the workshop item.
+
+		Return value:
+
+		True on succes,
+		False otherwise.
+		"""
+		if Steam.isSteamLoaded():
+			return Steam.cdll.Workshop_SetItemContent(updateHandle, contentDirectory.encode())
+		else:
+			return False
+
+	@staticmethod
+	def SetItemPreview(updateHandle, previewImage):
+		"""Set the preview image of the Workshop item.
+
+		Arguments:
+
+		updateHandle -- the handle returned by 'StartItemUpdate'
+
+		previewImage -- path to the preview image file.
+
+		Return value:
+
+		True on succes,
+		False otherwise.
+		"""
+		if Steam.isSteamLoaded():
+			return Steam.cdll.Workshop_SetItemPreview(updateHandle, previewImage.encode())
+		else:
+			return False
+
+	@staticmethod
+	def SubmitItemUpdate(updateHandle, changeNote, callback = None):
+		"""Submit the item update with the given handle to Steam.
+
+		Arguments:
+
+		updateHandle -- the handle returned by 'StartItemUpdate'
+
+		changeNote -- a string containing change notes for the current update.
+		"""
+		if Steam.isSteamLoaded():
+			if callback != None:
+				SteamWorkshop.SetItemUpdatedCallback(callback)
+
+			return Steam.cdll.Workshop_SubmitItemUpdate(updateHandle, changeNote.encode())
+		else:
+			return False
+
+	@staticmethod
+	def GetNumSubscribedItems():
+		"""Get the total number of items the user is subscribed to for this game or application.
+
+		Return value:
+
+		On success: The number of subscribed items,
+		Otherwise: False.
+		"""
+		if Steam.isSteamLoaded():
+			return Steam.cdll.Workshop_GetNumSubscribedItems()
+		else:
+			return False
+
+	@staticmethod
+	def GetSubscribedItems(maxEntries=-1):
+		"""Get a list of published file IDs that the user is subscribed to
+
+		Arguments:
+
+		maxEntries -- the maximum number of entries to fetch. If omitted
+		the function will try to fetch as much items as the user is 
+		subscribed to.
+
+		Return Value:
+
+		On success: A list of published file IDs that the user is subscribed to.
+		Otherwise: False.
+		"""
+		if Steam.isSteamLoaded():
+			if maxEntries < 0:
+				maxEntries = SteamWorkshop.GetNumSubscribedItems()
+
+			# Published file IDs are stored as uint64 values
+			PublishedFileIdsArrayCType = c_uint64 * maxEntries
+			pvecPublishedFileIds = PublishedFileIdsArrayCType()
+
+			# TODO: We might need to add an exception check here to catch any errors while
+			# writing to the 'pvecPublishedFileIds' array.
+			numItems = Steam.cdll.Workshop_GetSubscribedItems(pvecPublishedFileIds, maxEntries)
+			# According to steam's example, it is possible for numItems to be greater than maxEntries
+			# so we crop.
+			if numItems > maxEntries:
+				numItems = maxEntries
+
+			publishedFileIdsList = [pvecPublishedFileIds[i] for i in range(numItems)]
+			return publishedFileIdsList
+		else:
+			return False
+
+	@staticmethod
+	def GetItemInstallInfo(publishedFileId, maxFolderPathLength=1024):
+		"""Get info about an installed item
+
+		Arguments:
+
+		publishedFileId -- the id of the item to look up,
+		maxFolderPathLength -- maximum length of the folder path in characters.
+
+		Return Value:
+
+		If the item is installed: an object with the following attributes
+		-- 'sizeOnDisk'
+		-- 'folder'
+		-- 'timestamp'
+
+		If the item is not installed, or the method fails it returns: False
+		"""
+		if Steam.isSteamLoaded():
+			pSizeOnDisk = pointer(c_uint64(0))
+			pTimestamp = pointer(c_uint32(0))
+			pFolder = create_string_buffer(maxFolderPathLength)
+
+			isInstalled = Steam.cdll.Workshop_GetItemInstallInfo(publishedFileId, pSizeOnDisk, pFolder, maxFolderPathLength, pTimestamp)
+
+			if isInstalled:
+				itemInfo = {
+					'sizeOnDisk' : pSizeOnDisk.contents.value,
+					'folder' : pFolder.value.decode(),
+					'timestamp' : pTimestamp.contents.value
+				}
+
+				return itemInfo
+
+		return False
 
 # Class for Steam Utilities
 #------------------------------------------------
