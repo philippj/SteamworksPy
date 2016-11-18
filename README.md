@@ -16,6 +16,7 @@ While I am still tinkering away with this, here are some things to note:
 # To Do
 - Add in more features from the Steamworks SDK
 - Create a Mac version (I do not own a Mac, so someone who does that can help out would be greatly appreciated!)
+- Add features/function updates for UGC and Workshop additions from peacegiverman
 
 # How To
 1. Download this repo and unpack
