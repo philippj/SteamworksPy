@@ -24,13 +24,14 @@ While I am still tinkering away with this, here are some things to note:
 3. Move the Steam header (steam) folder from /sdk/public/ into the unpacked repo for compiling
 4. Move the Steam API file from /sdk/redistributable_bin into the unpacked repo
   - For Linux, find libsteam_api.so
+      - This file might need to be copied to /usr/lib for the compiling to work if Steam does not copy it correctly
   - For Windows, find steam_api.dll or steam_api64.dll as well as steam_api.lib or steam_api64.lib
 5. Create the new DLL or SO file
   - For Linux:
     - Run the makefile from the repo
     - Alternately, you could just run something like:
     ```
-    g++ -o SteamworksPy.so -shared -fPIC SteamworksPy.cpp -lsteam_api
+    g++ -std=c++11 -o SteamworksPy.so -shared -fPIC SteamworksPy.cpp -lsteam_api
     ```
   - For Windows:
     - Create a new DLL project in Visual Studio
