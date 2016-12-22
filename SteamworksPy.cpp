@@ -53,6 +53,9 @@ SW_PY int GetPersonaState(){
 SW_PY void ActivateGameOverlay(const char* name){
 	return SteamFriends()->ActivateGameOverlay(name);	
 }
+SW_PY void ActivateGameOverlayToWebPage(const char* url) {
+	return SteamFriends()->ActivateGameOverlayToWebPage(url);
+}
 // Steam Music
 SW_PY bool MusicIsEnabled(){
 	return SteamMusic()->BIsEnabled();

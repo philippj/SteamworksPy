@@ -89,7 +89,8 @@ class Steam:
 		Steam.cdll.GetFriendCount.restype = int
 		Steam.cdll.GetPersonaName.restype = c_char_p
 		Steam.cdll.GetPersonaState.restype = int
-		Steam.cdll.ActivateGameOverlay.restype = c_char_p
+		Steam.cdll.ActivateGameOverlay.restype = None
+		Steam.cdll.ActivateGameOverlayToWebPage.restype = None
 		# Set restype for Music functions
 		Steam.cdll.MusicIsEnabled.restype = bool
 		Steam.cdll.MusicIsPlaying.restype = bool
@@ -237,7 +238,14 @@ class SteamFriends:
 			Steam.warn = True
 			return False
 		else:
-			return Steam.cdll.ActivateGameOverlay()			
+			return Steam.cdll.ActivateGameOverlay()	
+
+	@staticmethod
+	def ActivateGameOverlayToWebPage(url):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.ActivateGameOverlayToWebPage(url)
+		else:
+			return False
 
 # Class for Steam Music
 class SteamMusic:
