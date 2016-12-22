@@ -29,6 +29,16 @@ WorkshopFileType = {
 	# but we do not need them for now.
 }
 
+WorkshopItemState = {
+	"ItemStateNone":			0,	# item not tracked on client
+	"ItemStateSubscribed":		1,	# current user is subscribed to this item. Not just cached.
+	"ItemStateLegacyItem":		2,	# item was created with ISteamRemoteStorage
+	"ItemStateInstalled":		4,	# item is installed and usable (but maybe out of date)
+	"ItemStateNeedsUpdate":		8,	# items needs an update. Either because it's not installed yet or creator updated content
+	"ItemStateDownloading":		16,	# item update is currently downloading
+	"ItemStateDownloadPending":	32,	# DownloadItem() was called for this item, content isn't available until DownloadItemResult_t is fired
+}
+
 # Main Steam Class, obviously
 #------------------------------------------------
 class Steam:
@@ -142,6 +152,8 @@ class Steam:
 		Steam.cdll.Workshop_GetNumSubscribedItems.restype = c_uint32
 		Steam.cdll.Workshop_GetSubscribedItems.restype = c_uint32
 		Steam.cdll.Workshop_GetSubscribedItems.argtypes = [POINTER(c_uint64), c_uint32]
+		Steam.cdll.Workshop_GetItemState.restype = c_uint32
+		Steam.cdll.Workshop_GetItemState.argtypes = [c_uint64]
 		Steam.cdll.Workshop_GetItemInstallInfo.restype = bool
 		Steam.cdll.Workshop_GetItemInstallInfo.argtypes = [c_uint64, POINTER(c_uint64), c_char_p, c_uint32,  POINTER(c_uint32)]
 
@@ -675,6 +687,24 @@ class SteamWorkshop:
 
 			publishedFileIdsList = [pvecPublishedFileIds[i] for i in range(numItems)]
 			return publishedFileIdsList
+		else:
+			return False
+
+	@staticmethod
+	def GetItemState(publishedFileId):
+		"""Get the current state of a workshop item.
+
+		Arguments:
+
+		publishedFileId -- the id of the item whose state to check
+
+		Return Value:
+
+		On success: A `WorkshopItemState` value describing the item state.
+		Otherwise: False
+		"""
+		if Steam.isSteamLoaded():
+			return Steam.cdll.Workshop_GetItemState(publishedFileId)
 		else:
 			return False
 

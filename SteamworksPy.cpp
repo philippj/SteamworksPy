@@ -310,6 +310,11 @@ SW_PY uint32 Workshop_GetSubscribedItems(PublishedFileId_t* pvecPublishedFileID,
 	return SteamUGC()->GetSubscribedItems(pvecPublishedFileID, maxEntries);
 }
 
+SW_PY uint32 Workshop_GetItemState(PublishedFileId_t publishedFileID)
+{
+	return SteamUGC()->GetItemState(publishedFileID);
+}
+
 SW_PY bool Workshop_GetItemInstallInfo(PublishedFileId_t nPublishedFileID, uint64 *punSizeOnDisk, char *pchFolder, uint32 cchFolderSize, uint32 *punTimeStamp)
 {
 	return SteamUGC()->GetItemInstallInfo(nPublishedFileID, punSizeOnDisk, pchFolder, cchFolderSize, punTimeStamp);
