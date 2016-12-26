@@ -300,6 +300,11 @@ SW_PY void Workshop_SubmitItemUpdate(UGCUpdateHandle_t updateHandle, const char 
 	workshop.SubmitItemUpdate(updateHandle, pChangeNote);
 }
 
+SW_PY EItemUpdateStatus Workshop_GetItemUpdateProgress(UGCUpdateHandle_t handle, uint64 *punBytesProcessed, uint64* punBytesTotal)
+{
+	return SteamUGC()->GetItemUpdateProgress(handle, punBytesProcessed, punBytesTotal);
+}
+
 SW_PY uint32 Workshop_GetNumSubscribedItems()
 {
 	return SteamUGC()->GetNumSubscribedItems();
@@ -318,4 +323,9 @@ SW_PY uint32 Workshop_GetItemState(PublishedFileId_t publishedFileID)
 SW_PY bool Workshop_GetItemInstallInfo(PublishedFileId_t nPublishedFileID, uint64 *punSizeOnDisk, char *pchFolder, uint32 cchFolderSize, uint32 *punTimeStamp)
 {
 	return SteamUGC()->GetItemInstallInfo(nPublishedFileID, punSizeOnDisk, pchFolder, cchFolderSize, punTimeStamp);
+}
+
+SW_PY bool Workshop_GetItemDownloadInfo(PublishedFileId_t publishedFileID, uint64 *punBytesDownloaded, uint64 *punBytesTotal)
+{
+	return SteamUGC()->GetItemDownloadInfo(publishedFileID, punBytesDownloaded, punBytesTotal);
 }

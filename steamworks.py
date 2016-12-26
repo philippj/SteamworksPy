@@ -156,6 +156,8 @@ class Steam:
 		Steam.cdll.Workshop_GetItemState.argtypes = [c_uint64]
 		Steam.cdll.Workshop_GetItemInstallInfo.restype = bool
 		Steam.cdll.Workshop_GetItemInstallInfo.argtypes = [c_uint64, POINTER(c_uint64), c_char_p, c_uint32,  POINTER(c_uint32)]
+		Steam.cdll.Workshop_GetItemDownloadInfo.restype = bool
+		Steam.cdll.Workshop_GetItemDownloadInfo.argtypes = [c_uint64, POINTER(c_uint64), POINTER(c_uint64)]
 
 	@staticmethod
 	def isSteamLoaded():
@@ -641,6 +643,44 @@ class SteamWorkshop:
 			return False
 
 	@staticmethod
+	def GetItemUpdateProgress(updateHandle):
+		"""Get the progress of an item update request.
+
+		Argument:
+
+		updateHandle -- the handle returned by 'StartItemUpdate'
+
+		Return Value:
+
+		On success: An object with the following attributes
+
+		-- 'itemUpdateStatus - a `WorkshopItemUpdateStatus` value describing the update status of the item
+		-- 'bytesProcessed' - amount of bytes processed
+		-- 'bytesTotal' - total amount of bytes to be processed
+		-- 'progress' - a value ranging from 0 to 1 representing update progress
+
+		Otherwise: False
+		"""
+		if Steam.isSteamLoaded():
+			pBytesProcessed = pointer(c_uint64)
+			pBytesTotal = pointer(c_uint64)
+
+			itemUpdateStatus = Workshop_GetItemUpdateProgress(updateHandle, pBytesProcessed, pBytesTotal)
+			# Unlike for GetItemDownloadInfo, pBytesTotal should always be set here
+			progress = pBytesProcessed.contents.value / pBytesTotal.contents.value
+
+			itemUpdateInfo = {
+				'itemUpdateStatus' : itemUpdateStatus,
+				'bytesProcessed' : pBytesProcessed.contents.value,
+				'bytesTotal' : pBytesTotal.contents.value,
+				'progress' : progress
+			}
+
+			return itemUpdateInfo
+		else:
+			return False
+
+	@staticmethod
 	def GetNumSubscribedItems():
 		"""Get the total number of items the user is subscribed to for this game or application.
 
@@ -743,6 +783,53 @@ class SteamWorkshop:
 				return itemInfo
 
 		return False
+
+	@staticmethod
+	def GetItemDownloadInfo(publishedFileId):
+		"""Get download info for a subscribed item
+
+		Arguments:
+
+		publishedFileId -- the id of the item whose download info to look up
+
+		Return Value:
+
+		If download information is available returns an object with
+		the following attributes
+
+		-- 'bytesDownloaded'- the amount of downloaded bytes
+		-- 'bytesTotal' - the total amounts of bytes an item has
+		-- 'progress' - a value ranging from 0 to 1 representing download progress
+
+		If download information or steamworks or not available, 
+		returns False
+		"""
+		if Steam.isSteamLoaded():
+			pBytesDownloaded = pointer(c_uint64(0))
+			pBytesTotal = pointer(c_uint64(0))
+
+			# NOTE: pBytesTotal will only be valid after the download has started.
+			downloadInfoAvailable = Steam.cdll.Workshop_GetItemDownloadInfo(publishedFileId, pBytesDownloaded, pBytesTotal)
+
+			if downloadInfoAvailable:
+				bytesDownloaded = pBytesDownloaded.contents.value
+				bytesTotal = pBytesTotal.contents.value
+
+				progress = 0
+				if bytesTotal > 0:
+					progress = bytesDownloaded / bytesTotal
+
+				downloadInfo = {
+					'bytesDownloaded' : bytesDownloaded,
+					'bytesTotal' : bytesTotal,
+					'progress' : progress
+				}
+
+				return downloadInfo
+			
+			return False
+		else:
+			return False
 
 # Class for Steam Utilities
 #------------------------------------------------
