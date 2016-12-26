@@ -53,6 +53,9 @@ SW_PY int GetPersonaState(){
 SW_PY void ActivateGameOverlay(const char* name){
 	return SteamFriends()->ActivateGameOverlay(name);	
 }
+SW_PY void ActivateGameOverlayToWebPage(const char* url) {
+	return SteamFriends()->ActivateGameOverlayToWebPage(url);
+}
 // Steam Music
 SW_PY bool MusicIsEnabled(){
 	return SteamMusic()->BIsEnabled();
@@ -160,15 +163,21 @@ SW_PY void RunCallbacks()
 // Workshop
 typedef void(*CreateItemResultCallback_t) (CreateItemResult_t);
 typedef void(*SubmitItemUpdateResultCallback_t) (SubmitItemUpdateResult_t);
+typedef void(*ItemInstalledCallback_t) (ItemInstalled_t);
 
 class Workshop
 {
 public:
 	CreateItemResultCallback_t _pyItemCreatedCallback;
 	SubmitItemUpdateResultCallback_t _pyItemUpdatedCallback;
+	ItemInstalledCallback_t _pyItemInstalledCallback;
 
 	CCallResult<Workshop, CreateItemResult_t> _itemCreatedCallback;
 	CCallResult<Workshop, SubmitItemUpdateResult_t> _itemUpdatedCallback;
+
+	CCallback<Workshop, ItemInstalled_t> _itemInstalledCallback;
+
+	Workshop() : _itemInstalledCallback(this, &Workshop::OnItemInstalled) {}
 
 	void SetItemCreatedCallback(CreateItemResultCallback_t callback)
 	{
@@ -180,6 +189,16 @@ public:
 		_pyItemUpdatedCallback = callback;
 	}
 	
+	void SetItemInstalledCallback(ItemInstalledCallback_t callback)
+	{
+		_pyItemInstalledCallback = callback;
+	}
+
+	void ClearItemInstallCallback()
+	{
+		_pyItemInstalledCallback = nullptr;
+	}
+
 	void CreateItem(AppId_t consumerAppId, EWorkshopFileType fileType)
 	{
 		//TODO: Check if fileType is a valid value?
@@ -208,6 +227,14 @@ private:
 		if (_pyItemUpdatedCallback != nullptr)
 		{
 			_pyItemUpdatedCallback(*submitItemUpdateResult);
+		}
+	}
+
+	void OnItemInstalled(ItemInstalled_t* itemInstalledResult)
+	{
+		if (_pyItemInstalledCallback != nullptr)
+		{
+			_pyItemInstalledCallback(*itemInstalledResult);
 		}
 	}
 };
@@ -297,6 +324,11 @@ SW_PY void Workshop_SubmitItemUpdate(UGCUpdateHandle_t updateHandle, const char 
 	workshop.SubmitItemUpdate(updateHandle, pChangeNote);
 }
 
+SW_PY EItemUpdateStatus Workshop_GetItemUpdateProgress(UGCUpdateHandle_t handle, uint64 *punBytesProcessed, uint64* punBytesTotal)
+{
+	return SteamUGC()->GetItemUpdateProgress(handle, punBytesProcessed, punBytesTotal);
+}
+
 SW_PY uint32 Workshop_GetNumSubscribedItems()
 {
 	return SteamUGC()->GetNumSubscribedItems();
@@ -307,7 +339,27 @@ SW_PY uint32 Workshop_GetSubscribedItems(PublishedFileId_t* pvecPublishedFileID,
 	return SteamUGC()->GetSubscribedItems(pvecPublishedFileID, maxEntries);
 }
 
+SW_PY uint32 Workshop_GetItemState(PublishedFileId_t publishedFileID)
+{
+	return SteamUGC()->GetItemState(publishedFileID);
+}
+
+SW_PY void Workshop_SetItemInstalledCallback(ItemInstalledCallback_t callback)
+{
+	workshop.SetItemInstalledCallback(callback);
+}
+
+SW_PY void Workshop_ClearItemInstalledCallback()
+{
+	workshop.ClearItemInstallCallback();
+}
+
 SW_PY bool Workshop_GetItemInstallInfo(PublishedFileId_t nPublishedFileID, uint64 *punSizeOnDisk, char *pchFolder, uint32 cchFolderSize, uint32 *punTimeStamp)
 {
 	return SteamUGC()->GetItemInstallInfo(nPublishedFileID, punSizeOnDisk, pchFolder, cchFolderSize, punTimeStamp);
+}
+
+SW_PY bool Workshop_GetItemDownloadInfo(PublishedFileId_t publishedFileID, uint64 *punBytesDownloaded, uint64 *punBytesTotal)
+{
+	return SteamUGC()->GetItemDownloadInfo(publishedFileID, punBytesDownloaded, punBytesTotal);
 }

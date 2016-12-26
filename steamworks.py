@@ -29,6 +29,16 @@ WorkshopFileType = {
 	# but we do not need them for now.
 }
 
+WorkshopItemState = {
+	"ItemStateNone":			0,	# item not tracked on client
+	"ItemStateSubscribed":		1,	# current user is subscribed to this item. Not just cached.
+	"ItemStateLegacyItem":		2,	# item was created with ISteamRemoteStorage
+	"ItemStateInstalled":		4,	# item is installed and usable (but maybe out of date)
+	"ItemStateNeedsUpdate":		8,	# items needs an update. Either because it's not installed yet or creator updated content
+	"ItemStateDownloading":		16,	# item update is currently downloading
+	"ItemStateDownloadPending":	32,	# DownloadItem() was called for this item, content isn't available until DownloadItemResult_t is fired
+}
+
 # Main Steam Class, obviously
 #------------------------------------------------
 class Steam:
@@ -89,7 +99,10 @@ class Steam:
 		Steam.cdll.GetFriendCount.restype = int
 		Steam.cdll.GetPersonaName.restype = c_char_p
 		Steam.cdll.GetPersonaState.restype = int
-		Steam.cdll.ActivateGameOverlay.restype = c_char_p
+		Steam.cdll.ActivateGameOverlay.restype = None
+		Steam.cdll.ActivateGameOverlay.argtypes = [c_char_p]
+		Steam.cdll.ActivateGameOverlayToWebPage.restype = None
+		Steam.cdll.ActivateGameOverlayToWebPage.argtypes = [c_char_p]
 		# Set restype for Music functions
 		Steam.cdll.MusicIsEnabled.restype = bool
 		Steam.cdll.MusicIsPlaying.restype = bool
@@ -141,8 +154,12 @@ class Steam:
 		Steam.cdll.Workshop_GetNumSubscribedItems.restype = c_uint32
 		Steam.cdll.Workshop_GetSubscribedItems.restype = c_uint32
 		Steam.cdll.Workshop_GetSubscribedItems.argtypes = [POINTER(c_uint64), c_uint32]
+		Steam.cdll.Workshop_GetItemState.restype = c_uint32
+		Steam.cdll.Workshop_GetItemState.argtypes = [c_uint64]
 		Steam.cdll.Workshop_GetItemInstallInfo.restype = bool
 		Steam.cdll.Workshop_GetItemInstallInfo.argtypes = [c_uint64, POINTER(c_uint64), c_char_p, c_uint32,  POINTER(c_uint32)]
+		Steam.cdll.Workshop_GetItemDownloadInfo.restype = bool
+		Steam.cdll.Workshop_GetItemDownloadInfo.argtypes = [c_uint64, POINTER(c_uint64), POINTER(c_uint64)]
 
 	@staticmethod
 	def isSteamLoaded():
@@ -231,13 +248,20 @@ class SteamFriends:
 			return Steam.cdll.GetPersonaState()
 
 	@staticmethod
-	def ActivateGameOverlay():
+	def ActivateGameOverlay(dialog=''):
 		if not Steam.cdll and not Steam.warn:
 			print("Steam is not loaded")
 			Steam.warn = True
 			return False
 		else:
-			return Steam.cdll.ActivateGameOverlay()			
+			return Steam.cdll.ActivateGameOverlay(dialog.encode())	
+
+	@staticmethod
+	def ActivateGameOverlayToWebPage(url):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.ActivateGameOverlayToWebPage(url.encode())
+		else:
+			return False
 
 # Class for Steam Music
 class SteamMusic:
@@ -444,31 +468,56 @@ class SteamWorkshop:
 			("userNeedsToAcceptWorkshopLegalAgreement", c_bool)
 		]
 
+	class ItemInstalled_t(Structure):
+		"""A class that describes Steam's ItemInstalled_t C struct"""
+		_fields_ = [
+			("appId", c_uint32),
+			("publishedFileId", c_uint64)
+		]
+
 	# We want to keep callbacks in the class scope, so that they don't get
 	# garbage collected while we still need them.
-	ITEM_CREATED_CALLBACK = CFUNCTYPE(None, CreateItemResult_t)
+	ITEM_CREATED_CALLBACK_TYPE = CFUNCTYPE(None, CreateItemResult_t)
 	itemCreatedCallback = None
 
-	ITEM_UPDATED_CALLBACK = CFUNCTYPE(None, SubmitItemUpdateResult_t)
+	ITEM_UPDATED_CALLBACK_TYPE = CFUNCTYPE(None, SubmitItemUpdateResult_t)
 	itemUpdatedCallback = None
 
-	@staticmethod
-	def SetItemCreatedCallback(callback):
-		if Steam.isSteamLoaded():
-			SteamWorkshop.itemCreatedCallback = SteamWorkshop.ITEM_CREATED_CALLBACK(callback)
+	ITEM_INSTALLED_CALLBACK_TYPE = CFUNCTYPE(None, ItemInstalled_t)
+	itemInstalledCallback = None
 
-			Steam.cdll.Workshop_SetItemCreatedCallback(SteamWorkshop.itemCreatedCallback)
+	@classmethod
+	def SetItemCreatedCallback(cls, callback):
+		if Steam.isSteamLoaded():
+			cls.itemCreatedCallback = cls.ITEM_CREATED_CALLBACK_TYPE(callback)
+
+			Steam.cdll.Workshop_SetItemCreatedCallback(cls.itemCreatedCallback)
 		else:
 			return False
 
-	@staticmethod
-	def SetItemUpdatedCallback(callback):
+	@classmethod
+	def SetItemUpdatedCallback(cls, callback):
 		if Steam.isSteamLoaded():
-			SteamWorkshop.itemUpdatedCallback = SteamWorkshop.ITEM_UPDATED_CALLBACK(callback)
+			cls.itemUpdatedCallback = cls.ITEM_UPDATED_CALLBACK_TYPE(callback)
 
-			Steam.cdll.Workshop_SetItemUpdatedCallback(SteamWorkshop.itemUpdatedCallback)
+			Steam.cdll.Workshop_SetItemUpdatedCallback(cls.itemUpdatedCallback)
 		else:
 			return False
+
+	@classmethod
+	def SetItemInstalledCallback(cls, callback):
+		if Steam.isSteamLoaded():
+			cls.itemInstalledCallback = cls.ITEM_INSTALLED_CALLBACK_TYPE(callback)
+
+			Steam.cdll.Workshop_SetItemInstalledCallback(cls.itemInstalledCallback)
+		else:
+			return False
+
+	@classmethod
+	def ClearItemInstalledCallback(cls, callback):
+		if Steam.isSteamLoaded():
+			itemInstalledCallback = None
+			Steam.cdll.Workshop_ClearItemInstalledCallback()
 
 	@staticmethod
 	def CreateItem(appId, filetype, callback = None):
@@ -621,6 +670,44 @@ class SteamWorkshop:
 			return False
 
 	@staticmethod
+	def GetItemUpdateProgress(updateHandle):
+		"""Get the progress of an item update request.
+
+		Argument:
+
+		updateHandle -- the handle returned by 'StartItemUpdate'
+
+		Return Value:
+
+		On success: An object with the following attributes
+
+		-- 'itemUpdateStatus - a `WorkshopItemUpdateStatus` value describing the update status of the item
+		-- 'bytesProcessed' - amount of bytes processed
+		-- 'bytesTotal' - total amount of bytes to be processed
+		-- 'progress' - a value ranging from 0 to 1 representing update progress
+
+		Otherwise: False
+		"""
+		if Steam.isSteamLoaded():
+			pBytesProcessed = pointer(c_uint64)
+			pBytesTotal = pointer(c_uint64)
+
+			itemUpdateStatus = Workshop_GetItemUpdateProgress(updateHandle, pBytesProcessed, pBytesTotal)
+			# Unlike for GetItemDownloadInfo, pBytesTotal should always be set here
+			progress = pBytesProcessed.contents.value / pBytesTotal.contents.value
+
+			itemUpdateInfo = {
+				'itemUpdateStatus' : itemUpdateStatus,
+				'bytesProcessed' : pBytesProcessed.contents.value,
+				'bytesTotal' : pBytesTotal.contents.value,
+				'progress' : progress
+			}
+
+			return itemUpdateInfo
+		else:
+			return False
+
+	@staticmethod
 	def GetNumSubscribedItems():
 		"""Get the total number of items the user is subscribed to for this game or application.
 
@@ -671,6 +758,24 @@ class SteamWorkshop:
 			return False
 
 	@staticmethod
+	def GetItemState(publishedFileId):
+		"""Get the current state of a workshop item.
+
+		Arguments:
+
+		publishedFileId -- the id of the item whose state to check
+
+		Return Value:
+
+		On success: A `WorkshopItemState` value describing the item state.
+		Otherwise: False
+		"""
+		if Steam.isSteamLoaded():
+			return Steam.cdll.Workshop_GetItemState(publishedFileId)
+		else:
+			return False
+
+	@staticmethod
 	def GetItemInstallInfo(publishedFileId, maxFolderPathLength=1024):
 		"""Get info about an installed item
 
@@ -705,6 +810,53 @@ class SteamWorkshop:
 				return itemInfo
 
 		return False
+
+	@staticmethod
+	def GetItemDownloadInfo(publishedFileId):
+		"""Get download info for a subscribed item
+
+		Arguments:
+
+		publishedFileId -- the id of the item whose download info to look up
+
+		Return Value:
+
+		If download information is available returns an object with
+		the following attributes
+
+		-- 'bytesDownloaded'- the amount of downloaded bytes
+		-- 'bytesTotal' - the total amounts of bytes an item has
+		-- 'progress' - a value ranging from 0 to 1 representing download progress
+
+		If download information or steamworks or not available, 
+		returns False
+		"""
+		if Steam.isSteamLoaded():
+			pBytesDownloaded = pointer(c_uint64(0))
+			pBytesTotal = pointer(c_uint64(0))
+
+			# NOTE: pBytesTotal will only be valid after the download has started.
+			downloadInfoAvailable = Steam.cdll.Workshop_GetItemDownloadInfo(publishedFileId, pBytesDownloaded, pBytesTotal)
+
+			if downloadInfoAvailable:
+				bytesDownloaded = pBytesDownloaded.contents.value
+				bytesTotal = pBytesTotal.contents.value
+
+				progress = 0
+				if bytesTotal > 0:
+					progress = bytesDownloaded / bytesTotal
+
+				downloadInfo = {
+					'bytesDownloaded' : bytesDownloaded,
+					'bytesTotal' : bytesTotal,
+					'progress' : progress
+				}
+
+				return downloadInfo
+			
+			return False
+		else:
+			return False
 
 # Class for Steam Utilities
 #------------------------------------------------
