@@ -101,6 +101,7 @@ class Steam:
 		Steam.cdll.GetPersonaState.restype = int
 		Steam.cdll.ActivateGameOverlay.restype = None
 		Steam.cdll.ActivateGameOverlayToWebPage.restype = None
+		Steam.cdll.ActivateGameOverlayToWebPage.argtypes = [c_char_p]
 		# Set restype for Music functions
 		Steam.cdll.MusicIsEnabled.restype = bool
 		Steam.cdll.MusicIsPlaying.restype = bool
@@ -257,7 +258,7 @@ class SteamFriends:
 	@staticmethod
 	def ActivateGameOverlayToWebPage(url):
 		if Steam.isSteamLoaded():
-			return Steam.cdll.ActivateGameOverlayToWebPage(url)
+			return Steam.cdll.ActivateGameOverlayToWebPage(url.encode())
 		else:
 			return False
 
