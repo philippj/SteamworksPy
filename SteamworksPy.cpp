@@ -163,15 +163,21 @@ SW_PY void RunCallbacks()
 // Workshop
 typedef void(*CreateItemResultCallback_t) (CreateItemResult_t);
 typedef void(*SubmitItemUpdateResultCallback_t) (SubmitItemUpdateResult_t);
+typedef void(*ItemInstalledCallback_t) (ItemInstalled_t);
 
 class Workshop
 {
 public:
 	CreateItemResultCallback_t _pyItemCreatedCallback;
 	SubmitItemUpdateResultCallback_t _pyItemUpdatedCallback;
+	ItemInstalledCallback_t _pyItemInstalledCallback;
 
 	CCallResult<Workshop, CreateItemResult_t> _itemCreatedCallback;
 	CCallResult<Workshop, SubmitItemUpdateResult_t> _itemUpdatedCallback;
+
+	CCallback<Workshop, ItemInstalled_t> _itemInstalledCallback;
+
+	Workshop() : _itemInstalledCallback(this, &Workshop::OnItemInstalled) {}
 
 	void SetItemCreatedCallback(CreateItemResultCallback_t callback)
 	{
@@ -183,6 +189,16 @@ public:
 		_pyItemUpdatedCallback = callback;
 	}
 	
+	void SetItemInstalledCallback(ItemInstalledCallback_t callback)
+	{
+		_pyItemInstalledCallback = callback;
+	}
+
+	void ClearItemInstallCallback()
+	{
+		_pyItemInstalledCallback = nullptr;
+	}
+
 	void CreateItem(AppId_t consumerAppId, EWorkshopFileType fileType)
 	{
 		//TODO: Check if fileType is a valid value?
@@ -211,6 +227,14 @@ private:
 		if (_pyItemUpdatedCallback != nullptr)
 		{
 			_pyItemUpdatedCallback(*submitItemUpdateResult);
+		}
+	}
+
+	void OnItemInstalled(ItemInstalled_t* itemInstalledResult)
+	{
+		if (_pyItemInstalledCallback != nullptr)
+		{
+			_pyItemInstalledCallback(*itemInstalledResult);
 		}
 	}
 };
@@ -318,6 +342,16 @@ SW_PY uint32 Workshop_GetSubscribedItems(PublishedFileId_t* pvecPublishedFileID,
 SW_PY uint32 Workshop_GetItemState(PublishedFileId_t publishedFileID)
 {
 	return SteamUGC()->GetItemState(publishedFileID);
+}
+
+SW_PY void Workshop_SetItemInstalledCallback(ItemInstalledCallback_t callback)
+{
+	workshop.SetItemInstalledCallback(callback);
+}
+
+SW_PY void Workshop_ClearItemInstalledCallback()
+{
+	workshop.ClearItemInstallCallback();
 }
 
 SW_PY bool Workshop_GetItemInstallInfo(PublishedFileId_t nPublishedFileID, uint64 *punSizeOnDisk, char *pchFolder, uint32 cchFolderSize, uint32 *punTimeStamp)

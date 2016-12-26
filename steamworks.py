@@ -466,18 +466,28 @@ class SteamWorkshop:
 			("userNeedsToAcceptWorkshopLegalAgreement", c_bool)
 		]
 
+	class ItemInstalled_t(Structure):
+		"""A class that describes Steam's ItemInstalled_t C struct"""
+		_fields_ = [
+			("appId", c_uint32),
+			("publishedFileId", c_uint64)
+		]
+
 	# We want to keep callbacks in the class scope, so that they don't get
 	# garbage collected while we still need them.
-	ITEM_CREATED_CALLBACK = CFUNCTYPE(None, CreateItemResult_t)
+	ITEM_CREATED_CALLBACK_TYPE = CFUNCTYPE(None, CreateItemResult_t)
 	itemCreatedCallback = None
 
-	ITEM_UPDATED_CALLBACK = CFUNCTYPE(None, SubmitItemUpdateResult_t)
+	ITEM_UPDATED_CALLBACK_TYPE = CFUNCTYPE(None, SubmitItemUpdateResult_t)
 	itemUpdatedCallback = None
+
+	ITEM_INSTALLED_CALLBACK_TYPE = CFUNCTYPE(None, ItemInstalled_t)
+	itemInstalledCallback = None
 
 	@staticmethod
 	def SetItemCreatedCallback(callback):
 		if Steam.isSteamLoaded():
-			SteamWorkshop.itemCreatedCallback = SteamWorkshop.ITEM_CREATED_CALLBACK(callback)
+			SteamWorkshop.itemCreatedCallback = SteamWorkshop.ITEM_CREATED_CALLBACK_TYPE(callback)
 
 			Steam.cdll.Workshop_SetItemCreatedCallback(SteamWorkshop.itemCreatedCallback)
 		else:
@@ -486,11 +496,26 @@ class SteamWorkshop:
 	@staticmethod
 	def SetItemUpdatedCallback(callback):
 		if Steam.isSteamLoaded():
-			SteamWorkshop.itemUpdatedCallback = SteamWorkshop.ITEM_UPDATED_CALLBACK(callback)
+			SteamWorkshop.itemUpdatedCallback = SteamWorkshop.ITEM_UPDATED_CALLBACK_TYPE(callback)
 
 			Steam.cdll.Workshop_SetItemUpdatedCallback(SteamWorkshop.itemUpdatedCallback)
 		else:
 			return False
+
+	@classmethod
+	def SetItemInstalledCallback(cls, callback):
+		if Steam.isSteamLoaded():
+			cls.itemInstalledCallback = cls.ITEM_INSTALLED_CALLBACK_TYPE(callback)
+
+			Steam.cdll.Workshop_SetItemInstalledCallback(cls.itemInstalledCallback)
+		else:
+			return False
+
+	@classmethod
+	def ClearItemInstalledCallback(cls, callback):
+		if Steam.isSteamLoaded():
+			itemInstalledCallback = None
+			Steam.cdll.Workshop_ClearItemInstalledCallback()
 
 	@staticmethod
 	def CreateItem(appId, filetype, callback = None):
