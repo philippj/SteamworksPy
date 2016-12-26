@@ -485,21 +485,21 @@ class SteamWorkshop:
 	ITEM_INSTALLED_CALLBACK_TYPE = CFUNCTYPE(None, ItemInstalled_t)
 	itemInstalledCallback = None
 
-	@staticmethod
-	def SetItemCreatedCallback(callback):
+	@classmethod
+	def SetItemCreatedCallback(cls, callback):
 		if Steam.isSteamLoaded():
-			SteamWorkshop.itemCreatedCallback = SteamWorkshop.ITEM_CREATED_CALLBACK_TYPE(callback)
+			cls.itemCreatedCallback = cls.ITEM_CREATED_CALLBACK_TYPE(callback)
 
-			Steam.cdll.Workshop_SetItemCreatedCallback(SteamWorkshop.itemCreatedCallback)
+			Steam.cdll.Workshop_SetItemCreatedCallback(cls.itemCreatedCallback)
 		else:
 			return False
 
-	@staticmethod
-	def SetItemUpdatedCallback(callback):
+	@classmethod
+	def SetItemUpdatedCallback(cls, callback):
 		if Steam.isSteamLoaded():
-			SteamWorkshop.itemUpdatedCallback = SteamWorkshop.ITEM_UPDATED_CALLBACK_TYPE(callback)
+			cls.itemUpdatedCallback = cls.ITEM_UPDATED_CALLBACK_TYPE(callback)
 
-			Steam.cdll.Workshop_SetItemUpdatedCallback(SteamWorkshop.itemUpdatedCallback)
+			Steam.cdll.Workshop_SetItemUpdatedCallback(cls.itemUpdatedCallback)
 		else:
 			return False
 
