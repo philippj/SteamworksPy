@@ -100,6 +100,7 @@ class Steam:
 		Steam.cdll.GetPersonaName.restype = c_char_p
 		Steam.cdll.GetPersonaState.restype = int
 		Steam.cdll.ActivateGameOverlay.restype = None
+		Steam.cdll.ActivateGameOverlay.argtypes = [c_char_p]
 		Steam.cdll.ActivateGameOverlayToWebPage.restype = None
 		Steam.cdll.ActivateGameOverlayToWebPage.argtypes = [c_char_p]
 		# Set restype for Music functions
@@ -247,13 +248,13 @@ class SteamFriends:
 			return Steam.cdll.GetPersonaState()
 
 	@staticmethod
-	def ActivateGameOverlay():
+	def ActivateGameOverlay(dialog=''):
 		if not Steam.cdll and not Steam.warn:
 			print("Steam is not loaded")
 			Steam.warn = True
 			return False
 		else:
-			return Steam.cdll.ActivateGameOverlay()	
+			return Steam.cdll.ActivateGameOverlay(dialog.encode())	
 
 	@staticmethod
 	def ActivateGameOverlayToWebPage(url):
