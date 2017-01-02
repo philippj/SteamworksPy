@@ -31,7 +31,7 @@ While I am still tinkering away with this, here are some things to note:
     - Run the makefile from the repo
     - Alternately, you could just run something like:
     ```
-    g++ -std=c++11 -o SteamworksPy.so -shared -fPIC SteamworksPy.cpp -lsteam_api
+    g++ -std=c++11 -o SteamworksPy.so -shared -fPIC SteamworksPy.cpp -l steam_api -L
     ```
   - For Windows:
     - Create a new DLL project in Visual Studio
