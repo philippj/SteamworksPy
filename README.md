@@ -1,9 +1,9 @@
 # SteamworksForPython
-Howdy!  This is a branch of Easimer's SteamworksForPython in an attempt to bring a fully-functional Python module for Steam out for the public.
+Howdy!  This is a fork of Easimer's original SteamworksForPython in an attempt to bring a fully-functional Python module for Steam out for the public.
 
 Feel free to fork or contribute to this module.
 
-For a fuller tutorial, with images, on SteamworksPy please read our post: http://coaguco.tumblr.com/post/128240756897/steamworks-for-python-tutorial-linux.
+For a fuller (yet outdated) tutorial, with images, on SteamworksPy please read our post: http://coaguco.tumblr.com/post/128240756897/steamworks-for-python-tutorial-linux.
 
 # Some Notes
 While I am still tinkering away with this, here are some things to note:
@@ -17,6 +17,7 @@ While I am still tinkering away with this, here are some things to note:
 - Add in more features from the Steamworks SDK
 - Create a Mac version (I do not own a Mac, so someone who does that can help out would be greatly appreciated!)
 - Add features/function updates for UGC and Workshop additions from peacegiverman
+- Finished documentation website and link it here
 
 # How To
 1. Download this repo and unpack
@@ -51,7 +52,7 @@ from steamworks import *
 #Initialize Steam
 Steam.Init()
 ```
-From here you should be able to call various functions of the steamworks.py.  A list of available functions is listed below; take a closer look at the steamworks.py for a better understanding.  In addition, you should be able to read the Steamworks API documentation to see what all is available and cross-reference with the steamworks.py!
+From here you should be able to call various functions of the steamworks.py.  A (mostly complete) list of available functions is listed below; take a closer look at the steamworks.py for a better understanding.  In addition, you should be able to read the Steamworks API documentation to see what all is available and cross-reference with the steamworks.py!
 
 # Features / Functions
 1. Init()
