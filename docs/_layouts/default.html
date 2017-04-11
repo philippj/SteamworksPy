@@ -80,7 +80,9 @@
 										<li>Run the makefile from the repo.</li>
 										<li>Alternatively, you could just run something like:<br />
 											<div class="language-ruby highlighter-rouge">
-												<code>g++ -std=c++11 -o SteamworksPy.so -shared -fPIC SteamworksPy.cpp -l steam_api -L.</code>
+												<pre class="highlight">
+													<code>g++ -std=c++11 -o SteamworksPy.so -shared -fPIC SteamworksPy.cpp -l steam_api -L.</code>
+												</pre>
 											</div>
 										</li>
 									</ul>
@@ -97,7 +99,9 @@
 										<li>Under Linker > Input, add steam_api.lib or steam_api64.lib to Additional Dependenices.</li>
 										<li>You may also want to add _CRT_SECURE_NO_WARNINGS under C/C++ > Preprocessor > Preprocessor Definitions if you receive:<br />
 											<div class="language-ruby highlighter-rouge">
-												<code>error C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.</code>
+												<pre class="highlight">
+													<code>error C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.</code>
+												</pre>
 											</div>
 											This error is related to a depreciated function in the Steamworks SDK.
 										</li>
@@ -114,10 +118,12 @@
 						</li>
 						<li>Add the following to your to your main file or whichever file you plan on calling Steam from:
 							<div class="language-ruby highlighter-rouge">
-								<code>from steamworks import *<br/>
-								#Initialize Steam<br/>
-								Steam.Init()
-								</code>
+								<pre class="highlight">
+									<code>from steamworks import *<br/>
+									#Initialize Steam<br/>
+									Steam.Init()
+									</code>
+								</pre>
 							</div>
 						</li>
 					</ol>
