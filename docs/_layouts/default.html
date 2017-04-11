@@ -81,7 +81,9 @@
 									<ul>
 										<li>Run the makefile from the repo.</li>
 										<li>Alternatively, you could just run something like:
-											<code>g++ -std=c++11 -o SteamworksPy.so -shared -fPIC SteamworksPy.cpp -l steam_api -L.</code>
+											<pre class="highlight">
+												<code>g++ -std=c++11 -o SteamworksPy.so -shared -fPIC SteamworksPy.cpp -l steam_api -L.</code>
+											</pre>
 										</li>
 									</ul>
 								</li>
@@ -96,8 +98,9 @@
 										<li>Under C/C++ > Precompiled Headers, turn off Precompiled Header option.</li>
 										<li>Under Linker > Input, add steam_api.lib or steam_api64.lib to Additional Dependenices.</li>
 										<li>You may also want to add _CRT_SECURE_NO_WARNINGS under C/C++ > Preprocessor > Preprocessor Definitions if you receive:
-											<code>error C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-											</code>
+											<pre class="highlight">
+												<code>error C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.</code>
+											</pre>
 											This error is related to a depreciated function in the Steamworks SDK.
 										</li>
 										<li>Clean and build.</li>
