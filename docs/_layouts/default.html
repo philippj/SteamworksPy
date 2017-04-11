@@ -79,7 +79,9 @@
 									<ul>
 										<li>Run the makefile from the repo.</li>
 										<li>Alternatively, you could just run something like:<br />
-											<code>g++ -std=c++11 -o SteamworksPy.so -shared -fPIC SteamworksPy.cpp -l steam_api -L.</code>
+											<div class="language-ruby highlighter-rouge">
+												<code>g++ -std=c++11 -o SteamworksPy.so -shared -fPIC SteamworksPy.cpp -l steam_api -L.</code>
+											</div>
 										</li>
 									</ul>
 								</li>
@@ -94,7 +96,9 @@
 										<li>Under C/C++ > Precompiled Headers, turn off Precompiled Header option.</li>
 										<li>Under Linker > Input, add steam_api.lib or steam_api64.lib to Additional Dependenices.</li>
 										<li>You may also want to add _CRT_SECURE_NO_WARNINGS under C/C++ > Preprocessor > Preprocessor Definitions if you receive:<br />
-											<code>error C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.</code><br />
+											<div class="language-ruby highlighter-rouge">
+												<code>error C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.</code>
+											</div>
 											This error is related to a depreciated function in the Steamworks SDK.
 										</li>
 										<li>Clean and build.</li>
@@ -109,10 +113,12 @@
 							</ul>
 						</li>
 						<li>Add the following to your to your main file or whichever file you plan on calling Steam from:
-							<code>from steamworks import *
-							#Initialize Steam
-							Steam.Init()
-							</code>
+							<div class="language-ruby highlighter-rouge">
+								<code>from steamworks import *<br/>
+								#Initialize Steam<br/>
+								Steam.Init()
+								</code>
+							</div>
 						</li>
 					</ol>
 					<p>From here you should be able to call various functions of the steamworks.py file.  A (mostly complete) list of available functions is listed below and take a closer look at the steamworks.py file for a better understanding.  In addition, you should be able to read the Steamworks API documentation to see what all is available and cross-reference with the steamworks.py!</p>
