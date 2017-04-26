@@ -3,6 +3,8 @@ Howdy!  This is a fork of Easimer's original SteamworksForPython in an attempt t
 
 Feel free to fork or contribute to this module.
 
+Pre-builds for Windows and Linux here: https://github.com/Gramps/SteamworksForPython/releases
+
 Full documentation is now available here: https://gramps.github.io/SteamworksForPython/
 
 For a fuller (yet outdated) tutorial, with images, on SteamworksPy please read our post: http://coaguco.tumblr.com/post/128240756897/steamworks-for-python-tutorial-linux.
