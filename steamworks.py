@@ -474,7 +474,7 @@ class SteamMusic:
 class SteamScreenshots:
 	# Causes Steam overlay to take a screenshot
 	@staticmethod
-	def TriggerScreenshot(value):
+	def TriggerScreenshot():
 		if Steam.isSteamLoaded():
 			return Steam.cdll.TriggerScreenshot()
 		else:
