@@ -53,7 +53,6 @@
 					<p>Here is a short-list of additional things still needed for the wrapper:</p>
 					<ul>
 						<li>Add in more features from the Steamworks SDK. <a href="http://gramps.github.io/SteamworksForPython/#future">Additional features in the works below!</a></li>
-						<li>Create and test the Mac version (I don't own a Mac)</li>
 						<li>Add features/functions updates for UGC and Workshop additions by peacegiverman</li>
 					</ul>
 				</div>
@@ -105,7 +104,23 @@
 										<li>Clean and build.</li>
 									</ul>
 								</li>
-								<li>For Mac: to-do still.</li>
+								<li>For Mac:
+									<ul>
+										<li>Create a new library project in Xcode.</li>
+										<li>New > Project > Library</li>
+										<li>When configuring options, set Framework to "None (Plain C/C++ Library)" and Type to "Dynamic". </li>
+										<li>Move libsteam_api.dylib to the project directory created by Xcode.</li>
+										<li>In the Build Phases tab:
+											<ul>
+												<li>Add SteamworksPy.cpp to Compile Sources.</li>
+												<li>Add steam_api.h from /steam/ folder to the public section of Headers.</li>
+												<li>Add libsteam_api.dylib to Link Binary with Libraries. </li>
+											</ul>
+										</li>
+										<li>Build.</li>
+										<li>Find the resultant library and rename it SteamworksPy.dylib.</li>
+									</ul>
+								</li>
 							</ul>
 						</li>
 						<li>Move the steamworks.py and new compiled SteamworkPy.so or SteamworksPy.dll from the unpacked repo into your project.
