@@ -76,10 +76,10 @@ def utilitiesTest():
 	print("Seconds Since Game Active: "+str(SteamUtilities.GetSecondsSinceAppActive()))
 	print("Seconds Since Computer Active: "+str(SteamUtilities.GetSecondsSinceComputerActive()))
 	print("Server Time: "+str(SteamUtilities.GetServerRealTime()))
-	print("Steam Overlay Enabled?: %s") % (SteamUtilities.IsOverlayEnabled())
-	print("Steam VR Running?: %s") % (SteamUtilities.IsSteamRunningInVR())
-	print("Steam UI Language: %s") % (SteamUtilities.GetSteamUILanguage())
-	print("Steam App ID: %s") % (SteamUtilities.GetAppID())
+	print("Steam Overlay Enabled?: %s" % (SteamUtilities.IsOverlayEnabled()))
+	print("Steam VR Running?: %s" % (SteamUtilities.IsSteamRunningInVR()))
+	print("Steam UI Language: %s" % (SteamUtilities.GetSteamUILanguage()))
+	print("Steam App ID: %s" % (SteamUtilities.GetAppID()))
 	input("INFO: Utilities test done. Press any key to continue.\n")
 #------------------------------------------------
 # The main test loop
