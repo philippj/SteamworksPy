@@ -1,144 +1,33 @@
-//===============================================
-//  STEAMWORKS FOR PYTHON
-//===============================================
+/////////////////////////////////////////////////
+/////  STEAMWORKS FOR PYTHON CPP
+/////////////////////////////////////////////////
 //-----------------------------------------------
-// Modify SW_PY based on operating system and include the proper Steamworks API file
-//-----------------------------------------------
-#if defined( _WIN32 )
-	#include "steam\steam_api.h"
-	#define SW_PY extern "C" __declspec(dllexport)
-#elif defined( __APPLE__ )
-	#include "steam/steam_api.h"
-	#include "TargetConditionals.h"
-	#define SW_PY extern "C" __attribute__ ((visibility("default")))
-#elif defined( __linux__ )
-	#include "steam/steam_api.h"
-	#define SW_PY extern "C" __attribute__ ((visibility("default")))
-#else
-	#error "Unsupported platform"
-#endif
-//-----------------------------------------------
-// Definitions
-//-----------------------------------------------
-//#define IS_INIT_SUCCESS
-#define IS_VALID
-#define OFFLINE 0
-#define ONLINE 1
-#define BUSY 2
-#define AWAY 3
-#define SNOOZE 4
-#define LF_TRADE
-#define LF_PLAY
-#define STATE_MAX
-#define NOT_OFFLINE 8
-#define ALL 9
-#define TOP_LEFT 0
-#define TOP_RIGHT 1
-#define BOT_LEFT 2
-#define BOT_RIGHT 3
-#define OK 0
-#define FAILED 1
-#define ERR_NO_CLIENT 2
-#define ERR_NO_CONNECTION 3
-#define AVATAR_SMALL 0
-#define AVATAR_MEDIUM 1
-#define AVATAR_LARGE 2
-#define GLOBAL 0
-#define GLOBAL_AROUND_USER 1
-#define FRIENDS 2
-#define USERS 3
-#define LOBBY_OK 0
-#define LOBBY_NO_CONNECTION 1
-#define LOBBY_TIMEOUT 2
-#define LOBBY_FAIL 3
-#define LOBBY_ACCESS_DENIED 4
-#define LOBBY_LIMIT_EXCEEDED 5
-#define PRIVATE 0
-#define FRIENDS_ONLY 1
-#define PUBLIC 2
-#define INVISIBLE 3
-#define LOBBY_KEY_LENGTH 255
-#define UGC_MAX_TITLE_CHARS 128
-#define UGC_MAX_DESC_CHARS 8000
-#define UGC_MAX_METADATA_CHARS 5000
-#define UGC_ITEM_COMMUNITY 0
-#define UGC_ITEM_MICROTRANSACTION 1
-#define UGC_STATE_NONE 0
-#define UGC_STATE_SUBSCRIBED 1
-#define UGC_STATE_LEGACY 2
-#define UGC_STATE_INSTALLED 4
-#define UGC_STATE_UPDATE 8
-#define UGC_STATE_DOWNLOADING 16
-#define UGC_STATE_PENDING 32
-#define STATUS_INVALID 0
-#define STATUS_PREPARING_CONFIG 1
-#define STATUS_PREPARING_CONTENT 2
-#define STATUS_UPLOADING_CONTENT 3
-#define STATUS_UPLOADING_PREVIEW 4
-#define STATUS_COMMITTING_CHANGES 5
-typedef void(*CreateItemResultCallback_t) (CreateItemResult_t);
-typedef void(*SubmitItemUpdateResultCallback_t) (SubmitItemUpdateResult_t);
-typedef void(*ItemInstalledCallback_t) (ItemInstalled_t);
-//-----------------------------------------------
-// Workshop Class
-//-----------------------------------------------
-class Workshop
-{
-public:
-	CreateItemResultCallback_t _pyItemCreatedCallback;
-	SubmitItemUpdateResultCallback_t _pyItemUpdatedCallback;
-	ItemInstalledCallback_t _pyItemInstalledCallback;
+//
+#include "SteamworksPy.h"
+#include "steam/steam_api.h"
 
-	CCallResult<Workshop, CreateItemResult_t> _itemCreatedCallback;
-	CCallResult<Workshop, SubmitItemUpdateResult_t> _itemUpdatedCallback;
+Steam::Steam(){
+	isInitSuccess = false;
+	tickets.clear();
+}
 
-	CCallback<Workshop, ItemInstalled_t> _itemInstalledCallback;
-
-	Workshop() : _itemInstalledCallback(this, &Workshop::OnItemInstalled) {}
-
-	void SetItemCreatedCallback(CreateItemResultCallback_t callback){
-		_pyItemCreatedCallback = callback;
+CSteamID CreateSteamID(uint32 steamID, int accountType){
+	CSteamID cSteamID;
+	if(accountType < 0 || accountType >= k_EAccountTypeMax){
+		accountType = 1;
 	}
-	void SetItemUpdatedCallback(SubmitItemUpdateResultCallback_t callback){
-		_pyItemUpdatedCallback = callback;
-	}
-	void SetItemInstalledCallback(ItemInstalledCallback_t callback){
-		_pyItemInstalledCallback = callback;
-	}
-	void ClearItemInstallCallback(){
-		_pyItemInstalledCallback = nullptr;
-	}
-	void CreateItem(AppId_t consumerAppId, EWorkshopFileType fileType){
-		//TODO: Check if fileType is a valid value?
-		SteamAPICall_t createItemCall = SteamUGC()->CreateItem(consumerAppId, fileType);
-		_itemCreatedCallback.Set(createItemCall, this, &Workshop::OnWorkshopItemCreated);
-	}
-	void SubmitItemUpdate(UGCUpdateHandle_t updateHandle, const char *pChangeNote){
-		SteamAPICall_t submitItemUpdateCall = SteamUGC()->SubmitItemUpdate(updateHandle, pChangeNote);
-		_itemUpdatedCallback.Set(submitItemUpdateCall, this, &Workshop::OnItemUpdateSubmitted);
-	}
-private:
-	void OnWorkshopItemCreated(CreateItemResult_t* createItemResult, bool bIOFailure){
-		if(_pyItemCreatedCallback != nullptr){
-			_pyItemCreatedCallback(*createItemResult);
-		}
-	}
-	void OnItemUpdateSubmitted(SubmitItemUpdateResult_t* submitItemUpdateResult, bool bIOFailure){
-		if(_pyItemUpdatedCallback != nullptr){
-			_pyItemUpdatedCallback(*submitItemUpdateResult);
-		}
-	}
-	void OnItemInstalled(ItemInstalled_t* itemInstalledResult){
-		if(_pyItemInstalledCallback != nullptr){
-			_pyItemInstalledCallback(*itemInstalledResult);
-		}
-	}
-};
-static Workshop workshop;
-//-----------------------------------------------
-// Steamworks functions
-//-----------------------------------------------
-SW_PY bool SteamInit(){
+	cSteamID.Set(steamID, EUniverse(k_EUniversePublic), EAccountType(accountType));
+	return cSteamID;
+}
+/////////////////////////////////////////////////
+///// STEAMWORKS FUNCTIONS //////////////////////
+//
+// Checks if your executable was launched through Steam and relaunches it through Steam if it wasn't.
+bool Steam::RestartAppIfNecessary(int value){
+	return SteamAPI_RestartAppIfNecessary((AppId_t)value);
+}
+// Initialize Steamworks
+bool Steam::SteamInit(){
 	return SteamAPI_Init();
 	// Look for errors
 	bool IS_INIT_SUCCESS = SteamAPI_Init();
@@ -159,85 +48,139 @@ SW_PY bool SteamInit(){
 	return err;
 }
 // Returns true/false if Steam is running
-SW_PY bool IsSteamRunning(void){
+bool Steam::IsSteamRunning(void){
 	return SteamAPI_IsSteamRunning();
 }
-CSteamID CreateSteamID(uint32 steamID, int accountType){
-	CSteamID cSteamID;
-	if(accountType < 0 || accountType >= k_EAccountTypeMax){
-		accountType = 1;
-	}
-	cSteamID.Set(steamID, EUniverse(k_EUniversePublic), EAccountType(accountType));
-	return cSteamID;
-}
-// Callbacks
-SW_PY void RunCallbacks(){
-	SteamAPI_RunCallbacks();
-}
-//-----------------------------------------------
-// Steam Apps
-//-----------------------------------------------
-SW_PY int HasOtherApp(int32 value){
+/////////////////////////////////////////////////
+///// APPS //////////////////////////////////////
+//
+// Check if the user has a given application/game
+bool Steam::HasOtherApp(int value){
 	if(SteamApps() == NULL){
 		return false;
 	}
 	return SteamApps()->BIsSubscribedApp((AppId_t)value);
 }
-SW_PY int GetDlcCount(){
+// Get the number of DLC the user owns for a parent application/game
+int Steam::GetDLCCount(){
 	if(SteamApps() == NULL){
 		return 0;
 	}
 	return SteamApps()->GetDLCCount();
 }
-SW_PY bool IsDlcInstalled(int32 value){
+// Takes AppID of DLC and checks if the user owns the DLC & if the DLC is installed
+bool IsDlcInstalled(int value){
 	if(SteamApps() == NULL){
 		return false;
 	}
 	return SteamApps()->BIsDlcInstalled(value);
 }
-SW_PY void RequestAppProofOfPurchaseKey(int32 value){
-	if(SteamApps() == NULL){
-		return;
-	}
-	return SteamApps()->RequestAppProofOfPurchaseKey(value);
-}
-SW_PY bool IsAppInstalled(int32 value){
+// Check if given application/game is installed, not necessarily owned
+bool IsAppInstalled(int32 value){
 	if(SteamApps() == NULL){
 		return false;
 	}
 	return SteamApps()->BIsAppInstalled((AppId_t)value);
 }
-SW_PY const char* GetCurrentGameLanguage(){
+// Get the user's game language
+const char* GetCurrentGameLanguage(){
 	if(SteamApps() == NULL){
 		return "None";
 	}
 	return SteamApps()->GetCurrentGameLanguage();
 }
-//-----------------------------------------------
-// Steam Friends
-//-----------------------------------------------
-SW_PY int GetFriendCount(int flag){
+// Does the user have a VAC ban for this game
+bool Steam::IsVACBanned(){
+	if(SteamApps() == NULL){
+		return false;
+	}
+	return SteamApps()->BIsVACBanned();
+}
+// Returns the Unix time of the purchase of the app
+int Steam::GetEarliestPurchaseUnixTime(int value){
+	if(SteamApps() == NULL){
+		return 0;
+	}
+	return SteamApps()->GetEarliestPurchaseUnixTime((AppId_t)value);
+}
+// Checks if the user is subscribed to the current app through a free weekend
+// This function will return false for users who have a retail or other type of license
+// Suggested you contact Valve on how to package and secure your free weekend properly
+bool Steam::IsSubscribedFromFreeWeekend(){
+	if(SteamApps() == NULL){
+		return false;
+	}
+	return SteamApps()->BIsSubscribedFromFreeWeekend();
+}
+// Install/Uninstall control for optional DLC
+void Steam::InstallDLC(int value){
+	if(SteamApps() == NULL){
+		return;
+	}
+	SteamApps()->InstallDLC((AppId_t)value);
+}
+void Steam::UninstallDLC(int value){
+	if(SteamApps() == NULL){
+		return;
+	}
+	SteamApps()->UninstallDLC((AppId_t)value);
+}
+// Is subscribed lacks notes
+bool Steam::IsSubscribed(){
+	if(SteamApps() == NULL){
+		return false;
+	}
+	return SteamApps()->BIsSubscribed();
+}
+// Presumably if Steam is set to low violence; lacks note
+bool Steam::IsLowViolence(){
+	if(SteamApps() == NULL){
+		return false;
+	}
+	return SteamApps()->BIsLowViolence();
+}
+// Presumably if users is a cyber cafe; lacks notes
+bool Steam::IsCybercafe(){
+	if(SteamApps() == NULL){
+		return false;
+	}
+	return SteamApps()->BIsCybercafe();
+}
+// Only use to check ownership of another game related to yours: a demo, etc.
+bool Steam::IsSubscribedApp(int value){
+	if(SteamApps() == NULL){
+		return false;
+	}
+	return SteamApps()->BIsSubscribedApp((AppId_t)value);
+}
+// Return the build ID for this app; will change based on backend updates
+int Steam::GetAppBuildId(){
+	if(SteamApps() == NULL){
+		return 0;
+	}
+	return SteamApps()->GetAppBuildId();
+}
+/////////////////////////////////////////////////
+///// FRIENDS ///////////////////////////////////
+//
+// Get number of friends user has
+int Steam::GetFriendCount(){
 	if(SteamFriends() == NULL){
 		return 0;
 	}
-	return SteamFriends()->GetFriendCount(flag);
+	return SteamFriends()->GetFriendCount(0x04);
 }
-SW_PY const char* GetPersonaName(){
+// Get the user's Steam username
+const char* Steam::GetPersonaName(){
 	if(SteamFriends() == NULL){
 		return "";
 	}
 	return SteamFriends()->GetPersonaName();
 }
-SW_PY int GetPersonaState(){
-	if(SteamFriends() == NULL){
-		return 0;
-	}
-	return SteamFriends()->GetPersonaState();
-}
-SW_PY const char* GetFriendPersonaName(int steamID){
+// Get given friend's Steam username
+const char* Steam::GetFriendPersonaName(int steamID){
 	if(SteamFriends() != NULL && steamID > 0){
-		// Add 1 here to prevent error
-		CSteamID friendID = CreateSteamID(steamID, 1);
+		CSteamID friendID = CreateSteamID(steamID);
 		bool isDataLoading = SteamFriends()->RequestUserInformation(friendID, true);
 		if(!isDataLoading){
 			return SteamFriends()->GetFriendPersonaName(friendID);
@@ -245,71 +188,143 @@ SW_PY const char* GetFriendPersonaName(int steamID){
 	}
 	return "";
 }
-SW_PY void SetGameInfo(const char* serverKey, const char* serverValue){
+// Set the game information in Steam; used in 'View Game Info'
+void Steam::SetGameInfo(const char* key, const char* value){
+	// Rich presence data is automatically shared between friends in the same game
+	// Each user has a set of key/value pairs, up to 20 can be set
+	// Two magic keys (status, connect)
+	// setGameInfo() to an empty string deletes the key
 	if(SteamFriends() == NULL){
 		return;
 	}
-	SteamFriends()->SetRichPresence(serverKey, serverValue);
+	SteamFriends()->SetRichPresence(key, value);
 }
-SW_PY void ClearGameInfo(){
+// Clear the game information in Steam; used in 'View Game Info'
+void Steam::ClearGameInfo(){
 	if(SteamFriends() == NULL){
 		return;
 	}
 	SteamFriends()->ClearRichPresence();
 }
-SW_PY void InviteFriend(int steamID, const char* conString){
+// Invite friend to current game/lobby
+void Steam::InviteFriend(int steamID, const char* connectString){
 	if(SteamFriends() == NULL){
 		return;
 	}
-	CSteamID friendID = CreateSteamID(steamID, 1);
-	SteamFriends()->InviteUserToGame(friendID, conString);
+	CSteamID friendID = CreateSteamID(steamID);
+	SteamFriends()->InviteUserToGame(friendID, connectString);
 }
-SW_PY void SetPlayedWith(int steamID){
+// Set player as 'Played With' for game
+void Steam::SetPlayedWith(int steamID){
 	if(SteamFriends() == NULL){
 		return;
 	}
-	CSteamID friendID = CreateSteamID(steamID, 1);
+	CSteamID friendID = CreateSteamID(steamID);
 	SteamFriends()->SetPlayedWith(friendID);
 }
-// SW_PY GetRecentPlayers
-// SW_PY GetFriendAvatar
-// SW_PY DrawAvatar
-SW_PY void ActivateGameOverlay(const char* name){
+// Get player's avatar
+void Steam::GetFriendAvatar(int size){
+	if(size < AVATAR_SMALL || size > AVATAR_LARGE){
+		return;
+	}
 	if(SteamFriends() == NULL){
 		return;
 	}
-	return SteamFriends()->ActivateGameOverlay(name);	
+	int handle = -2;
+	switch(size){
+		case AVATAR_SMALL:{
+			handle = SteamFriends()->GetSmallFriendAvatar( SteamUser()->GetSteamID() );
+			size = 32; break;
+		}
+		case AVATAR_MEDIUM:{
+			handle = SteamFriends()->GetMediumFriendAvatar( SteamUser()->GetSteamID() );
+			size = 64; break;
+		}
+		case AVATAR_LARGE:{
+			handle = SteamFriends()->GetLargeFriendAvatar( SteamUser()->GetSteamID() );
+			size = 184; break;
+		}
+		default:
+			return;
+	}
+	if(handle <= 0){
+		if(handle == -1){
+			// Still loading
+			return;
+		}
+		// Invalid
+		return;
+	}
+	// Has already loaded, simulate callback
+	AvatarImageLoaded_t* avatarData = new AvatarImageLoaded_t;
+	avatarData->m_steamID = SteamUser()->GetSteamID();
+	avatarData->m_iImage = handle;
+	avatarData->m_iWide = size;
+	avatarData->m_iTall = size;
+	_avatar_loaded(avatarData);
+	delete avatarData;
+	return;
 }
-SW_PY void ActivateGameOverlayToUser(const char* url, int steamID){
+// Draw the given avatar
+//TEXTURE Steam::DrawAvatar(int image){
+//	TEXTURE texture = 0;
+//	uint32 avatarWidth, avatarHeight;
+//	bool success SteamUtils()->GetImageSize(image, avatarWidth, avatarHeight);
+//	if(!success){
+//		return texture;
+//	}
+//	// Get the raw RGBA data from Steam and do something with it
+//	const int imageSize = avatarWidth * avatarHeight * 4;
+//	uint8 *avatarRGBA = new uint8[imageSize];
+//	success = SteamUtils()->GetImageRGBA(image, avatarRGBA, imageSize);
+//	if(!success){
+//		Do something to conert texture
+//	}
+//	delete[] avatarRGBA;
+//	return texture;
+//}
+// Activates the overlay with optional dialog to open the following: "Friends", "Community", "Players", "Settings", "OfficialGameGroup", "Stats", "Achievements", "LobbyInvite"
+void Steam::ActivateGameOverlay(const char* url){
 	if(SteamFriends() == NULL){
 		return;
 	}
-	CSteamID overlayUserID = CreateSteamID(steamID, 1);
-	return SteamFriends()->ActivateGameOverlayToUser(url, overlayUserID);
+	SteamFriends()->ActivateGameOverlay(url);
 }
-SW_PY void ActivateGameOverlayToWebPage(const char* url){
+// Activates the overlay to the following: "steamid", "chat", "jointrade", "stats", "achievements", "friendadd", "friendremove", "friendrequestaccept", "friendrequestignore"
+void Steam::ActivateGameOverlayToUser(const char* url, int steam_id){
 	if(SteamFriends() == NULL){
 		return;
 	}
-	return SteamFriends()->ActivateGameOverlayToWebPage(url);
+	CSteamID overlayUserID = CreateSteamID(steam_id);
+	SteamFriends()->ActivateGameOverlayToUser(url, overlayUserID);
 }
-SW_PY void ActivateGameOverlayToStore(int app_id){
+// Activates the overlay with specified web address
+void Steam::ActivateGameOverlayToWebPage(const char* url){
 	if(SteamFriends() == NULL){
 		return;
 	}
-	return SteamFriends()->ActivateGameOverlayToStore(AppId_t(app_id), EOverlayToStoreFlag(0));
+	SteamFriends()->ActivateGameOverlayToWebPage(url);
 }
-SW_PY void ActivateGameOverlayInviteDialog(int steamID){
+// Activates the overlay with the application/game Steam store page
+void Steam::ActivateGameOverlayToStore(int app_id){
 	if(SteamFriends() == NULL){
 		return;
 	}
-	CSteamID lobbyID = CreateSteamID(steamID, 1);
-	return SteamFriends()->ActivateGameOverlayInviteDialog(lobbyID);
+	SteamFriends()->ActivateGameOverlayToStore(AppId_t(app_id), EOverlayToStoreFlag(0));
 }
-//-----------------------------------------------
-// Steam Matchmaking
-//-----------------------------------------------
-SW_PY void CreateLobby(int lobbyType, int cMaxMembers){
+// Activates game overlay to open the invite dialog. Invitations will be sent for the provided lobby
+void Steam::ActivateGameOverlayInviteDialog(int steam_id){
+	if(SteamFriends() == NULL){
+		return;
+	}
+	CSteamID lobbyID = CreateSteamID(steam_id);
+	SteamFriends()->ActivateGameOverlayInviteDialog(lobbyID);
+}
+/////////////////////////////////////////////////
+///// MATCHMAKING ///////////////////////////////
+//
+// Create a lobby on the Steam servers, if private the lobby will not be returned by any RequestLobbyList() call
+void Steam::CreateLobby(int lobbyType, int maxMembers){
 	if(SteamMatchmaking() == NULL){
 		return;
 	}
@@ -327,391 +342,755 @@ SW_PY void CreateLobby(int lobbyType, int cMaxMembers){
 	else{
 		eLobbyType = k_ELobbyTypeInvisible;
 	}
-	SteamMatchmaking()->CreateLobby(eLobbyType, cMaxMembers);
+	SteamMatchmaking()->CreateLobby(eLobbyType, maxMembers);
 }
-SW_PY void JoinLobby(int steamIDLobby){
+// Join an existing lobby
+void Steam::JoinLobby(int steamIDLobby){
 	if(SteamMatchmaking() == NULL){
 		return;
 	}
-	CSteamID lobbyID = CreateSteamID(steamIDLobby, 1);
+	CSteamID lobbyID = CreateSteamID(steamIDLobby);
 	SteamMatchmaking()->JoinLobby(lobbyID);
 }
-SW_PY void LeaveLobby(int steamIDLobby){
+// Leave a lobby, this will take effect immediately on the client side, other users will be notified by LobbyChatUpdate_t callback
+void Steam::LeaveLobby(int steamIDLobby){
 	if(SteamMatchmaking() == NULL){
 		return;
 	}
-	CSteamID lobbyID = CreateSteamID(steamIDLobby, 1);
+	CSteamID lobbyID = CreateSteamID(steamIDLobby);
 	return SteamMatchmaking()->LeaveLobby(lobbyID);
 }
-SW_PY bool InviteUserToLobby(int steamIDLobby, int steamIDInvitee){
+// Invite another user to the lobby, the target user will receive a LobbyInvite_t callback, will return true if the invite is successfully sent, whether or not the target responds
+bool Steam::InviteUserToLobby(int steamIDLobby, int steamIDInvitee){
 	if(SteamMatchmaking() == NULL){
 		return 0;
 	}
-	CSteamID lobbyID = CreateSteamID(steamIDLobby, 1);
-	CSteamID inviteeID = CreateSteamID(steamIDInvitee, 1);
+	CSteamID lobbyID = CreateSteamID(steamIDLobby);
+	CSteamID inviteeID = CreateSteamID(steamIDInvitee);
 	return SteamMatchmaking()->InviteUserToLobby(lobbyID, inviteeID);
 }
-//-----------------------------------------------
-// Steam Music
-//-----------------------------------------------
-SW_PY bool MusicIsEnabled(){
+/////////////////////////////////////////////////
+///// MUSIC /////////////////////////////////////
+//
+// Is Steam music enabled
+bool Steam::MusicIsEnabled(){
 	if(SteamMusic() == NULL){
 		return false;
 	}
 	return SteamMusic()->BIsEnabled();
 }
-SW_PY bool MusicIsPlaying(){
+// Is Steam music playing something
+bool Steam::MusicIsPlaying(){
 	if(SteamMusic() == NULL){
 		return false;
 	}
 	return SteamMusic()->BIsPlaying();
 }
-SW_PY float MusicGetVolume(){
+// Get the volume level of the music
+float Steam::MusicGetVolume(){
 	if(SteamMusic() == NULL){
 		return 0;
 	}
 	return SteamMusic()->GetVolume();
 }
-SW_PY void MusicPause(){
+// Pause whatever Steam music is playing
+void Steam::MusicPause(){
 	if(SteamMusic() == NULL){
 		return;
 	}
 	return SteamMusic()->Pause();
 }
-SW_PY void MusicPlay(){
+// Play current track/album
+void Steam::MusicPlay(){
 	if(SteamMusic() == NULL){
 		return;
 	}
 	return SteamMusic()->Play();
 }
-SW_PY void MusicPlayNext(){
+// Play next track/album
+void Steam::MusicPlayNext(){
 	if(SteamMusic() == NULL){
 		return;
 	}
 	return SteamMusic()->PlayNext();
 }
-SW_PY void MusicPlayPrev(){
+// Play previous track/album
+void Steam::MusicPlayPrev(){
 	if(SteamMusic() == NULL){
 		return;
 	}
 	return SteamMusic()->PlayPrevious();
 }
-SW_PY void MusicSetVolume(float value){
+// Set the volume of Steam music
+void Steam::MusicSetVolume(float value){
 	if(SteamMusic() == NULL){
 		return;
 	}
 	return SteamMusic()->SetVolume(value);
 }
-//-----------------------------------------------
-// Steam Screenshots
-//-----------------------------------------------
-SW_PY void TriggerScreenshot(){
+/////////////////////////////////////////////////
+///// REMOTE STORAGE ////////////////////////////
+//
+// Write to given file from Steam Cloud
+//bool Steam::FileWrite(const char* file, const void *data, int32 dataSize){
+//	if(SteamRemoteStorage() == NULL){
+//		return false;
+//	}
+//	return SteamRemoteStorage()->FileWrite(file, data, dataSize);
+//}
+// Read given file from Steam Cloud
+//int32 Steam::FileRead(const char* file, void *data, int32 dataToRead){
+//	if(SteamRemoteStorage() == NULL){
+//		return false;
+//	}
+//	vector<uint8> data;
+//	data.resize(dataToRead);
+//	Dictionary d;
+//	d["ret"] = SteamRemoteStorage()->FileRead(file, Data.write().ptr(), dataToRead);
+//	d["buf"] = data;
+//	return d;
+//}
+// Delete file from remote storage but leave it on local disk to remain accessible
+bool Steam::FileForget(const char* file){
+	if(SteamRemoteStorage() == NULL){
+		return false;
+	}
+	return SteamRemoteStorage()->FileForget(file);
+}
+// Delete a given file in Steam Cloud
+bool Steam::FileDelete(const char* file){
+	if(SteamRemoteStorage() == NULL){
+		return false;
+	}
+	return SteamRemoteStorage()->FileDelete(file);
+}
+// Check if a given file exists in Steam Cloud
+bool Steam::FileExists(const char* file){
+	if(SteamRemoteStorage() == NULL){
+		return false;
+	}
+	return SteamRemoteStorage()->FileExists(file);
+}
+// Check if a given file is persisted in Steam Cloud
+bool Steam::FilePersisted(const char* file){
+	if(SteamRemoteStorage() == NULL){
+		return false;
+	}
+	return SteamRemoteStorage()->FilePersisted(file);
+}
+// Get the size of a given file
+int32 Steam::GetFileSize(const char* file){
+	if(SteamRemoteStorage() == NULL){
+		return -1;
+	}
+	return SteamRemoteStorage()->GetFileSize(file);
+}
+// Get the timestamp of when the file was uploaded/changed
+int64 Steam::GetFileTimestamp(const char* file){
+	if(SteamRemoteStorage() == NULL){
+		return -1;
+	}
+	return SteamRemoteStorage()->GetFileTimestamp(file);
+}
+// Gets the total number of local files synchronized by Steam Cloud
+int32 Steam::GetFileCount(){
+	if(SteamRemoteStorage() == NULL){
+		return 0;
+	}
+	return SteamRemoteStorage()->GetFileCount();
+}
+// Is Steam Cloud enabled on the user's account?
+bool Steam::IsCloudEnabledForAccount(){
+	if(SteamRemoteStorage() == NULL){
+		return false;
+	}
+	return SteamRemoteStorage()->IsCloudEnabledForAccount();
+}
+// Is Steam Cloud enabled for this application?
+bool Steam::IsCloudEnabledForApp(){
+	if(SteamRemoteStorage() == NULL){
+		return false;
+	}
+	return SteamRemoteStorage()->IsCloudEnabledForApp();
+}
+// Set Steam Cloud enabled for this application
+void Steam::SetCloudEnabledForApp(bool enabled){
+	if(SteamRemoteStorage() == NULL){
+		return;
+	}
+	return SteamRemoteStorage()->SetCloudEnabledForApp(enabled);
+}
+// Gets the file name and size of a file from the index
+//map Steam::GetFileNameAndSize(int file){
+//	map d;
+//	const char name = "";
+//	int32 size = 0;
+//	if(SteamRemoteStorage() != NULL){
+//		name = const char(SteamRemoteStorage()->GetFileNameAndSize(file, &size));
+//	}
+//	d["name"] = name;
+//	d["size"] = size;
+//	return d;
+//}
+// Gets the number of bytes available, and used on the users Steam Cloud storage
+//map Steam::GetQuota(){
+//	map d;
+//	uint64 total = 0;
+//	uint64 available = 0;
+//	if(SteamRemoteStorage() != NULL){
+//		SteamRemoteStorage()->GetQuota((uint64*)&total, (uint64*)&available);
+//	}
+//	d["total_bytes"] = total;
+//	d["available_bytes"] = available;
+//	return d;
+//}
+// Obtains the platforms that the specified file will syncronize to
+uint32 Steam::GetSyncPlatforms(const char* file){
+	if(SteamRemoteStorage() == NULL){
+		return 0;
+	}
+	return SteamRemoteStorage()->GetSyncPlatforms(file);
+}
+/////////////////////////////////////////////////
+///// SCREENSHOTS ///////////////////////////////
+//
+// Toggles whether the overlay handles screenshots
+void Steam::HookScreenshots(bool hook){
+	if(SteamScreenshots() == NULL){
+		return;
+	}
+	SteamScreenshots()->HookScreenshots(hook);
+}
+// Checks if the app is hooking screenshots
+bool Steam::IsScreenshotsHooked(){
+	if(SteamScreenshots() == NULL){
+		return false;
+	}
+	return SteamScreenshots()->IsScreenshotsHooked();
+}
+// Causes Steam overlay to take a screenshot
+void Steam::TriggerScreenshot(){
 	if(SteamScreenshots() == NULL){
 		return;
 	}
 	SteamScreenshots()->TriggerScreenshot();
 }
-//-----------------------------------------------
-// Steam User
-//-----------------------------------------------
-SW_PY int GetSteamID(){
+// Writes a screenshot to the user's Steam screenshot library
+//uint32 Steam::WriteScreenshot(const map<uint8_t>& RGB, int width, int height){
+//	if(SteamScreenshots() == NULL){
+//		return 0;
+//	}
+//	return SteamScreenshots()->WriteScreenshot((void*)RGB.read().ptr(), RGB.size(), width, height);
+//}
+/////////////////////////////////////////////////
+///// USERS /////////////////////////////////////
+//
+// Get an authentication ticket
+//uint32 Steam::GetAuthSessionTicket(){
+//	if(SteamUser() == NULL){
+//		return 0;
+//	}
+//	uint32 cbTicket = 1024;
+//	uint32 *buf = memnew_arr(uint32, cbTicket);
+//	uint32 id = SteamUser()->GetAuthSessionTicket(buf, cbTicket, &cbTicket);
+//	TicketData ticket = { id, buf, cbTicket };
+//	tickets.push_back(ticket);
+//	return id;
+//}
+// Cancels an auth ticket
+//void Steam::CancelAuthTicket(uint32 authTicket){
+//	if(SteamUser() == NULL){
+//		return;
+//	}
+//	for(int i=0; i<tickets.size(); i++){
+//		TicketData ticket = tickets.get(i);
+//		if (ticket.id == authTicket){
+//			tickets.remove(i);
+//			memdelete_arr(ticket.buf);
+//			break;
+//		}
+//	}
+//}
+// Authenticate the ticket from the entity Steam ID to be sure it is valid and isn't reused
+//int Steam::BeginAuthSession(uint32 authTicket, uint64 steamID){
+//	if(SteamUser() == NULL){
+//		return -1;
+//	}
+//	for(int i=0; i<tickets.size(); i++){
+//		TicketData ticket = tickets.get(i);
+//		if (ticket.id == authTicket){
+//			CSteamID authSteamID = CreateSteamID(steamID);
+//			return SteamUser()->BeginAuthSession(ticket.buf, ticket.size, authSteamID);
+//		}
+//	}
+//	return -1;
+//}
+// Ends an auth session
+void Steam::EndAuthSession(uint64 steamID){
+	if(SteamUser() == NULL){
+		return;
+	}
+	CSteamID authSteamID = CreateSteamID(steamID);
+	return SteamUser()->EndAuthSession(authSteamID);
+}
+// Get user's Steam ID
+uint64 Steam::GetSteamID(){
 	if(SteamUser() == NULL){
 		return 0;
 	}
-	CSteamID steamID = SteamUser()->GetSteamID();
-	return steamID.ConvertToUint64();
+	CSteamID cSteamID = SteamUser()->GetSteamID();
+	return cSteamID.ConvertToUint64();
 }
-SW_PY int GetPlayerSteamLevel(){
+// Check, true/false, if user is logged into Steam currently
+bool Steam::LoggedOn(){
+	if(SteamUser() == NULL){
+		return false;
+	}
+	return SteamUser()->BLoggedOn();
+}
+// Get the user's Steam level
+int Steam::GetPlayerSteamLevel(){
 	if(SteamUser() == NULL){
 		return 0;
 	}
 	return SteamUser()->GetPlayerSteamLevel(); 
 }
-SW_PY const char* GetUserDataFolder(){
-	if(SteamUser() == NULL){
-		return "";
+// Get the user's Steam installation path
+//const char Steam::GetUserDataFolder(){
+//	if(SteamUser() == NULL){
+//		return "";
+//	}
+//	const int cubBuffer = 256;
+//	char *pchBuffer = new char[cubBuffer];
+//	SteamUser()->GetUserDataFolder((char*)pchBuffer, cubBuffer);
+//	const char data_path = pchBuffer;
+//	delete pchBuffer;
+//	return data_path;
+//}
+// (LEGACY FUNCTION) Set data to be replicated to friends so that they can join your game
+//void Steam::AdvertiseGame(const char* serverIP, int port){
+//	if(SteamUser() == NULL){
+//		return;
+//	}
+//	CSteamID gameserverID = SteamUser()->GetSteamID();
+//	SteamUser()->AdvertiseGame(gameserverID, *((uint32 *)serverIP), port);
+//}
+// Trading Card badges data access, if you only have one set of cards, the series will be 1
+// The user has can have two different badges for a series; the regular (max level 5) and the foil (max level 1)
+int Steam::GetGameBadgeLevel(int series, bool foil){
+	if(SteamUser()== NULL){
+		return 0;
 	}
-	const int cubBuffer = 256;
-	char *pchBuffer = new char[cubBuffer];
-	SteamUser()->GetUserDataFolder((char*)pchBuffer, cubBuffer);
-	char *data_path = pchBuffer;
-	delete pchBuffer;
-	return data_path;
+	return SteamUser()->GetGameBadgeLevel(series, foil);
 }
-//-----------------------------------------------
-// Steam User Stats
-//-----------------------------------------------
-SW_PY bool ClearAchievement(const char* name){
-	if(SteamUser() == NULL){
-		return false;
-	}
+/////////////////////////////////////////////////
+///// USER STATS ////////////////////////////////
+//
+// Clears a given achievement
+bool Steam::ClearAchievement(const char* name){
 	return SteamUserStats()->ClearAchievement(name);
 }
-SW_PY bool GetAchievement(const char* name){
-	if(SteamUser() == NULL){
-		return "";
-	}
+// Return true/false if use has given achievement
+bool Steam::GetAchievement(const char* name){
 	bool achieved = false;
 	SteamUserStats()->GetAchievement(name, &achieved);
 	return achieved;
 }
-SW_PY float GetStatFloat(const char* name){
-	if(SteamUser() == NULL){
+// Returns the percentage of users who have unlocked the specified achievement
+//map Steam::GetAchievementAchievedPercent(const char* name){
+//	map d;
+//	float percent = 0.f;
+//	bool achieved = false;
+//	if(SteamUserStats() == NULL){
+//		d["ret"] = false;
+//	} else {
+//		d["ret"] = SteamUserStats()->GetAchievementAchievedPercent(name, &percent);
+//	}
+//	d["percent"] = percent;
+//	return d;
+//}
+//  Get the amount of players currently playing the current game (online + offline)
+void Steam::GetNumberOfCurrentPlayers(){
+	if(SteamUserStats() == NULL){
+		return;
+	}
+	SteamAPICall_t apiCall = SteamUserStats()->GetNumberOfCurrentPlayers();
+	callResultNumberOfCurrentPlayers.Set(apiCall, this, &Steam::_number_of_current_players);
+}
+// Get the number of achievements
+uint32 Steam::GetNumAchievements(){
+	if(SteamUserStats() == NULL){
 		return 0;
 	}
+	return SteamUserStats()->GetNumAchievements();
+}
+// Get the value of a float statistic
+float Steam::GetStatFloat(const char* name){
 	float statval = 0;
 	SteamUserStats()->GetStat(name, &statval);
 	return statval;
 }
-SW_PY int32 GetStatInt(const char* name){
-	if(SteamUser() == NULL){
-		return 0;
-	}
+// Get the value of an integer statistic
+int Steam::GetStatInt(const char* name){
 	int32 statval = 0;
 	SteamUserStats()->GetStat(name, &statval);
 	return statval;
 }
-SW_PY bool ResetAllStats(bool achievesToo){
-	if(SteamUser() == NULL){
-		return false;
-	}
-	return SteamUserStats()->ResetAllStats(achievesToo);
-}
-SW_PY bool RequestCurrentStats(){
-	if(SteamUser() == NULL){
-		return false;
-	}
-	return SteamUserStats()->RequestCurrentStats();
-}
-SW_PY bool SetAchievement(const char* name){
-	if(SteamUser() == NULL){
-		return false;
-	}
-	return SteamUserStats()->SetAchievement(name);
-}
-SW_PY bool SetStatFloat(const char* name, float value){
-	if(SteamUser() == NULL){
-		return false;
-	}
-	return SteamUserStats()->SetStat(name, value);
-}
-SW_PY bool SetStatInt(const char* name, int32 value){
-	if(SteamUser() == NULL){
-		return false;
-	}
-	return SteamUserStats()->SetStat(name, value);
-}
-SW_PY bool StoreStats(){
-	if(SteamUser() == NULL){
-		return false;
-	}
+// Reset all Steam statistics; optional to reset achievements
+bool Steam::ResetAllStats(bool achievementsToo){
+	SteamUserStats()->ResetAllStats(achievementsToo);
 	return SteamUserStats()->StoreStats();
 }
-//SW_PY void FindLeaderboard(const char* name)
-//SW_PY const char* GetLeaderboardName()
-//SW_PY int GetLeaderboardEntryCount()
-//SW_PY void DownloadLeaderboardEntries()
-//SW_PY void DownloadLeaderboardEntriesForUsers()
-//SW_PY void UploadLeaderboardScore()
-//SW_PY void GetDownloadLeaderboardEntry()
-//SW_PY void UpdateLeaderboardHandle()
-//SW_PY uint64 GetLeaderboardHandle()
-//SW_PY void GetLeaderBoardEntries()
-//-----------------------------------------------
-// Steam Utilities
-//-----------------------------------------------
-SW_PY uint8 GetCurrentBatteryPower(){
-	if(SteamUtils() == NULL){
+// Request all statistics and achievements from Steam servers
+bool Steam::RequestCurrentStats(){
+	return SteamUserStats()->RequestCurrentStats();
+}
+// Asynchronously fetch the data for the percentages
+//void Steam::RequestGlobalAchievementPercentages(){
+//	if(SteamUserStats() == NULL){
+//		return;
+//	}
+//	SteamAPICall_t apiCall = SteamUserStats()->RequestGlobalAchievementPercentages();
+//	callResultGlobalAchievementPercentagesReady.Set(apiCall, this, &Steam::_global_achievement_percentages_ready);
+//}
+// Set a given achievement
+bool Steam::SetAchievement(const char* name){
+	if(SteamUserStats() == NULL){
 		return 0;
 	}
-	return SteamUtils()->GetCurrentBatteryPower();
+	SteamUserStats()->SetAchievement(name);
+	return SteamUserStats()->StoreStats();
 }
-SW_PY const char* GetIPCountry(){
-	if(SteamUtils() == NULL){
-		return "None";
+// Set a float statistic
+bool Steam::SetStatFloat(const char* name, float value){
+	return SteamUserStats()->SetStat(name, value);
+}
+// Set an integer statistic
+bool Steam::SetStatInt(const char* name, int value){
+	return SteamUserStats()->SetStat(name, value);
+}
+// Store all statistics, and achievements, on Steam servers; must be called to "pop" achievements
+bool Steam::StoreStats(){
+	if(SteamUserStats() == NULL){
+		return 0;
 	}
+	SteamUserStats()->StoreStats();
+	return SteamUserStats()->RequestCurrentStats();
+}
+// Find a given leaderboard, by name
+//void Steam::FindLeaderboard(const char* name){
+//	if(SteamUserStats() == NULL){
+//		return;
+//	}
+//	//SteamAPICall_t apiCall = 
+//	SteamUserStats()->FindLeaderboard(name);
+//}
+// Get the name of a leaderboard
+//const char Steam::GetLeaderboardName(){
+//	if(SteamUserStats() == NULL){
+//		return "";
+//	}
+//	return SteamUserStats()->GetLeaderboardName(leaderboard_handle);
+//}
+// Get the total number of entries in a leaderboard, as of the last request
+//int Steam::GetLeaderboardEntryCount(){
+//	if(SteamUserStats() == NULL){
+//		return -1;
+//	}
+//	return SteamUserStats()->GetLeaderboardEntryCount(leaderboard_handle);
+//}
+// Request all rows for friends of user
+//void Steam::DownloadLeaderboardEntries(int start, int end, int type){
+//	if(SteamUserStats() == NULL){
+//		return;
+//	}
+//	//SteamAPICall_t apiCall = 
+//	SteamUserStats()->DownloadLeaderboardEntries(leaderboard_handle, ELeaderboardDataRequest(type), start, end);
+//}
+// Request a maximum of 100 users with only one outstanding call at a time
+//void Steam::DownloadLeaderboardEntriesForUsers(int usersID[]){
+//	if(SteamUserStats() == NULL){
+//		return;
+//	}
+//	int users_count = usersID.size();
+//	if(users_count == 0){
+//		return;
+//	}
+//	CSteamID *pUsers = new CSteamID[users_count];
+//	for(int i = 0; i < users_count; i++){
+//		CSteamID user = CreateSteamID(usersID[i]);
+//		pUsers[i] = user;
+//	}
+//	SteamUserStats()->DownloadLeaderboardEntriesForUsers(leaderboard_handle, pUsers, users_count);
+//	delete[] pUsers;
+//}
+// Upload a leaderboard score for the user
+//void Steam::UploadLeaderboardScore(int score, bool keepBest){
+//	if(SteamUserStats() == NULL){
+//		return;
+//	}
+//	ELeaderboardUploadScoreMethod method = keepBest ? k_ELeaderboardUploadScoreMethodKeepBest : k_ELeaderboardUploadScoreMethodForceUpdate;
+//	SteamAPICall_t apiCall = SteamUserStats()->UploadLeaderboardScore(leaderboard_handle, method, (int32)score, NULL, 0);
+//	callResultUploadScore.Set(apiCall, this, &Steam::_leaderboard_uploaded);
+//}
+// Once all entries are accessed, the data will be freed up and the handle will become invalid, use this to store it
+//bool Steam::GetDownloadedLeaderboardEntry(SteamLeaderboardEntries_t handle, int entryCount){
+//	if(SteamUserStats() == NULL){
+//		return 0;
+//	}
+//	leaderboard_entries.clear();
+//	LeaderboardEntry_t *entry = new(LeaderboardEntry_t);
+//	for(int i = 0; i < entryCount; i++){
+//		SteamUserStats()->GetDownloadedLeaderboardEntry(handle, i, entry, NULL, 0);
+//		const char entryDict;
+//		entryDict["score"] = entry->m_nScore;
+//		entryDict["steam_id"] = entry->m_steamIDUser.GetAccountID();
+//		entryDict["global_rank"] = entry->m_nGlobalRank;
+//		leaderboard_entries.append(entryDict);
+//	}
+//	delete(entry);
+//}
+// Get the currently used leaderboard handle
+uint64 Steam::GetLeaderboardHandle(){
+	return leaderboard_handle;
+}
+// Get the currently used leaderboard entries
+const char* Steam::GetLeaderboardEntries(){
+	return leaderboard_entries;
+}
+// Get the achievement status, and the time it was unlocked if unlocked (in seconds since January 1, 19)
+bool Steam::GetAchievementAndUnlockTime(const char *name, bool *achieved, uint32 *unlockTime){
+	if(SteamUserStats() == NULL){
+		return 0;
+	}
+	return SteamUserStats()->GetAchievementAndUnlockTime(name, (bool *)achieved, (uint32 *)unlockTime);
+}
+// Achievement progress, triggers an AchievementProgress callback, that is all.
+// Calling this with X out of X progress will NOT set the achievement, the game must still do that.
+bool Steam::IndicateAchievementProgress(const char *name, uint32 currentProgress, uint32 maxProgress){
+	if(SteamUserStats() == NULL){
+		return 0;
+	}
+	return SteamUserStats()->IndicateAchievementProgress(name, currentProgress, maxProgress);
+}
+/////////////////////////////////////////////////
+///// UTILS /////////////////////////////////////
+//
+// Get the user's country by IP
+const char* Steam::GetIPCountry(){
 	return SteamUtils()->GetIPCountry();
 }
-SW_PY uint32 GetSecondsSinceAppActive(){
-	if(SteamUtils() == NULL){
-		return 0;
-	}
-	return SteamUtils()->GetSecondsSinceAppActive();
-}
-SW_PY uint32 GetSecondsSinceComputerActive(){
-	if(SteamUtils() == NULL){
-		return 0;
-	}
-	return SteamUtils()->GetSecondsSinceComputerActive();
-}
-SW_PY uint32 GetServerRealTime(){
-	if(SteamUtils() == NULL){
-		return 0;
-	}
-	return SteamUtils()->GetServerRealTime();
-}
-SW_PY bool IsOverlayEnabled(){
-	if(SteamUtils() == NULL){
-		return false;
-	}
+// Returns true/false if Steam overlay is enabled
+bool Steam::IsOverlayEnabled(){
 	return SteamUtils()->IsOverlayEnabled();
 }
-SW_PY bool IsSteamRunningInVR(){
-	if(SteamUtils() == NULL){
-		return false;
-	}
-	return SteamUtils()->IsSteamRunningInVR();
-}
-SW_PY const char* GetSteamUILanguage(){
-	if(SteamUtils() == NULL){
-		return "None";
-	}
-	return SteamUtils()->GetSteamUILanguage();
-}
-SW_PY uint32 GetAppID(){
-	if(SteamUtils() == NULL){
-		return 0;
-	}
-	return SteamUtils()->GetAppID();
-}
-SW_PY void SetOverlayNotificationPosition(int pos){
+// Set the position where overlay shows notifications
+void Steam::SetOverlayNotificationPosition(int pos){
 	if((pos < 0) || (pos > 3) || (SteamUtils() == NULL)){
 		return;
 	}
 	SteamUtils()->SetOverlayNotificationPosition(ENotificationPosition(pos));
 }
-//-----------------------------------------------
-// Steam Workshop
-//-----------------------------------------------
-SW_PY void Workshop_SetItemCreatedCallback(CreateItemResultCallback_t callback){
+// Get the Steam user interface language
+const char* Steam::GetSteamUILanguage(){
+	return SteamUtils()->GetSteamUILanguage();
+}
+// Get the Steam ID of the running application/game
+int Steam::GetAppID(){
+	if(SteamUtils() == NULL){
+		return 0;
+	}
+	return SteamUtils()->GetAppID();
+}
+// Return amount of time, in seconds, user has spent in this session
+int Steam::GetSecondsSinceAppActive(){
+	if(SteamUtils() == NULL){
+		return 0;
+	}
+	return SteamUtils()->GetSecondsSinceAppActive();
+}
+// Get the amount of battery power, clearly for laptops
+int Steam::GetCurrentBatteryPower(){
+	if(SteamUtils() == NULL){
+		return 0;
+	}
+	return SteamUtils()->GetCurrentBatteryPower();
+}
+// Is Steam running in VR?
+bool Steam::IsSteamRunningInVR(){
+	if(SteamUtils() == NULL){
+		return 0;
+	}
+	return SteamUtils()->IsSteamRunningInVR();
+}
+// Get the actual time
+int Steam::GetServerRealTime(){
+	if(SteamUtils() == NULL){
+		return 0;
+	}
+	return SteamUtils()->GetServerRealTime();
+}
+// Returns true if Steam & the Steam Overlay are running in Big Picture mode
+bool Steam::IsSteamInBigPictureMode(){
+	if(SteamUtils() == NULL){
+		return false;
+	}
+	return SteamUtils()->IsSteamInBigPictureMode();
+}
+// Ask SteamUI to create and render its OpenVR dashboard
+void Steam::StartVRDashboard(){
+	if(SteamUtils() == NULL){
+		return;
+	}
+	SteamUtils()->StartVRDashboard();
+}
+/////////////////////////////////////////////////
+///// WORKSHOP //////////////////////////////////
+//
+// Download new or update already installed item. If returns true, wait for DownloadItemResult_t. If item is already installed, then files on disk should not be used until callback received.
+// If item is not subscribed to, it will be cached for some time. If bHighPriority is set, any other item download will be suspended and this item downloaded ASAP.
+bool Steam::DownloadItem(int publishedFileID, bool highPriority){
+	if(SteamUGC() == NULL){
+		return 0;
+	}
+	PublishedFileId_t fileID = (int)publishedFileID;
+	return SteamUGC()->DownloadItem(fileID, highPriority);
+}
+// SuspendDownloads( true ) will suspend all workshop downloads until SuspendDownloads( false ) is called or the game ends.
+void Steam::SuspendDownloads(bool suspend){
+	return SteamUGC()->SuspendDownloads(suspend);
+}
+// Starts the item update process.
+uint64 Steam::StartItemUpdate(AppId_t appID, int publishedFileID){
+	PublishedFileId_t fileID = (int)publishedFileID;
+	return SteamUGC()->StartItemUpdate(appID, fileID);
+}
+// Gets the current state of a workshop item on this client.
+int Steam::GetItemState(int publishedFileID){
+	if(SteamUGC() == NULL){
+		return 0;
+	}
+	PublishedFileId_t fileID = (int)publishedFileID;
+	return SteamUGC()->GetItemState(fileID);
+}
+// Gets the progress of an item update.
+int Steam::GetItemUpdateProgress(UGCUpdateHandle_t updateHandle, uint64 *bytesProcessed, uint64* bytesTotal){
+	return SteamUGC()->GetItemUpdateProgress(updateHandle, (uint64*)&bytesProcessed, bytesTotal);
+}
+//
+void Steam::CreateItem(AppId_t appID, EWorkshopFileType fileType){
 	if(SteamUGC() == NULL){
 		return;
 	}
-	workshop.SetItemCreatedCallback(callback);
+	SteamAPICall_t apiCall = SteamUGC()->CreateItem(appID, fileType);
+	callResultItemCreate.Set(apiCall, this, &Steam::_workshop_item_created);
 }
-SW_PY void Workshop_CreateItem(AppId_t consumerAppId, EWorkshopFileType fileType){
-	if(SteamUGC() == NULL){
-		return;
-	}
-	workshop.CreateItem(consumerAppId, fileType);
-}
-SW_PY UGCUpdateHandle_t Workshop_StartItemUpdate(AppId_t consumerAppId, PublishedFileId_t publishedFileId){
-	return SteamUGC()->StartItemUpdate(consumerAppId, publishedFileId);
-}
-SW_PY bool Workshop_SetItemTitle(UGCUpdateHandle_t updateHandle, const char *pTitle){
+// Sets a new title for an item.
+bool Steam::SetItemTitle(UGCUpdateHandle_t updateHandle, const char *title){
 	if(SteamUGC() == NULL){
 		return false;
 	}
-	if (strlen(pTitle) > UGC_MAX_TITLE_CHARS){
+	if (strlen(title) > UGC_MAX_TITLE_CHARS){
 		printf("Title cannot have more than %d ASCII characters. Title not set.", UGC_MAX_TITLE_CHARS);
 		return false;
 	}
-	return SteamUGC()->SetItemTitle(updateHandle, pTitle);
+	return SteamUGC()->SetItemTitle(updateHandle, title);
 }
-SW_PY bool Workshop_SetItemDescription(UGCUpdateHandle_t updateHandle, const char *pDescription){
+// Sets a new description for an item.
+bool Steam::SetItemDescription(UGCUpdateHandle_t updateHandle, const char *description){
 	if(SteamUGC() == NULL){
 		return false;
 	}
-	if (strlen(pDescription) > UGC_MAX_DESC_CHARS){
+	if(strlen(description) > UGC_MAX_DESC_CHARS){
 		printf("Description cannot have more than %d ASCII characters. Description not set.", UGC_MAX_DESC_CHARS);
 		return false;
 	}
-	return SteamUGC()->SetItemDescription(updateHandle, pDescription);
+	return SteamUGC()->SetItemDescription(updateHandle, description);
 }
-SW_PY bool Workshop_SetItemUpdateLanguage(UGCUpdateHandle_t updateHandle, const char *pLanguage){
+// Sets the language of the title and description that will be set in this item update.
+bool Steam::SetItemUpdateLanguage(UGCUpdateHandle_t updateHandle, const char *language){
 	if(SteamUGC() == NULL){
 		return false;
 	}
-	return SteamUGC()->SetItemUpdateLanguage(updateHandle, pLanguage);
+	return SteamUGC()->SetItemUpdateLanguage(updateHandle, language);
 }
-SW_PY bool Workshop_SetItemMetadata(UGCUpdateHandle_t updateHandle, const char *pMetadata){
+// Sets arbitrary metadata for an item. This metadata can be returned from queries without having to download and install the actual content.
+bool Steam::SetItemMetadata(UGCUpdateHandle_t updateHandle, const char *metadata){
 	if(SteamUGC() == NULL){
 		return false;
 	}
-	if (strlen(pMetadata) > UGC_MAX_METADATA_CHARS){
+	if(strlen(metadata) > UGC_MAX_METADATA_CHARS){
 		printf("Metadata cannot have more than %d ASCII characters. Metadata not set.", UGC_MAX_METADATA_CHARS);
 	}
-	return SteamUGC()->SetItemMetadata(updateHandle, pMetadata);
+	return SteamUGC()->SetItemMetadata(updateHandle, metadata);
 }
-SW_PY bool Workshop_SetItemVisibility(UGCUpdateHandle_t updateHandle, ERemoteStoragePublishedFileVisibility visibility){
+// Sets the visibility of an item.
+bool Steam::SetItemVisibility(UGCUpdateHandle_t updateHandle, ERemoteStoragePublishedFileVisibility visibility){
 	if(SteamUGC() == NULL){
 		return false;
 	}
 	return SteamUGC()->SetItemVisibility(updateHandle, visibility);
 }
+// Sets arbitrary developer specified tags on an item.
+bool Steam::SetItemTags(UGCUpdateHandle_t updateHandle, const SteamParamStringArray_t *tags){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	return SteamUGC()->SetItemTags(updateHandle, tags);
+}
+// Sets the folder that will be stored as the content for an item.
+bool Steam::SetItemContent(UGCUpdateHandle_t updateHandle, const char *contentFolder){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	return SteamUGC()->SetItemContent(updateHandle, contentFolder);
+}
+// Sets the primary preview image for the item.
+bool Steam::SetItemPreview(UGCUpdateHandle_t updateHandle, const char *previewFile){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	return SteamUGC()->SetItemPreview(updateHandle, previewFile);
+}
+// Uploads the changes made to an item to the Steam Workshop; to be called after setting your changes.
+void Steam::SubmitItemUpdate(UGCUpdateHandle_t updateHandle, const char *changeNote){
+	if(SteamUGC() == NULL){
+		return;
+	}
+	SteamAPICall_t apiCall = SteamUGC()->SubmitItemUpdate(updateHandle, changeNote);
+	callResultItemUpdate.Set(apiCall, this, &Steam::_workshop_item_updated);
+}
+uint32 Steam::GetSubscribedItems(PublishedFileId_t* publishedFileID, uint32 maxEntries){
+	if(SteamUGC() == NULL){
+		return 0;
+	}
+	return SteamUGC()->GetSubscribedItems(publishedFileID, maxEntries);
+}
+// Gets info about currently installed content on the disc for workshop items that have k_EItemStateInstalled set.
+bool Steam::GetItemInstallInfo(int publishedFileID, uint64 *sizeOnDisk, char *folder, uint32 folderSize, uint32 *timeStamp){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	PublishedFileId_t fileID = (int)publishedFileID;
+	return SteamUGC()->GetItemInstallInfo(fileID, sizeOnDisk, folder, folderSize, timeStamp);
+}
+// Get info about a pending download of a workshop item that has k_EItemStateNeedsUpdate set.
+bool Steam::GetItemDownloadInfo(int publishedFileID, uint64 *bytesDownloaded, uint64 *bytesTotal){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	PublishedFileId_t fileID = int(publishedFileID);
+	return SteamUGC()->GetItemDownloadInfo(fileID, bytesDownloaded, bytesTotal);
+}
 
-SW_PY bool Workshop_SetItemTags(UGCUpdateHandle_t updateHandle, const char ** stringArray, const int32 stringCount){
-	if(SteamUGC() == NULL){
-		return false;
+Steam::~Steam(){
+	if(isInitSuccess){
+		SteamUserStats()->StoreStats();
+		SteamAPI_Shutdown;
 	}
-	SteamParamStringArray_t tags = { stringArray, stringCount };	
-	return SteamUGC()->SetItemTags(updateHandle, &tags);
-}
-SW_PY bool Workshop_SetItemContent(UGCUpdateHandle_t updateHandle, const char *pContentFolder){
-	if(SteamUGC() == NULL){
-		return false;
+	for(int i = 0; i < tickets.size(); i++){
+		TicketData ticket = tickets.at(i);
+		delete ticket.buffer;
 	}
-	return SteamUGC()->SetItemContent(updateHandle, pContentFolder);
-}
-SW_PY bool Workshop_SetItemPreview(UGCUpdateHandle_t updateHandle, const char *pPreviewFile){
-	if(SteamUGC() == NULL){
-		return false;
-	}
-	return SteamUGC()->SetItemPreview(updateHandle, pPreviewFile);
-}
-SW_PY void Workshop_SetItemUpdatedCallback(SubmitItemUpdateResultCallback_t callback){
-	if(SteamUGC() == NULL){
-		return;
-	}
-	workshop.SetItemUpdatedCallback(callback);
-}
-SW_PY void Workshop_SubmitItemUpdate(UGCUpdateHandle_t updateHandle, const char *pChangeNote){
-	if(SteamUGC() == NULL){
-		return;
-	}
-	workshop.SubmitItemUpdate(updateHandle, pChangeNote);
-}
-SW_PY EItemUpdateStatus Workshop_GetItemUpdateProgress(UGCUpdateHandle_t handle, uint64 *punBytesProcessed, uint64* punBytesTotal){
-	return SteamUGC()->GetItemUpdateProgress(handle, punBytesProcessed, punBytesTotal);
-}
-SW_PY uint32 Workshop_GetNumSubscribedItems(){if(SteamUGC() == NULL){
-		return 0;
-	}
-	return SteamUGC()->GetNumSubscribedItems();
-}
-SW_PY uint32 Workshop_GetSubscribedItems(PublishedFileId_t* pvecPublishedFileID, uint32 maxEntries){
-	if(SteamUGC() == NULL){
-		return 0;
-	}
-	return SteamUGC()->GetSubscribedItems(pvecPublishedFileID, maxEntries);
-}
-SW_PY uint32 Workshop_GetItemState(PublishedFileId_t publishedFileID){
-	if(SteamUGC() == NULL){
-		return 0;
-	}
-	return SteamUGC()->GetItemState(publishedFileID);
-}
-SW_PY void Workshop_SetItemInstalledCallback(ItemInstalledCallback_t callback){
-	if(SteamUGC() == NULL){
-		return;
-	}
-	workshop.SetItemInstalledCallback(callback);
-}
-SW_PY void Workshop_ClearItemInstalledCallback(){
-	if(SteamUGC() == NULL){
-		return;
-	}
-	workshop.ClearItemInstallCallback();
-}
-SW_PY bool Workshop_GetItemInstallInfo(PublishedFileId_t nPublishedFileID, uint64 *punSizeOnDisk, char *pchFolder, uint32 cchFolderSize, uint32 *punTimeStamp){
-	if(SteamUGC() == NULL){
-		return false;
-	}
-	return SteamUGC()->GetItemInstallInfo(nPublishedFileID, punSizeOnDisk, pchFolder, cchFolderSize, punTimeStamp);
-}
-SW_PY bool Workshop_GetItemDownloadInfo(PublishedFileId_t publishedFileID, uint64 *punBytesDownloaded, uint64 *punBytesTotal){
-	if(SteamUGC() == NULL){
-		return false;
-	}
-	return SteamUGC()->GetItemDownloadInfo(publishedFileID, punBytesDownloaded, punBytesTotal);
+	tickets.clear();
 }

@@ -1,11 +1,11 @@
-#================================================
+#=========================================================================
 # Steamworks For Python
-#================================================
+#=========================================================================
 from ctypes import *
 import sys, os
-#------------------------------------------------
+#-------------------------------------------------------------------------
 # User Status
-#------------------------------------------------
+#-------------------------------------------------------------------------
 FriendFlags = {  # regular friend
     'None': 0x00,
     'Blocked': 0x01,
@@ -20,9 +20,9 @@ FriendFlags = {  # regular friend
     'Suggested': 0x800,
     'All': 0xFFFF,
     }
-#------------------------------------------------
+#-------------------------------------------------------------------------
 # Workshop File Types
-#------------------------------------------------
+#-------------------------------------------------------------------------
 WorkshopFileType = {
 	'Community': 0x00,			# normal Workshop item that can be subscribed to
 	'Microtransaction': 0x01,	# Workshop item that is meant to be voted on for the purpose of selling in-game
@@ -30,9 +30,9 @@ WorkshopFileType = {
 	# NOTE: There are more workshop file types defined "in isteamremotestorage.h",
 	# but we do not need them for now.
 }
-#------------------------------------------------
+#-------------------------------------------------------------------------
 # Workshop Item States
-#------------------------------------------------
+#-------------------------------------------------------------------------
 WorkshopItemState = {
 	"ItemStateNone":			0,	# item not tracked on client
 	"ItemStateSubscribed":		1,	# current user is subscribed to this item. Not just cached.
@@ -42,9 +42,9 @@ WorkshopItemState = {
 	"ItemStateDownloading":		16,	# item update is currently downloading
 	"ItemStateDownloadPending":	32,	# DownloadItem() was called for this item, content isn't available until DownloadItemResult_t is fired
 }
-#------------------------------------------------
+#-------------------------------------------------------------------------
 # Main Steam Class, obviously
-#------------------------------------------------
+#-------------------------------------------------------------------------
 class Steam:
 	# Set some basic variables for the Steam class
 	cdll = None
@@ -96,27 +96,34 @@ class Steam:
 			print("INFO: Steamworks initialized!")
 		else:
 			print("ERROR: Steamworks failed to initialize!")
-		#----------------------------------------
+		#-----------------------------------------------------------------
 		# Restypes and Argtypes
-		#----------------------------------------
-		# Set restype for Apps functions
+		#-----------------------------------------------------------------
+		# Set restype for Apps functions #################################
 		Steam.cdll.HasOtherApp.restype = bool
-		Steam.cdll.GetDlcCount.restype = int
+		Steam.cdll.GetDLCCount.restype = int
 		Steam.cdll.IsDlcInstalled.restype = bool
-		Steam.cdll.RequestAppProofOfPurchaseKey.restype = c_char_p
 		Steam.cdll.IsAppInstalled.restype = bool
 		Steam.cdll.GetCurrentGameLanguage.restype = c_char_p
-		# Set restype for Friends functions
+		Steam.cdll.IsVACBanned.restype = bool
+		Steam.cdll.GetEarliestPurchaseUnixTime.restype = int
+		Steam.cdll.IsSubscribedFromFreeWeekend.restype = bool
+		Steam.cdll.InstallDLC.restype = None
+		Steam.cdll.UninstallDLC.restype = None
+		Steam.cdll.IsSubscribed.restype = bool
+		Steam.cdll.IsLowViolence.restype = bool
+		Steam.cdll.IsCybercafe.restype = bool
+		Steam.cdll.IsSubscribedApp.restype = bool
+		Steam.cdll.GetAppBuildId.restype = int
+		# Set restype for Friends functions ##############################
 		Steam.cdll.GetFriendCount.restype = int
 		Steam.cdll.GetPersonaName.restype = c_char_p
-		Steam.cdll.GetPersonaState.restype = int
 		Steam.cdll.GetFriendPersonaName.restype = c_char_p
 		Steam.cdll.SetGameInfo.restype = None
 		Steam.cdll.ClearGameInfo.restype = None
 		Steam.cdll.InviteFriend.restype = None
 		Steam.cdll.SetPlayedWith.restype = None
-#		Steam.cdll.GetRecentPlayers.restype = None
-#		Steam.cdll.GetFriendAvatar.restype = None
+		Steam.cdll.GetFriendAvatar.restype = None
 #		Steam.cdll.DrawAvatar.restype = None
 		Steam.cdll.ActivateGameOverlay.restype = None
 		Steam.cdll.ActivateGameOverlay.argtypes = [c_char_p]
@@ -128,7 +135,7 @@ class Steam:
 		Steam.cdll.ActivateGameOverlayToStore.argtypes = [c_uint32]
 		Steam.cdll.ActivateGameOverlayInviteDialog.restype = None
 		Steam.cdll.ActivateGameOverlayInviteDialog.argtypes = [c_uint64]
-		# Set restype for Matchmaking
+		# Set restype for Matchmaking ####################################
 		Steam.cdll.CreateLobby.restype = None
 		Steam.cdll.CreateLobby.argtypes = [c_uint64, c_uint64]
 		Steam.cdll.JoinLobby.restype = None
@@ -137,7 +144,7 @@ class Steam:
 		Steam.cdll.LeaveLobby.argtypes = [c_uint64]
 		Steam.cdll.InviteUserToLobby.restype = bool
 		Steam.cdll.InviteUserToLobby.argtypes = [c_uint64, c_uint64]
-		# Set restype for Music functions
+		# Set restype for Music functions ################################
 		Steam.cdll.MusicIsEnabled.restype = bool
 		Steam.cdll.MusicIsPlaying.restype = bool
 		Steam.cdll.MusicGetVolume.restype = c_float
@@ -146,14 +153,33 @@ class Steam:
 		Steam.cdll.MusicPlayNext.restype = bool
 		Steam.cdll.MusicPlayPrev.restype = bool
 		Steam.cdll.MusicSetVolume.restype = c_float
-		# Set restype for Screenshot functions
+		# Set restype for Remote Storage functions #######################
+#		Steam.cdll.FileWrite.restype = bool
+		Steam.cdll.FileForget.restype = bool
+		Steam.cdll.FileDelete.restype = bool
+		Steam.cdll.FileExists.restype = bool
+		Steam.cdll.FilePersisted.restype = bool
+		Steam.cdll.GetFileSize.restype = int
+		Steam.cdll.GetFileTimestamp.restype = int
+		Steam.cdll.GetFileCount.restype = int
+		Steam.cdll.IsCloudEnabledForAccount.restype = bool
+		Steam.cdll.IsCloudEnabledForApp.restype = bool
+		Steam.cdll.SetCloudEnabledForApp.restype = None
+		Steam.cdll.GetSyncPlatforms.restype = int
+		# Set restype for Screenshot functions ###########################
+		Steam.cdll.HookScreenshots.restype = None
+		Steam.cdll.IsScreenshotsHooked.restype = bool
 		Steam.cdll.TriggerScreenshot.restype = None
-		# Set restype for User functions		
+		# Set restype for User functions #################################
+		Steam.cdll.EndAuthSession.restype = None
 		Steam.cdll.GetSteamID.restype = int
+		Steam.cdll.LoggedOn.restype = bool
 		Steam.cdll.GetPlayerSteamLevel.restype = int
-		Steam.cdll.GetUserDataFolder.restype = c_char_p
-		# Set restype for User Statistic functions
+#		Steam.cdll.GetUserDataFolder.restype = c_char_p
+		Steam.cdll.GetGameBadgeLevel.restype = int
+		# Set restype for User Statistic functions #######################
 		Steam.cdll.GetAchievement.restype = bool
+		Steam.cdll.GetNumAchievements.restype = int
 		Steam.cdll.GetStatInt.restype = int
 		Steam.cdll.GetStatFloat.restype = c_float
 		Steam.cdll.ResetAllStats.restype = bool
@@ -174,43 +200,53 @@ class Steam:
 #		Steam.cdll.UploadLeaderboardScore.argtypes = [int, bool]
 #		Steam.cdll.GetDownloadLeaderboardEntry.restype = None
 #		Steam.cdll.UpdateLeaderboardHandle.restype = None
-#		Steam.cdll.GetLeadboardHandle.restype = c_uint64
-#		Steam.cdll.GetLeaderboardEntries.restype = None
-		# Set restype for Utilities functions
+		Steam.cdll.GetLeadboardHandle.restype = c_uint64
+		Steam.cdll.GetLeaderboardEntries.restype = None
+		Steam.cdll.GetAchievementAndUnlockTime.restype = bool
+		Steam.cdll.IndicateAchievementProgress.restype = bool
+		# Set restype for Utilities functions ############################
 		Steam.cdll.GetCurrentBatteryPower.restype = int
 		Steam.cdll.GetIPCountry.restype = c_char_p
 		Steam.cdll.GetSecondsSinceAppActive.restype = int
-		Steam.cdll.GetSecondsSinceComputerActive.restype = int
 		Steam.cdll.GetServerRealTime.restype = int
 		Steam.cdll.IsOverlayEnabled.restype = bool
 		Steam.cdll.IsSteamRunningInVR.restype = bool
+		Steam.cdll.IsSteamInBigPictureMode.restype = bool
+		Steam.cdll.StartVRDashboard.restype = None
 		Steam.cdll.GetSteamUILanguage.restype = c_char_p
 		Steam.cdll.GetAppID.restype = int
 		Steam.cdll.SetOverlayNotificationPosition.restype = None
-		# Set argtypes and restype for Workshop functions
-		Steam.cdll.Workshop_StartItemUpdate.restype = c_uint64
-		Steam.cdll.Workshop_SetItemTitle.restype = bool
-		Steam.cdll.Workshop_SetItemTitle.argtypes = [c_uint64, c_char_p]
-		Steam.cdll.Workshop_SetItemDescription.restype = bool
-		Steam.cdll.Workshop_SetItemDescription.argtypes = [c_uint64, c_char_p]
-		Steam.cdll.Workshop_SetItemUpdateLanguage.restype = bool
-		Steam.cdll.Workshop_SetItemMetadata.restype = bool
-		Steam.cdll.Workshop_SetItemVisibility.restype = bool
-		Steam.cdll.Workshop_SetItemTags.restype = bool
-		Steam.cdll.Workshop_SetItemContent.restype = bool
-		Steam.cdll.Workshop_SetItemContent.argtypes = [c_uint64, c_char_p]
-		Steam.cdll.Workshop_SetItemPreview.restype = bool
-		Steam.cdll.Workshop_SetItemPreview.argtypes = [c_uint64, c_char_p]
-		Steam.cdll.Workshop_SubmitItemUpdate.argtypes = [c_uint64, c_char_p]
-		Steam.cdll.Workshop_GetNumSubscribedItems.restype = c_uint32
-		Steam.cdll.Workshop_GetSubscribedItems.restype = c_uint32
-		Steam.cdll.Workshop_GetSubscribedItems.argtypes = [POINTER(c_uint64), c_uint32]
-		Steam.cdll.Workshop_GetItemState.restype = c_uint32
-		Steam.cdll.Workshop_GetItemState.argtypes = [c_uint64]
-		Steam.cdll.Workshop_GetItemInstallInfo.restype = bool
-		Steam.cdll.Workshop_GetItemInstallInfo.argtypes = [c_uint64, POINTER(c_uint64), c_char_p, c_uint32,  POINTER(c_uint32)]
-		Steam.cdll.Workshop_GetItemDownloadInfo.restype = bool
-		Steam.cdll.Workshop_GetItemDownloadInfo.argtypes = [c_uint64, POINTER(c_uint64), POINTER(c_uint64)]
+		# Set argtypes and restype for Workshop functions ################
+		Steam.cdll.DownloadItem.restype = bool
+		Steam.cdll.DownloadItem.argtypes [int, bool]
+		Steam.cdll.SuspendDownloads.restype = None
+		Steam.cdll.StartItemUpdate.restype = c_uint64
+		Steam.cdll.GetItemState.restype = int
+		Steam.cdll.GetItemUpdateProgress.restype = int
+		Steam.cdll.CreateItem.restype = None
+		Steam.cdll.SetItemTitle.restype = bool
+		Steam.cdll.SetItemTitle.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.SetItemDescription.restype = bool
+		Steam.cdll.SetItemDescription.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.SetItemUpdateLanguage.restype = bool
+		Steam.cdll.SetItemMetadata.restype = bool
+		Steam.cdll.SetItemVisibility.restype = bool
+		Steam.cdll.SetItemTags.restype = bool
+		Steam.cdll.SetItemContent.restype = bool
+		Steam.cdll.SetItemContent.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.SetItemPreview.restype = bool
+		Steam.cdll.SetItemPreview.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.SubmitItemUpdate.restype = None
+		Steam.cdll.SubmitItemUpdate.argtypes = [c_uint64, c_char_p]
+		Steam.cdll.GetNumSubscribedItems.restype = c_uint32
+		Steam.cdll.GetSubscribedItems.restype = c_uint32
+		Steam.cdll.GetSubscribedItems.argtypes = [POINTER(c_uint64), c_uint32]
+#		Steam.cdll.GetItemState.restype = c_uint32
+#		Steam.cdll.GetItemState.argtypes = [c_uint64]
+#		Steam.cdll.GetItemInstallInfo.restype = bool
+#		Steam.cdll.GetItemInstallInfo.argtypes = [c_uint64, POINTER(c_uint64), c_char_p, c_uint32,  POINTER(c_uint32)]
+#		Steam.cdll.GetItemDownloadInfo.restype = bool
+#		Steam.cdll.GetItemDownloadInfo.argtypes = [c_uint64, POINTER(c_uint64), POINTER(c_uint64)]
 	# Is Steam loaded
 	@staticmethod
 	def isSteamLoaded():
@@ -235,10 +271,9 @@ class Steam:
 			return True
 		else:
 			return False
-#------------------------------------------------
-# Class for Steam Apps
-#------------------------------------------------
-class SteamApps:
+	#---------------------------------------------------------------------
+	# Definitions for Apps
+	#---------------------------------------------------------------------
 	# Check if the user has a given application/game
 	@staticmethod
 	def HasOtherApp(appID):
@@ -248,9 +283,9 @@ class SteamApps:
 			return False
 	# Get the number of DLC the user owns for a parent application/game
 	@staticmethod
-	def GetDlcCount():
+	def GetDLCCount():
 		if Steam.isSteamLoaded():
-			return Steam.cdll.GetDlcCount()
+			return Steam.cdll.GetDLCCount()
 		else:
 			return 0
 	# Check give the given DLC is installed, returns true/false
@@ -260,13 +295,6 @@ class SteamApps:
 			return Steam.cdll.IsDlcInstalled(appID)
 		else:
 			return False
-	# Returns purchase key for given application/game
-	@staticmethod
-	def RequestAppProofOfPurchaseKey(value):
-		if Steam.isSteamLoaded():
-			return Steam.cdll.RequestAppProofOfPurchaseKey(value)
-		else:
-			return "None"
 	# Check if given application/game is installed, not necessarily owned
 	@staticmethod
 	def IsAppInstalled(appID):
@@ -281,10 +309,79 @@ class SteamApps:
 			return Steam.cdll.GetCurrentGameLanguage()
 		else:
 			return "None"
-#------------------------------------------------
-# Class for Steam Friends
-#------------------------------------------------
-class SteamFriends:
+	# Does the user have a VAC ban for this game
+	@staticmethod
+	def IsVACBanned():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.IsVACBanned()
+		else:
+			return False
+	# Returns the Unit time of the purchase of the app
+	@staticmethod
+	def GetEarliestPurchaseUnixTime(value):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.GetEarliestPurchaseUnixTime(value)
+		else:
+			return 0
+	# Check if the user is subscribed to the current app
+	@staticmethod
+	def IsSubscribedFromFreeWeekend():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.IsSubscribedFromFreeWeekend()
+		else:
+			return False
+	# Install control for optional DLC
+	@staticmethod
+	def InstallDLC(value):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.InstallDLC(value)
+		else:
+			return
+	# Uninstall control for optional DLC
+	@staticmethod
+	def UninstallDLC(value):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.UninstallDLC(value)
+		else:
+			return
+	# Is subscribed lacks notes
+	@staticmethod
+	def IsSubscribed():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.IsSubscribed()
+		else:
+			return False
+	# Presumably if set to low violence
+	@staticmethod
+	def IsLowViolence():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.IsLowViolence()
+		else:
+			return False
+	# Presumably if user is a cyber cafe
+	@staticmethod
+	def IsCybercafe():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.IsCybercafe()
+		else:
+			return False
+	# Only used to check ownership of another game
+	@staticmethod
+	def IsSubscribedApp(appID):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.IsSubscribedApp(appID)
+		else:
+			return False
+	# Return the build ID for this app
+	@staticmethod
+	def GetAppBuildId:
+		if Steam.isSteamLoaded():
+			return Steam.cdll.GetAppBuildId()
+		else:
+			return 0
+	#---------------------------------------------------------------------
+	# Definitions for Friends
+	#---------------------------------------------------------------------
 	# Get number of friends user has
 	@staticmethod
 	def GetFriendCount(flag=FriendFlags['All']):
@@ -299,16 +396,9 @@ class SteamFriends:
 			return Steam.cdll.GetPersonaName()
 		else:
 			return ""
-	# Get the user's state on Steam
-	@staticmethod
-	def GetPlayerState():
-		if Steam.isSteamLoaded():
-			return Steam.cdll.GetPersonaState()
-		else:
-			return False
 	# Get given friend's Steam username
 	@staticmethod
-	def GetFriendPersonaName(steamID):
+	def GetFriendName(steamID):
 		if Steam.isSteamLoaded():
 			return Steam.cdll.GetFriendPersonaName(steamID)
 		else:
@@ -376,10 +466,9 @@ class SteamFriends:
 			return Steam.cdll.ActivateGameOverlayToWebPage(steamID)
 		else:
 			return
-#------------------------------------------------
-# Class for Steam Matchmaking
-#------------------------------------------------ 
-class SteamMatchmaking:
+	#---------------------------------------------------------------------
+	# Definitions for Matchmaking
+	#---------------------------------------------------------------------
 	# Create a lobby on the Steam servers, if private the lobby will not be returned by any RequestLobbyList() call
 	@staticmethod
 	def CreateLobby(lobbyType, maxMembers):
@@ -408,10 +497,9 @@ class SteamMatchmaking:
 			return Steam.cdll.InviteUserToLobby(lobbyID, steamID)
 		else:
 			return
-#------------------------------------------------
-# Class for Steam Music
-#------------------------------------------------
-class SteamMusic:
+	#---------------------------------------------------------------------
+	# Definitions for Music
+	#---------------------------------------------------------------------
 	# Is Steam music enabled
 	@staticmethod
 	def MusicIsEnabled():
@@ -468,10 +556,103 @@ class SteamMusic:
 			return Steam.cdll.MusicSetVolume(value)
 		else:
 			return False
-#------------------------------------------------
-# Class for Steam Screenshots
-#------------------------------------------------
-class SteamScreenshots:
+	#---------------------------------------------------------------------
+	# Definitions for Remote Storage
+	#---------------------------------------------------------------------
+	# Delete file from remote storage but leave it on local disk to remain accessible
+	@staticmethod
+	def FileForget(file):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.FileForget(file)
+		else:
+			return False
+	# Delete a given file in Steam Cloud
+	@staticmethod
+	def FileDelete(file):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.FileDelete(file)
+		else:
+			return False
+	# Check if a givenfile exists in Steam Cloud
+	@staticmethod
+	def FileExists(file):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.FileExists(file)
+		else:
+			return False
+	# Check if a given file is persisted in Steam Cloud
+	@staticmethod
+	def FilePersisted(file):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.FilePersisted(file)
+		else:
+			return False
+	# Get the size of a given file
+	@staticmethod
+	def GetFileSize(file):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.GetFileSize(file)
+		else:
+			return -1
+	# Get the timestamp of when the file was uploaded/changed
+	@staticmethod
+	def GetFileTimestamp(file):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.GetFileTimestamp(file)
+		else:
+			return -1
+	# Gets the total number of local files synchronized by Steam Cloud
+	@staticmethod
+	def GetFileCount():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.GetFileCount()
+		else:
+			return 0
+	# Is Steam Cloud enabled on the user's account?
+	@staticmethod
+	def IsCloudEnabledForAccount():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.IsCloudEnabledForAccount()
+		else:
+			return False
+	# Is Steam Cloud enabled for this application?
+	@staticmethod
+	def IsCloudEnabledForApp():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.IsCloudEnabledForApp()
+		else:
+			return False
+	# Set Steam Cloud enabled for this application
+	@staticmethod
+	def SetCloudEnabledForApp(enabled):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.SetCloudEnabledForApp(enabled)
+		else:
+			return
+	# Obtains the platforms that the specified file will syncronize to
+	@staticmethod
+	def GetSyncPlatforms(file):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.GetSyncPlatforms(file)
+		else:
+			return 0
+	#---------------------------------------------------------------------
+	# Definitions for Screenshots
+	#---------------------------------------------------------------------
+	# Toggles whether the overlay handles screenshots
+	@staticmethod
+	def HookScreenshots(hook):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.HookScreenshots(hook)
+		else:
+			return
+	# Checks if the app is hooking screenshots
+	@staticmethod
+	def IsScreenshotsHooked():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.IsScreenshotsHooked()
+		else:
+			return False
 	# Causes Steam overlay to take a screenshot
 	@staticmethod
 	def TriggerScreenshot():
@@ -479,17 +660,30 @@ class SteamScreenshots:
 			return Steam.cdll.TriggerScreenshot()
 		else:
 			return
-#------------------------------------------------
-# Class for Steam Users
-#------------------------------------------------
-class SteamUser:
+	#---------------------------------------------------------------------
+	# Definitions for Users
+	#---------------------------------------------------------------------
+	# Ends an auth session
+	@staticmethod
+	def EndAuthSession(steamID):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.EndAuthSession(steamID)
+		else:
+			return
 	# Get user's Steam ID
 	@staticmethod
-	def GetPlayerID():
+	def GetSteamID():
 		if Steam.isSteamLoaded():
 			return Steam.cdll.GetSteamID()
 		else:
 			return 0
+	# Check, true/false, if user is logged into Steam currently
+	@staticmethod
+	def LoggedOn():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.LoggedOn()
+		else:
+			return False
 	# Get the user's Steam level
 	@staticmethod
 	def GetPlayerSteamLevel():
@@ -498,16 +692,22 @@ class SteamUser:
 		else:
 			return 0
 	# Get the user's Steam installation path
+#	@staticmethod
+#	def GetUserDataFolder():
+#		if Steam.isSteamLoaded():
+#			return Steam.cdll.GetUserDataFolder()
+#		else:
+#			return ""
+	# Trading card badges data access, if you only have one set of cards, the series will be 1
 	@staticmethod
-	def GetUserDataFolder():
+	def GetGameBadgeLevel(series, foil):
 		if Steam.isSteamLoaded():
-			return Steam.cdll.GetUserDataFolder()
+			return Steam.cdll.GetGameBadgeLevel(series, foil)
 		else:
-			return ""
-#------------------------------------------------
-# Class for Steam User Statistics
-#------------------------------------------------
-class SteamUserStats:
+			return 0
+	#---------------------------------------------------------------------
+	# Definitions for User Statistics
+	#---------------------------------------------------------------------
 	# Return true/false if use has given achievement
 	@staticmethod
 	def GetAchievement(name):
@@ -515,6 +715,20 @@ class SteamUserStats:
 			return Steam.cdll.GetAchievement(name)
 		else:
 			return ""
+	# Get the amount of players currently playing the current game
+	@staticmethod
+	def GetNumberOfCurrentPlayers():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.GetNumberOfCurrentPlayers()
+		else:
+			return
+	# Get the number of achievements
+	@staticmethod
+	def GetNumAchievements():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.GetNumAchievements()
+		else:
+			return 0
 	# Get the value of a float statistic
 	@staticmethod
 	def GetStatFloat(name):
@@ -574,10 +788,37 @@ class SteamUserStats:
 			return Steam.cdll.ClearAchievement(name)
 		else:
 			return False
-#------------------------------------------------
-# Class for Steam Utilities
-#------------------------------------------------
-class SteamUtilities:
+	# Get the currently used leaderboard handle
+	@staticmethod
+	def GetLeadboardHandle():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.GetLeaderboardHandle()
+		else:
+			return 0
+	# Get the currently used leaderboard entries
+	@staticmethod
+	def GetLeaderboardEntries():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.GetLeaderboardEntries()
+		else:
+			return ""
+	# Get the achievement status, and the time it was unlocked if unlocked
+	@staticmethod
+	def GetAchievementAndUnlockTime(name, achieved, unlockTime):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.GetAchievementAndUnlockTime(name, achieved, unlockTime)
+		else:
+			return 0
+	# Achievement progress, triggers an AcheivementProgress callback, that is all
+	@staticmethod
+	def IndicateAchievementProgress(name, currentProgress, maxProgress):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.IndicateAchievementProgress(name, currentProgress, maxProgress)
+		else:
+			return 0
+	#---------------------------------------------------------------------
+	# Definitions for Utilities
+	#---------------------------------------------------------------------
 	# Get the amount of battery power, clearly for laptops
 	@staticmethod
 	def GetCurrentBatteryPower():
@@ -597,13 +838,6 @@ class SteamUtilities:
 	def GetSecondsSinceAppActive():
 		if Steam.isSteamLoaded():
 			return Steam.cdll.GetSecondsSinceAppActive()
-		else:
-			return 0
-	# Return seconds since computer was started
-	@staticmethod
-	def GetSecondsSinceComputerActive():
-		if Steam.isSteamLoaded():
-			return Steam.cdll.GetSecondsSinceComputerActive()
 		else:
 			return 0
 	# Get the actual time
@@ -627,6 +861,20 @@ class SteamUtilities:
 			return Steam.cdll.IsSteamRunningInVR()
 		else:
 			return False
+	# Returns true if Steam & Steam Overlay in Big Picture Mode
+	@staticmethod
+	def IsSteamInBigPictureMode():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.IsSteamInBigPictureMode()
+		else:
+			return False
+	# Ask SteamUI to create and render its OpenVR dashboard
+	@staticmethod
+	def StartVRDashboard():
+		if Steam.isSteamLoaded():
+			return Steam.cdll.StartVRDashboard()
+		else:
+			return
 	# Get the Steam user interface language
 	@staticmethod
 	def GetSteamUILanguage():
@@ -648,244 +896,154 @@ class SteamUtilities:
 			return Steam.cdll.SetOverlayNotificationPosition(pos)
 		else:
 			return False
-#------------------------------------------------
-# Class for Steam Workshop
-#------------------------------------------------
-class SteamWorkshop:
-	# A class that describes Steam's CreateItemResult_t C struct
-	class CreateItemResult_t(Structure):
-		_fields_ = [
-			("result", c_int),
-			("publishedFileId", c_uint64),
-			("userNeedsToAcceptWorkshopLegalAgreement", c_bool)
-		]
-	# A class that describes Steam's SubmitItemUpdateResult_t C struct
-	class SubmitItemUpdateResult_t(Structure):
-		_fields_ = [
-			("result", c_int),
-			("userNeedsToAcceptWorkshopLegalAgreement", c_bool)
-		]
-	# A class that describes Steam's ItemInstalled_t C struct
-	class ItemInstalled_t(Structure):
-		_fields_ = [
-			("appId", c_uint32),
-			("publishedFileId", c_uint64)
-		]
-	# We want to keep callbacks in the class scope, so that they don't get
-	# garbage collected while we still need them.
-	ITEM_CREATED_CALLBACK_TYPE = CFUNCTYPE(None, CreateItemResult_t)
-	itemCreatedCallback = None
-
-	ITEM_UPDATED_CALLBACK_TYPE = CFUNCTYPE(None, SubmitItemUpdateResult_t)
-	itemUpdatedCallback = None
-
-	ITEM_INSTALLED_CALLBACK_TYPE = CFUNCTYPE(None, ItemInstalled_t)
-	itemInstalledCallback = None
-	#
-	@classmethod
-	def SetItemCreatedCallback(cls, callback):
-		if Steam.isSteamLoaded():
-			cls.itemCreatedCallback = cls.ITEM_CREATED_CALLBACK_TYPE(callback)
-
-			Steam.cdll.Workshop_SetItemCreatedCallback(cls.itemCreatedCallback)
-		else:
-			return False
-	#
-	@classmethod
-	def SetItemUpdatedCallback(cls, callback):
-		if Steam.isSteamLoaded():
-			cls.itemUpdatedCallback = cls.ITEM_UPDATED_CALLBACK_TYPE(callback)
-
-			Steam.cdll.Workshop_SetItemUpdatedCallback(cls.itemUpdatedCallback)
-		else:
-			return False
-	#
-	@classmethod
-	def SetItemInstalledCallback(cls, callback):
-		if Steam.isSteamLoaded():
-			cls.itemInstalledCallback = cls.ITEM_INSTALLED_CALLBACK_TYPE(callback)
-
-			Steam.cdll.Workshop_SetItemInstalledCallback(cls.itemInstalledCallback)
-		else:
-			return False
-	#
-	@classmethod
-	def ClearItemInstalledCallback(cls, callback):
-		if Steam.isSteamLoaded():
-			itemInstalledCallback = None
-			Steam.cdll.Workshop_ClearItemInstalledCallback()
-	# Create a UGC (Workshop) item
-	#
-	# Arguments:
-	# appId -- The app ID of the game on Steam. 
-	# Do not use the creation tool app ID if they are separate.
-	#
-	# filetype -- Can be a community file type or microtransactions.
-	# Use predefined `WorkshopFileType` values.
-	#
-	# callback -- The function to call once the item creation is finished.
+	#---------------------------------------------------------------------
+	# Defintions for Workshop
+	#---------------------------------------------------------------------
+	# Download new or update already installed item.
 	@staticmethod
-	def CreateItem(appId, filetype, callback = None):
+	def DownloadItem(fileID, priority):
 		if Steam.isSteamLoaded():
-			if callback != None:
-				SteamWorkshop.SetItemCreatedCallback(callback)
-
-			Steam.cdll.Workshop_CreateItem(appId, filetype)
+			return Steam.cdll.DownloadItem(fileID, priority)
+		else:
+			return 0
+	# "True" will suspend all workshop downloads until "false" is called or the game ends
+	@staticmethod
+	def SuspendDownloads(suspend):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.SuspendDownloads(suspend)
+		else:
+			return
+	# Create a UGC (Workshop) item
+	@staticmethod
+	def CreateItem(appID, filetype):
+		if Steam.isSteamLoaded():
+			Steam.cdll.CreateItem(appID, filetype)
 			return True
 		else:
 			return False
 	# Start the item update process and receive an update handle.
-	#
-	# Arguments:
-	# appId -- The app ID of the game on Steam. 
-	# Do not use the creation tool app ID if they are separate
-	# publishedFileId -- The ID of the Workshop file you are updating
-	# 
-	# Return value:
-	# If sucessful: update handle - an ID of the current update transaction
-	# Otherwise: False
 	@staticmethod
-	def StartItemUpdate(appId, publishedFileId):
+	def StartItemUpdate(appID, fileID):
 		if Steam.isSteamLoaded():
-			return Steam.cdll.Workshop_StartItemUpdate(appId, c_uint64(publishedFileId))
+			return Steam.cdll.StartItemUpdate(appId, c_uint64(fileId))
+		else:
+			return False
+		 Get the current state of a workshop item.
+	@staticmethod
+	def GetItemState(fileId):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.GetItemState(fileId)
+		else:
+			return False
+	# Get the progress of an item update request.
+	@staticmethod
+	def GetItemUpdateProgress(updateHandle):
+		if Steam.isSteamLoaded():
+			bytesProcessed = pointer(c_uint64)
+			bytesTotal = pointer(c_uint64)
+			itemUpdateStatus = GetItemUpdateProgress(updateHandle, bytesProcessed, bytesTotal)
+			# Unlike for GetItemDownloadInfo, pBytesTotal should always be set here
+			progress = bytesProcessed.contents.value / bytesTotal.contents.value
+			itemUpdateInfo = {
+				'itemUpdateStatus' : itemUpdateStatus,
+				'bytesProcessed' : bytesProcessed.contents.value,
+				'bytesTotal' : bytesTotal.contents.value,
+				'progress' : progress
+			}
+			return itemUpdateInfo
 		else:
 			return False
 	# Set the title of a Workshop item
-	#
-	# Arguments:
-	# 
-	# updateHandle -- the handle returned by 'StartItemUpdate'
-	# title -- the desired title of the item.
-	# 
-	# Return value:
-	# True on succes,
-	# False otherwise.
 	@staticmethod
 	def SetItemTitle(updateHandle, title):
 		if Steam.isSteamLoaded():
 			if len(title) > 128:
 				print("ERROR: Your title is longer than 128 characters.")
 				return False
-
-			return Steam.cdll.Workshop_SetItemTitle(updateHandle, title.encode())
+			return Steam.cdll.SetItemTitle(updateHandle, title.encode())
 		else:
 			return False
 	# Set the description of a Workshop item
-	#
-	# Arguments:
-	# updateHandle -- the handle returned by 'StartItemUpdate'
-	# description -- the desired description of the item.
-	#
-	# Return value:
-	# True on succes,
-	# False otherwise.
 	@staticmethod
 	def SetItemDescription(updateHandle, description):
 		if Steam.isSteamLoaded():
 			if len(description) > 8000:
 				print("ERROR: Your description is longer than 8000 characters.")
 				return False
-
-			return Steam.cdll.Workshop_SetItemDescription(updateHandle, description.encode())
+			return Steam.cdll.SetItemDescription(updateHandle, description.encode())
 		else:
 			return False
 	# Set the directory containing the content you wish to upload to Workshop.
-	#
-	# Arguments:
-	# updateHandle -- the handle returned by 'StartItemUpdate'
-	# contentDirectory -- path to the directory containing the content of the workshop item.
-	#
-	# Return value:
-	# True on succes,
-	# False otherwise.
 	@staticmethod
 	def SetItemContent(updateHandle, contentDirectory):
 		if Steam.isSteamLoaded():
-			return Steam.cdll.Workshop_SetItemContent(updateHandle, contentDirectory.encode())
+			return Steam.cdll.SetItemContent(updateHandle, contentDirectory.encode())
 		else:
 			return False
 	# Set the preview image of the Workshop item.
-	#
-	# Arguments:
-	# updateHandle -- the handle returned by 'StartItemUpdate'
-	# previewImage -- path to the preview image file.
-	#
-	# Return value:
-	# True on succes,
-	# False otherwise.
 	@staticmethod
 	def SetItemPreview(updateHandle, previewImage):
 		if Steam.isSteamLoaded():
-			return Steam.cdll.Workshop_SetItemPreview(updateHandle, previewImage.encode())
+			return Steam.cdll.SetItemPreview(updateHandle, previewImage.encode())
 		else:
 			return False
 	# Submit the item update with the given handle to Steam.
-	#
-	# Arguments:
-	# updateHandle -- the handle returned by 'StartItemUpdate'
-	# changeNote -- a string containing change notes for the current update.
 	@staticmethod
 	def SubmitItemUpdate(updateHandle, changeNote, callback = None):
 		if Steam.isSteamLoaded():
-			if callback != None:
-				SteamWorkshop.SetItemUpdatedCallback(callback)
-
-			return Steam.cdll.Workshop_SubmitItemUpdate(updateHandle, changeNote.encode())
+			return Steam.cdll.WSubmitItemUpdate(updateHandle, changeNote.encode())
 		else:
 			return False
-	# Get the progress of an item update request.
-	#
-	# Argument:
-	# updateHandle -- the handle returned by 'StartItemUpdate'
-	#
-	# Return Value:
-	# On success: An object with the following attributes
-	# -- 'itemUpdateStatus - a `WorkshopItemUpdateStatus` value describing the update status of the item
-	# -- 'bytesProcessed' - amount of bytes processed
-	# -- 'bytesTotal' - total amount of bytes to be processed
-	# -- 'progress' - a value ranging from 0 to 1 representing update progress
-	# Otherwise: False
+	# Sets the language of the title and description that will be set in the item update
 	@staticmethod
-	def GetItemUpdateProgress(updateHandle):
+	def SetItemUpdateLanguage(updateHandle, language):
 		if Steam.isSteamLoaded():
-			pBytesProcessed = pointer(c_uint64)
-			pBytesTotal = pointer(c_uint64)
-
-			itemUpdateStatus = Workshop_GetItemUpdateProgress(updateHandle, pBytesProcessed, pBytesTotal)
-			# Unlike for GetItemDownloadInfo, pBytesTotal should always be set here
-			progress = pBytesProcessed.contents.value / pBytesTotal.contents.value
-
-			itemUpdateInfo = {
-				'itemUpdateStatus' : itemUpdateStatus,
-				'bytesProcessed' : pBytesProcessed.contents.value,
-				'bytesTotal' : pBytesTotal.contents.value,
-				'progress' : progress
-			}
-
-			return itemUpdateInfo
+			return Steam.cdll.SetItemUpdateLanguage(updateHandle, language)
 		else:
 			return False
-	# Get the total number of items the user is subscribed to for this game or application.
-	#
-	# Return value:
-	# On success: The number of subscribed items,
-	# Otherwise: False.
+	# Sets arbitrary metadata for an item
 	@staticmethod
-	def GetNumSubscribedItems():
+	def SetItemMetadata(updateHandle, metadata):
 		if Steam.isSteamLoaded():
-			return Steam.cdll.Workshop_GetNumSubscribedItems()
+			return Steam.cdll.SetItemMetadata(updateHandle, metadata)
 		else:
 			return False
+	# Sets the visibility of an item
+	@staticmethod
+	def SetItemVisibility(updateHandle, visibility):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.SetItemVisibility(updateHandle, visibility)
+		else:
+			return False
+	# Sets arbitrary developer specified tags on an item
+	@staticmethod
+	def SetItemTags(updateHandle, tags):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.SetItemTags(updateHandle, tags)
+		else:
+			return False
+	# Sets the folder that will be stored as the content for an item
+	@staticmethod
+	def SetItemContent(updateHandle, contentFolder):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.SetItemContent(updateHandle, contentFolder)
+		else:
+			return False
+	# Sets the primary preview image for the item
+	@staticmethod
+	def SetItemPreview(updateHandle, previewFile):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.SetItemPreview(updateHandle, previewFile)
+		else:
+			return
+	# Uploads the changes made to an item to the Steam Workshop; to be called after setting your changes
+	@staticmethod
+	def SubmitItemUpdate(updateHandle, changeNote):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.SubmitItemUpdate(updateHandle, changeNote)
+		else:
+			return
 	# Get a list of published file IDs that the user is subscribed to
-	#
-	# Arguments:
-	# maxEntries -- the maximum number of entries to fetch. If omitted
-	# the function will try to fetch as much items as the user is 
-	# subscribed to.
-	#
-	# Return Value:
-	# On success: A list of published file IDs that the user is subscribed to.
-	# Otherwise: False.
 	@staticmethod
 	def GetSubscribedItems(maxEntries=-1):
 		if Steam.isSteamLoaded():
@@ -894,79 +1052,34 @@ class SteamWorkshop:
 			# Published file IDs are stored as uint64 values
 			PublishedFileIdsArrayCType = c_uint64 * maxEntries
 			pvecPublishedFileIds = PublishedFileIdsArrayCType()
-
 			# TODO: We might need to add an exception check here to catch any errors while
 			# writing to the 'pvecPublishedFileIds' array.
-			numItems = Steam.cdll.Workshop_GetSubscribedItems(pvecPublishedFileIds, maxEntries)
+			numItems = Steam.cdll.GetSubscribedItems(pvecPublishedFileIds, maxEntries)
 			# According to steam's example, it is possible for numItems to be greater than maxEntries
 			# so we crop.
 			if numItems > maxEntries:
 				numItems = maxEntries
-
 			publishedFileIdsList = [pvecPublishedFileIds[i] for i in range(numItems)]
 			return publishedFileIdsList
 		else:
 			return False
-	# Get the current state of a workshop item.
-	#
-	# Arguments:
-	# publishedFileId -- the id of the item whose state to check
-	#
-	# Return Value:
-	# On success: A `WorkshopItemState` value describing the item state.
-	# Otherwise: False
-	@staticmethod
-	def GetItemState(publishedFileId):
-		if Steam.isSteamLoaded():
-			return Steam.cdll.Workshop_GetItemState(publishedFileId)
-		else:
-			return False
 	# Get info about an installed item
-	#
-	# Arguments:
-	# publishedFileId -- the id of the item to look up,
-	# maxFolderPathLength -- maximum length of the folder path in characters.
-	#
-	# Return Value:
-	# If the item is installed: an object with the following attributes
-	# -- 'sizeOnDisk'
-	# -- 'folder'
-	# -- 'timestamp'
-	#
-	# If the item is not installed, or the method fails it returns: False
 	@staticmethod
 	def GetItemInstallInfo(publishedFileId, maxFolderPathLength=1024):
 		if Steam.isSteamLoaded():
 			pSizeOnDisk = pointer(c_uint64(0))
 			pTimestamp = pointer(c_uint32(0))
 			pFolder = create_string_buffer(maxFolderPathLength)
-
-			isInstalled = Steam.cdll.Workshop_GetItemInstallInfo(publishedFileId, pSizeOnDisk, pFolder, maxFolderPathLength, pTimestamp)
-
+			isInstalled = Steam.cdll.GetItemInstallInfo(publishedFileId, pSizeOnDisk, pFolder, maxFolderPathLength, pTimestamp)
 			if isInstalled:
 				itemInfo = {
 					'sizeOnDisk' : pSizeOnDisk.contents.value,
 					'folder' : pFolder.value.decode(),
 					'timestamp' : pTimestamp.contents.value
 				}
-
 				return itemInfo
-
 		return False
 	# Get download info for a subscribed item
-	#
-	# Arguments:
-	# publishedFileId -- the id of the item whose download info to look up
-	#
-	# Return Value:
-	# If download information is available returns an object with
-	# the following attributes
-	# -- 'bytesDownloaded'- the amount of downloaded bytes
-	# -- 'bytesTotal' - the total amounts of bytes an item has
-	# -- 'progress' - a value ranging from 0 to 1 representing download progress
-	#
-	# If download information or steamworks or not available, 
-	# returns False
 	@staticmethod
 	def GetItemDownloadInfo(publishedFileId):
 		if Steam.isSteamLoaded():
