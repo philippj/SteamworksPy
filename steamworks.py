@@ -108,9 +108,11 @@ class Steam:
 		Steam.cdll.GetCurrentGameLanguage.restype = c_char_p
 		# Set restype for Friends functions
 		Steam.cdll.GetFriendCount.restype = int
+		Steam.cdll.GetFriendByIndex.restype = c_uint64
 		Steam.cdll.GetPersonaName.restype = c_char_p
 		Steam.cdll.GetPersonaState.restype = int
 		Steam.cdll.GetFriendPersonaName.restype = c_char_p
+		Steam.cdll.GetFriendPersonaName.argtypes = [c_uint64]
 		Steam.cdll.SetGameInfo.restype = None
 		Steam.cdll.ClearGameInfo.restype = None
 		Steam.cdll.InviteFriend.restype = None
@@ -149,7 +151,7 @@ class Steam:
 		# Set restype for Screenshot functions
 		Steam.cdll.TriggerScreenshot.restype = None
 		# Set restype for User functions		
-		Steam.cdll.GetSteamID.restype = int
+		Steam.cdll.GetSteamID.restype = c_uint64
 		Steam.cdll.GetPlayerSteamLevel.restype = int
 		Steam.cdll.GetUserDataFolder.restype = c_char_p
 		# Set restype for User Statistic functions
@@ -290,6 +292,13 @@ class SteamFriends:
 	def GetFriendCount(flag=FriendFlags['All']):
 		if Steam.isSteamLoaded():
 			return Steam.cdll.GetFriendCount(flag)
+		else:
+			return 0
+	# Get a friend by index
+	@staticmethod
+	def GetFriendByIndex(friendInt, flag=FriendFlags['All']):
+		if Steam.isSteamLoaded():
+			return Steam.cdll.GetFriendByIndex(friendInt, flag)
 		else:
 			return 0
 	# Get the user's Steam username

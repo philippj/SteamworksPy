@@ -222,6 +222,10 @@ SW_PY int GetFriendCount(int flag){
 	}
 	return SteamFriends()->GetFriendCount(flag);
 }
+SW_PY uint64_t GetFriendByIndex(int thisFriend){
+	CSteamID friendID = SteamFriends()->GetFriendByIndex(thisFriend, 0xFFFF);
+	return friendID.ConvertToUint64();
+}
 SW_PY const char* GetPersonaName(){
 	if(SteamFriends() == NULL){
 		return "";
@@ -414,7 +418,7 @@ SW_PY void TriggerScreenshot(){
 //-----------------------------------------------
 // Steam User
 //-----------------------------------------------
-SW_PY int GetSteamID(){
+SW_PY uint64_t GetSteamID(){
 	if(SteamUser() == NULL){
 		return 0;
 	}
