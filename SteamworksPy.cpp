@@ -79,6 +79,7 @@
 typedef void(*CreateItemResultCallback_t) (CreateItemResult_t);
 typedef void(*SubmitItemUpdateResultCallback_t) (SubmitItemUpdateResult_t);
 typedef void(*ItemInstalledCallback_t) (ItemInstalled_t);
+typedef void(*LeaderboardFindResultCallback_t) (LeaderboardFindResult_t);
 //-----------------------------------------------
 // Workshop Class
 //-----------------------------------------------
@@ -135,6 +136,31 @@ private:
 	}
 };
 static Workshop workshop;
+//-----------------------------------------------
+// Leaderboard Class
+//-----------------------------------------------
+class Leaderboard
+{
+public:
+	LeaderboardFindResultCallback_t _pyLeaderboardFindResultCallback;
+
+	CCallResult<Leaderboard, LeaderboardFindResult_t> _leaderboardFindResultCallback;
+
+	void SetLeaderboardFindResultCallback(LeaderboardFindResultCallback_t callback){
+		_pyLeaderboardFindResultCallback = callback;
+	}
+	void FindLeaderboard(const char *pchLeaderboardName){
+		SteamAPICall_t leaderboardFindResultCall = SteamUserStats()->FindLeaderboard(pchLeaderboardName);
+		_leaderboardFindResultCallback.Set(leaderboardFindResultCall, this, &Leaderboard::OnLeaderboardFindResult);
+	}
+private:
+	void OnLeaderboardFindResult(LeaderboardFindResult_t* leaderboardFindResult, bool bIOFailure){
+		if(_pyLeaderboardFindResultCallback != nullptr){
+			_pyLeaderboardFindResultCallback(*leaderboardFindResult);
+		}
+	}
+};
+static Leaderboard leaderboard;
 //-----------------------------------------------
 // Steamworks functions
 //-----------------------------------------------
@@ -511,7 +537,6 @@ SW_PY bool StoreStats(){
 	}
 	return SteamUserStats()->StoreStats();
 }
-//SW_PY void FindLeaderboard(const char* name)
 //SW_PY const char* GetLeaderboardName()
 //SW_PY int GetLeaderboardEntryCount()
 //SW_PY void DownloadLeaderboardEntries()
@@ -718,4 +743,19 @@ SW_PY bool Workshop_GetItemDownloadInfo(PublishedFileId_t publishedFileID, uint6
 		return false;
 	}
 	return SteamUGC()->GetItemDownloadInfo(publishedFileID, punBytesDownloaded, punBytesTotal);
+}
+//-----------------------------------------------
+// Steam Leaderboard
+//-----------------------------------------------
+SW_PY void Leaderboard_SetFindLeaderboardResultCallback(LeaderboardFindResultCallback_t callback){
+	if(SteamUserStats() == NULL){
+		return;
+	}
+	leaderboard.SetLeaderboardFindResultCallback(callback);
+}
+SW_PY void Leaderboard_FindLeaderboard(const char *pchLeaderboardName){
+	if(SteamUserStats() == NULL){
+		return;
+	}
+	leaderboard.FindLeaderboard(pchLeaderboardName);
 }

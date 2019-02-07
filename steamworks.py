@@ -165,8 +165,8 @@ class Steam:
 		Steam.cdll.SetStatFloat.restype = bool
 		Steam.cdll.StoreStats.restype = bool
 		Steam.cdll.ClearAchievement.restype = bool
-#		Steam.cdll.FindLeaderboard.restype = None
-#		Steam.cdll.FindLeaderboard.argtypes = [c_char_p]
+		Steam.cdll.Leaderboard_FindLeaderboard.restype = bool
+		Steam.cdll.Leaderboard_FindLeaderboard.argtypes = [c_char_p]
 #		Steam.cdll.GetLeaderboardName.restype = c_char_p
 #		Steam.cdll.GetLeaderboardEntryCount.restype = int
 #		Steam.cdll.DownloadLeaderboardEntries.restype = None
@@ -581,6 +581,40 @@ class SteamUserStats:
 	def ClearAchievement(name):
 		if Steam.isSteamLoaded():
 			return Steam.cdll.ClearAchievement(name)
+		else:
+			return False
+	# A class that describes Steam's LeaderboardFindResult_t C struct
+	class FindLeaderboardResult_t(Structure):
+		_fields_ = [
+			("leaderboardHandle", c_uint64),
+			("leaderboardFound", c_uint32)
+		]
+	FIND_LEADERBORAD_RESULT_CALLBACK_TYPE = CFUNCTYPE(None, FindLeaderboardResult_t)
+	findLeaderboardResultCallback = None
+
+	@classmethod
+	def SetFindLeaderboardResultCallback(cls, callback):
+		if Steam.isSteamLoaded():
+			print("setting callback")
+			cls.findLeaderboardResultCallback = cls.FIND_LEADERBORAD_RESULT_CALLBACK_TYPE (callback)
+
+			Steam.cdll.Leaderboard_SetFindLeaderboardResultCallback(cls.findLeaderboardResultCallback)
+		else:
+			return False
+	#
+	# Find Leaderboard by name
+	#
+	# name -- The leaderboard name to search for
+	# callback -- The function to call once the find returns a result
+	@staticmethod
+	def FindLeaderboard(name, callback = None):
+		print("looking for leaderboard named " + name)
+		if Steam.isSteamLoaded():
+			if callback != None:
+				SteamUserStats.SetFindLeaderboardResultCallback(callback)
+
+			Steam.cdll.Leaderboard_FindLeaderboard(name.encode())
+			return True
 		else:
 			return False
 #------------------------------------------------
