@@ -1,0 +1,152 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>SteamworksPy - A Python Wrapper For Steamworks</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="css/main.css" />
+		<noscript><link rel="stylesheet" href="css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+		<!-- Wrapper -->
+		<div id="wrapper" class="divided">
+			<!-- Content -->
+			<section class="wrapper style1 align-center">
+				<div class="inner">
+					<h1>SteamworksPy</h1>
+					<p>This is the documentation page for SteamworksPy, a Python wrapper for Steamworks. <a href="https://github.com/Gramps/SteamworksPy" target="_blank">You can find the GitHub repository here.</a> Additionally, you can acquire the <a href="https://github.com/Gramps/SteamworksForPython/releases" target="_blank">pre-built versions of the Linux SO files and Windows DLL files here.</a></p>
+					<div class="index align-left">
+					<!-- Starting -->
+					<section>
+						<header>
+							<h3>Starting Out</h3>
+						</header>
+						<div class="content">
+							<p>You will need the following things to begin working with the wrapper:</p>
+							<ul>
+								<li><a href="https://partner.steamgames.com" target="_blank">The Steamworks SDK</a></li>
+								<li>A Steamworks account</li>
+								<li>A valid AppID for more advanced functions (set achievements, set stats, etc.)</li>
+								<li>Alternatively you can use the SpaceWars AppID of 480 for testing the basics</li>
+							</ul>
+							<p>Once you have those basics, you'll probably need these too:</p>
+							<ul>
+								<li>Be logged into your Steam client (or suffer crashes)</li>
+								<li>A library with OpenGL or D3D for Steam overlay</li>
+							</ul>
+						</div>
+					</section>
+					<!-- Getting Started -->
+					<section>
+						<header>
+							<h3>Getting Started</h3>
+						</header>
+						<div class="content">
+							<p>First you will need to download the repository and unpack it into a project folder. After that you will need to download and unpack the Steamworks SDK and copy the following into your unpacked repo folder:</p>
+							<ul>
+								<li>Steam header (steam) folder from the <strong>/sdk/public</strong> folder</li>
+								<li>Steam API lib file from the <strong>/sdk/redistributable_bin</strong> folder</li>
+							</ul>
+							<p>Depending on your operating system, you will need to acquire different files from <strong>/sdk/redistributable_bin</strong> and follow a different set of instructions. We will address each below.</p>
+							<hr />
+							<h3>Linux</h3>
+							<p>Look in either the linux32 or linux64 folder, depending on your installation, and copy the libsteam_api.so over to your project folder.</p>
+							<p>At this point you can either run the makefile that is included in the repository or you can just run the following in terminal:</p>
+							<pre><code>
+g++ -std=c++11 -o SteamworksPy.so -shared -fPIC SteamworksPy.cpp -l steam_api -L.
+							</code></pre>
+							<p>This should result in the SteamworksPy.so file you need to use with the wrapper.</p>
+							<hr/>
+							<h3>Windows</h3>
+							<p>Look in either the base of the /sdk/redistributable_bin or the win64 folder, depending on your installation, and copy the steam_api.dll and steam_api.lib or the steam_api64.dll and steam_api64.lib files to your project folder.</p>
+							<p>If you have Native Tools Command Prompt installed for Visual Studio (or compiling tools for console), then you can use these handy commands to compile your DLL file. For 64-bit use:</p>
+							<pre><code>
+cl /D_USRDLL /D_WINDLL SteamworksPy.cpp steam_api64.lib /link /DLL /OUT:SteamworksPy64.dll
+							</code></pre>
+							<p>If you are using 32-bit then use:</p>
+							<pre><code>
+cl /D_USRDLL /D_WINDLL SteamworksPy.cpp steam_api.lib /link /DLL /OUT:SteamworksPy.dll
+							</code></pre>
+							<p>Alternatively you can create a new project in Visual Studio to create the DLL file using these steps:</p>
+							<ul>
+								<li>Create a new DLL project in Visual Studio.</li>
+								<li>New > Project.</li>
+								<li>Templates > Visual C++ > Win32 > Win32 Project.</li>
+								<li>Follow the wizard and pick the DLL Application Type.</li>
+								<li>Add SteamworksPy.cpp to Source Files and steam_api.h from /steam/ folder to Header Files.</li>
+								<li>Go to Project > Properties in the toolbar.</li>
+								<li>Under C/C++ > Precompiled Headers, turn off Precompiled Header option.</li>
+								<li>Under Linker > Input, add steam_api.lib or steam_api64.lib to Additional Dependenices.</li>
+								<li>You may also want to add _CRT_SECURE_NO_WARNINGS under C/C++ > Preprocessor > Preprocessor Definitions.</li>
+								<li>Clean and build.</li>
+							</ul>
+							<p>This will proce the SteamworksPy.dll somewhere deep in your Visual Studio output folders.</p>
+							<hr/>
+							<h3>MacOS</h3>
+							<p>Follow these steps to create your SteamworksPy.dylib file:</p>
+							<ul>
+								<li>Create a new library project in Xcode.</li>
+								<li>New > Project > Library</li>
+								<li>When configuring options, set Framework to "None (Plain C/C++ Library)" and Type to "Dynamic".</li>
+								<li>Move libsteam_api.dylib to the project directory created by Xcode.</li>
+								<li>In the Build Phases tab:
+									<ul>
+										<li>Add SteamworksPy.cpp to Compile Sources.</li>
+										<li>Add steam_api.h from /steam/ folder to the public section of Headers.</li>
+										<li>Add libsteam_api.dylib to Link Binary with Libraries.</li>
+									</ul>
+								</li>
+								<li>Build.</li>
+								<li>Find the resultant library and rename it SteamworksPy.dylib.</li>
+							</ul>
+						</div>
+					</section>
+					<!-- Adding to your project -->
+					<section>
+						<header>
+							<h3>Add It</h3>
+						</header>
+						<div class="content">
+							<p>Copy the <strong>steamworks.py</strong> file and the newly compiled <strong>SteamworksPy.dll or SteamworksPy.so or SteamworksPy.dylib</strong> file to your project folder. You may also have to copy the libsteam_api.so, steam_api.so, or libsteam_api.dylib file as well.</p>
+							<p>Add the following code to your main file or whatever file you plan on calling Steam from:</p>
+							<pre><code>
+from steamworks import *
+
+#Initialize Steam
+Steam.Init()
+							</code></pre>
+							<p>This will import the steamworks.py file and initialize the Steamworks API. At this point you can start adding in additional functions as you need them.</p>
+						</div>
+					</section>
+					<!-- Closing -->
+					<section>
+						<header>
+							<h3>In Closing</h3>
+						</header>
+						<div class="content">
+							<p>And those are the basics to using the SteamworksPy wrapper. A list of available functions, their responses, and what they do will be available in the repository's wiki page soon. In addition, you should be able to read the Steamworks API documentation to see what all is available and cross-reference with the steamworks.py!
+						</div>
+					</section>
+				</div>
+			</section>
+			<!-- Footer -->
+			<footer class="wrapper style1 align-center">
+				<div class="inner">
+					<ul class="icons">
+						<li><a href="https://twitter.com/CoaguCo" class="icon brands style2 fa-twitter"><span class="label">Twitter</span></a></li>
+						<li><a href="mailto: steamworkspy@coaguco.com" class="icon style2 fa-envelope"><span class="label">Email</span></a></li>
+					</ul>
+					<p>&copy; 2019. GP Garcia.</p>
+				</div>
+			</footer>
+		</div>
+		<!-- Scripts -->
+		<script src="js/jquery.min.js"></script>
+		<script src="js/jquery.scrollex.min.js"></script>
+		<script src="js/jquery.scrolly.min.js"></script>
+		<script src="js/browser.min.js"></script>
+		<script src="js/breakpoints.min.js"></script>
+		<script src="js/util.js"></script>
+		<script src="js/main.js"></script>
+	</body>
+</html>
