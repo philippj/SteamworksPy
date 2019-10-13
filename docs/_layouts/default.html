@@ -87,6 +87,11 @@
 								</li>
 								<li>For Windows:
 									<ul>
+										<li>If you have native tools command prompt installed for Visual Studio you can use either command:</li>
+										<li>64-bit: cl /D_USRDLL /D_WINDLL SteamworksPy.cpp steam_api64.lib /link /DLL /OUT:SteamworksPy64.dll</li>
+										<li>32-bit: cl /D_USRDLL /D_WINDLL SteamworksPy.cpp steam_api.lib /link /DLL /OUT:SteamworksPy.dll</li>
+									</ul>
+									<ul>
 										<li>Create a new DLL project in Visual Studio.</li>
 										<li>New > Project.</li>
 										<li>Templates > Visual C++ > Win32 > Win32 Project.</li>
