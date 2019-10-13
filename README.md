@@ -1,4 +1,4 @@
-# SteamworksPy
+# SteamworksPy - A Python Wrapper For Steamworks
 This is the experimental branch of SteamworksPy.  It was made to test out extensive changes to the project to match closer to my Godot Engine module for Steamworks.
 
 Feel free to fork or contribute to this module.
