@@ -54,7 +54,7 @@ class Steam:
 			if OS_BIT == '32bits':
 				Steam.cdll = CDLL(os.path.join(os.getcwd(), "SteamworksPy.dll"))
 			else:
-				Steam.cdll = CDLL(os.path.join(os.getcwd(), "SteamworksPy.dll"))
+				Steam.cdll = CDLL(os.path.join(os.getcwd(), "SteamworksPy64.dll"))
 			print("INFO: SteamworksPy loaded for Windows")
 			Steam.loaded = True
 		# Unrecognized platform, warn user, do not load Steam API
@@ -100,6 +100,27 @@ class Steam:
 		Steam.cdll.GetLaunchQueryParam.restype = c_char_p
 		Steam.cdll.GetAppBuildId.restype = int
 		Steam.cdll.GetFileDetails.restype = None
+		# Set restype for Music functions
+		Steam.cdll.MusicIsEnabled.restype = None
+		Steam.cdll.MusicIsPlaying.restype = None
+		Steam.cdll.MusicGetVolume.restype = c_float
+		Steam.cdll.MusicPause.restype = None
+		Steam.cdll.MusicPlay.restype = None
+		Steam.cdll.MusicPlayNext.restype = None
+		Steam.cdll.MusicPlayPrev.restype = None
+		Steam.cdll.MusicSetVolume.restype = None
+		# Set restype for Screenshot functions
+		Steam.cdll.AddScreenshotToLibrary.restype = c_uint32
+		Steam.cdll.HookScreenshots.restype = None
+		Steam.cdll.IsScreenshotsHooked.restype = bool
+		Steam.cdll.SetLocation.restype = bool
+		Steam.cdll.TriggerScreenshot.restype = None
+		# Set restype for User functions
+		Steam.cdll.GetSteamID.restype = c_uint64
+		Steam.cdll.LoggedOn.restype = bool
+		Steam.cdll.GetPlayerSteamLevel.restype = int
+		Steam.cdll.GetUserDataFolder.restype = c_char_p
+		Steam.cdll.GetGameBadgeLevel.restype = int
 		
 	# Is Steam loaded
 	@staticmethod
@@ -271,3 +292,142 @@ class SteamApps:
 			return Steam.cdll.GetFileDetails(filename)
 		else:
 			return
+#------------------------------------------------
+# Class for Steam Music
+#------------------------------------------------
+class SteamMusic:
+	# Is Steam music enabled.
+	@staticmethod
+	def MusicIsEnabled():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.MusicIsEnabled()
+		else:
+			return False
+	# Is Steam music playing something.
+	@staticmethod
+	def MusicIsPlaying():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.MusicIsPlaying()
+		else:
+			return False
+	# Get the volume level of the music.
+	@staticmethod
+	def MusicGetVolume():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.MusicGetVolume()
+		else:
+			return 0
+	# Pause whatever Steam music is playing.
+	@staticmethod
+	def MusicPause():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.MusicPause()
+		else:
+			return
+	# Play current track/album.
+	@staticmethod
+	def MusicPlay():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.MusicPlay()
+		else:
+			return
+	# Play next track/album.
+	@staticmethod
+	def MusicPlayNext():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.MusicPlayNext()
+		else:
+			return
+	# Play previous track/album.
+	@staticmethod
+	def MusicPlayPrev():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.MusicPlayPrev()
+		else:
+			return
+	# Set the volume of Steam music.
+	@staticmethod
+	def MusicSetVolume(volume):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.MusicSetVolume(volume)
+		else:
+			return
+#------------------------------------------------
+# Class for Steam Screenshots
+#------------------------------------------------
+class SteamScreenshots:
+	# Adds a screenshot to the user's Steam screenshot library from disk.
+	@staticmethod
+	def AddScreenshotToLibrary(filename, thumbnailFilename, width, height):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.AddScreenshotToLibrary(filename, thumbnailFilename, width, height)
+		else:
+			return 0
+	# Toggles whether the overlay handles screenshots.
+	@staticmethod
+	def HookScreenshots(hook):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.HookScreenshots(hook)
+		else:
+			return
+	# Checks if the app is hooking screenshots.
+	@staticmethod
+	def IsScreenshotsHooked():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.IsScreenshotsHooked()
+		else:
+			return False
+	# Sets optional metadata about a screenshot's location.
+	@staticmethod
+	def SetLocation(screenshot, location):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.SetLocation(screenshot, location)
+		else:
+			return False
+	# Causes Steam overlay to take a screenshot.
+	@staticmethod
+	def TriggerScreenshot():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.TriggerScreenshot()
+		else:
+			return
+#------------------------------------------------
+# Class for Steam Users
+#------------------------------------------------
+class SteamUsers:
+	# Get user's Steam ID.
+	@staticmethod
+	def GetSteamID():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetSteamID()
+		else:
+			return 0
+	# Check, true/false, if user is logged into Steam currently.
+	@staticmethod
+	def LoggedOn():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.LoggedOn()
+		else:
+			return False
+	# Get the user's Steam level.
+	@staticmethod
+	def GetPlayerSteamLevel():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetPlayerSteamLevel()
+		else:
+			return 0
+	# Get the user's Steam installation path (this function is depreciated).
+	@staticmethod
+	def GetUserDataFolder():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetUserDataFolder()
+		else:
+			return ""
+	# Trading Card badges data access, if you only have one set of cards, the series will be 1.
+	# The user has can have two different badges for a series; the regular (max level 5) and the foil (max level 1).
+	@staticmethod
+	def GetGameBadgeLevel(series, foil):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetGameBadgeLevel(series, foil)
+		else:
+			return 0

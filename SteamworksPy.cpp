@@ -266,3 +266,152 @@ SW_PY void GetFileDetails(const char* filename){
 	}
 	SteamApps()->GetFileDetails(filename);
 }
+
+/////////////////////////////////////////////////
+///// MUSIC /////////////////////////////////////
+/////////////////////////////////////////////////
+//
+// Is Steam music enabled.
+SW_PY bool MusicIsEnabled(){
+	if(SteamMusic() == NULL){
+		return false;
+	}
+	return SteamMusic()->BIsEnabled();
+}
+// Is Steam music playing something.
+SW_PY bool MusicIsPlaying(){
+	if(SteamMusic() == NULL){
+		return false;
+	}
+	return SteamMusic()->BIsPlaying();
+}
+// Get the volume level of the music.
+SW_PY float MusicGetVolume(){
+	if(SteamMusic() == NULL){
+		return 0;
+	}
+	return SteamMusic()->GetVolume();
+}
+// Pause whatever Steam music is playing.
+SW_PY void MusicPause(){
+	if(SteamMusic() == NULL){
+		return;
+	}
+	return SteamMusic()->Pause();
+}
+// Play current track/album.
+SW_PY void MusicPlay(){
+	if(SteamMusic() == NULL){
+		return;
+	}
+	return SteamMusic()->Play();
+}
+// Play next track/album.
+SW_PY void MusicPlayNext(){
+	if(SteamMusic() == NULL){
+		return;
+	}
+	return SteamMusic()->PlayNext();
+}
+// Play previous track/album.
+SW_PY void MusicPlayPrev(){
+	if(SteamMusic() == NULL){
+		return;
+	}
+	return SteamMusic()->PlayPrevious();
+}
+// Set the volume of Steam music.
+SW_PY void MusicSetVolume(float value){
+	if(SteamMusic() == NULL){
+		return;
+	}
+	return SteamMusic()->SetVolume(value);
+}
+
+/////////////////////////////////////////////////
+///// SCREENSHOTS ///////////////////////////////
+/////////////////////////////////////////////////
+//
+// Adds a screenshot to the user's Steam screenshot library from disk.
+SW_PY uint32_t AddScreenshotToLibrary(const char* filename, const char* thumbnailFilename, int width, int height){
+	if(SteamScreenshots() == NULL){
+		return 0;
+	}
+	return SteamScreenshots()->AddScreenshotToLibrary(filename, thumbnailFilename, width, height);
+}
+// Toggles whether the overlay handles screenshots.
+SW_PY void HookScreenshots(bool hook){
+	if(SteamScreenshots() == NULL){
+		return;
+	}
+	SteamScreenshots()->HookScreenshots(hook);
+}
+// Checks if the app is hooking screenshots.
+SW_PY bool IsScreenshotsHooked(){
+	if(SteamScreenshots() == NULL){
+		return false;
+	}
+	return SteamScreenshots()->IsScreenshotsHooked();
+}
+// Sets optional metadata about a screenshot's location.
+SW_PY bool SetLocation(uint32_t screenshot, const char* location){
+	if(SteamScreenshots() == NULL){
+		return false;
+	}
+	ScreenshotHandle handle = (ScreenshotHandle)screenshot;
+	return SteamScreenshots()->SetLocation(handle, location);
+}
+// Causes Steam overlay to take a screenshot.
+SW_PY void TriggerScreenshot(){
+	if(SteamScreenshots() == NULL){
+		return;
+	}
+	SteamScreenshots()->TriggerScreenshot();
+}
+
+/////////////////////////////////////////////////
+///// USERS /////////////////////////////////////
+/////////////////////////////////////////////////
+//
+// Get user's Steam ID.
+SW_PY uint64_t GetSteamID(){
+	if(SteamUser() == NULL){
+		return 0;
+	}
+	CSteamID steamID = SteamUser()->GetSteamID();
+	return steamID.ConvertToUint64();
+}
+// Check, true/false, if user is logged into Steam currently.
+SW_PY bool LoggedOn(){
+	if(SteamUser() == NULL){
+		return false;
+	}
+	return SteamUser()->BLoggedOn();
+}
+// Get the user's Steam level.
+SW_PY int GetPlayerSteamLevel(){
+	if(SteamUser() == NULL){
+		return 0;
+	}
+	return SteamUser()->GetPlayerSteamLevel(); 
+}
+// Get the user's Steam installation path (this function is depreciated).
+SW_PY const char* GetUserDataFolder(){
+	if(SteamUser() == NULL){
+		return "";
+	}
+	const int bufferSize = 256;
+	char *buffer = new char[bufferSize];
+	SteamUser()->GetUserDataFolder((char*)buffer, bufferSize);
+	char *data_path = buffer;
+	delete buffer;
+	return data_path;
+}
+// Trading Card badges data access, if you only have one set of cards, the series will be 1.
+// The user has can have two different badges for a series; the regular (max level 5) and the foil (max level 1).
+SW_PY int GetGameBadgeLevel(int series, bool foil){
+	if(SteamUser()== NULL){
+		return 0;
+	}
+	return SteamUser()->GetGameBadgeLevel(series, foil);
+}
