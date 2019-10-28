@@ -12,6 +12,7 @@ For a fuller (yet outdated) tutorial, with images, on SteamworksPy please read o
 There is now an experimental branch for converting the project to match my [Godot Engine module](https://github.com/Gramps/GodotSteam) in functionality and fix some problems with the original.  Once completed, it will move to the master branch.
 
 # Latest Updates
+- Added: missing Utils functions
 - Removed: docs folder as docs are now their own branch
 
 # Some Notes
