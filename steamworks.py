@@ -121,6 +121,25 @@ class Steam:
 		Steam.cdll.GetPlayerSteamLevel.restype = int
 		Steam.cdll.GetUserDataFolder.restype = c_char_p
 		Steam.cdll.GetGameBadgeLevel.restype = int
+		# Set restype for Utils functions
+		Steam.cdll.OverlayNeedsPresent.restype = bool
+		Steam.cdll.GetAppID.restype = int
+		Steam.cdll.GetCurrentBatteryPower.restype = int
+		Steam.cdll.GetIPCCallCount.restype = c_uint32
+		Steam.cdll.GetIPCountry.restype = c_char_p
+		Steam.cdll.GetSecondsSinceAppActive.restype = int
+		Steam.cdll.GetSecondsSinceComputerActive.restype = int
+		Steam.cdll.GetServerRealTime.restype = int
+		Steam.cdll.GetSteamUILanguage.restype = c_char_p
+		Steam.cdll.IsOverlayEnabled.restype = bool
+		Steam.cdll.IsSteamInBigPictureMode.restype = bool
+		Steam.cdll.IsSteamRunningInVR.restype = bool
+		Steam.cdll.IsVRHeadsetStreamingEnabled.restype = bool
+		Steam.cdll.SetOverlayNotificationInset.restype = None
+		Steam.cdll.SetOverlayNotificationPosition.restype = None
+		Steam.cdll.SetVRHeadsetStreamingEnabled.restype = None
+		Steam.cdll.ShowGamepadTextInput.restype = bool
+		Steam.cdll.StartVRDashboard.restype = None
 		
 	# Is Steam loaded
 	@staticmethod
@@ -431,3 +450,126 @@ class SteamUsers:
 			return Steam.cdll.GetGameBadgeLevel(series, foil)
 		else:
 			return 0
+#------------------------------------------------
+# Class for Steam Utils
+#------------------------------------------------
+class SteamUtils:
+	# Checks if the Overlay needs a present. Only required if using event driven render updates.
+	@staticmethod
+	def OverlayNeedsPresent():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.OverlayNeedsPresent()
+		else:
+			return False
+	# Get the Steam ID of the running application/game.
+	@staticmethod
+	def GetAppID():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetAppID()
+		else:
+			return 0
+	# Get the amount of battery power, clearly for laptops.
+	@staticmethod
+	def GetCurrentBatteryPower():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetCurrentBatteryPower()
+		else:
+			return 0
+	# Returns the number of IPC calls made since the last time this function was called.
+	@staticmethod
+	def GetIPCCallCount():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetIPCCallCount()
+		else:
+			return 0
+	# Get the user's country by IP.
+	@staticmethod
+	def GetIPCountry():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetIPCountry()
+		else:
+			return ""
+	# Return amount of time, in seconds, user has spent in this session.
+	@staticmethod
+	def GetSecondsSinceAppActive():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetSecondsSinceAppActive()
+		else:
+			return 0
+	# Returns the number of seconds since the user last moved the mouse.
+	@staticmethod
+	def GetSecondsSinceComputerActive():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetSecondsSinceComputerActive()
+		else:
+			return 0
+	# Get the actual time.
+	@staticmethod
+	def GetServerRealTime():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetServerRealTime()
+		else:
+			return 0
+	# Get the Steam user interface language.
+	@staticmethod
+	def GetSteamUILanguage():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetSteamUILanguage()
+		else:
+			return ""
+	# Returns true/false if Steam overlay is enabled.
+	@staticmethod
+	def IsOverlayEnabled():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.IsOverlayEnabled()
+		else:
+			return False
+	# Returns true if Steam & the Steam Overlay are running in Big Picture mode.
+	@staticmethod
+	def IsSteamInBigPictureMode():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.IsSteamInBigPictureMode()
+		else:
+			return False
+	# Is Steam running in VR?
+	@staticmethod
+	def IsVRHeadsetStreamingEnabled():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.IsVRHeadsetStreamingEnabled()
+		else:
+			return False
+	# Sets the inset of the overlay notification from the corner specified by SetOverlayNotificationPosition.
+	@staticmethod
+	def SetOverlayNotificationInset(horizontal, vertical):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.SetOverlayNotificationInset(horizontal, vertical)
+		else:
+			return
+	# Set the position where overlay shows notifications.
+	@staticmethod
+	def SetOverlayNotificationPosition(pos):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.SetOverlayNotificationPosition(pos)
+		else:
+			return
+	# Set whether the HMD content will be streamed via Steam In-Home Streaming.
+	@staticmethod
+	def SetVRHeadsetStreamingEnabled(enabled):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.SetVRHeadsetStreamingEnabled(enabled)
+		else:
+			return
+	# Activates the Big Picture text input dialog which only supports gamepad input.
+	@staticmethod
+	def ShowGamepadTextInput(inputMode, lineInputMode, description, maxText, presetText):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.ShowGamepadTextInput()
+		else:
+			return False
+	# Ask SteamUI to create and render its OpenVR dashboard.
+	@staticmethod
+	def StartVRDashboard():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.StartVRDashboard()
+		else:
+			return

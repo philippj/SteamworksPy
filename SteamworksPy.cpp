@@ -415,3 +415,149 @@ SW_PY int GetGameBadgeLevel(int series, bool foil){
 	}
 	return SteamUser()->GetGameBadgeLevel(series, foil);
 }
+
+/////////////////////////////////////////////////
+///// UTILS /////////////////////////////////////
+/////////////////////////////////////////////////
+//
+// Checks if the Overlay needs a present. Only required if using event driven render updates.
+SW_PY bool OverlayNeedsPresent(){
+	if(SteamUtils() == NULL){
+		return false;
+	}
+	return SteamUtils()->BOverlayNeedsPresent();
+}
+// Get the Steam ID of the running application/game.
+SW_PY int GetAppID(){
+	if(SteamUtils() == NULL){
+		return 0;
+	}
+	return SteamUtils()->GetAppID();
+}
+// Get the amount of battery power, clearly for laptops.
+SW_PY int GetCurrentBatteryPower(){
+	if(SteamUtils() == NULL){
+		return 0;
+	}
+	return SteamUtils()->GetCurrentBatteryPower();
+}
+// Returns the number of IPC calls made since the last time this function was called.
+SW_PY uint32 GetIPCCallCount(){
+	if(SteamUtils() == NULL){
+		return 0;
+	}
+	return SteamUtils()->GetIPCCallCount();
+}
+// Get the user's country by IP.
+SW_PY const char* GetIPCountry(){
+	if(SteamUtils() == NULL){
+		return "";
+	}
+	return SteamUtils()->GetIPCountry();
+}
+// Return amount of time, in seconds, user has spent in this session.
+SW_PY int GetSecondsSinceAppActive(){
+	if(SteamUtils() == NULL){
+		return 0;
+	}
+	return SteamUtils()->GetSecondsSinceAppActive();
+}
+// Returns the number of seconds since the user last moved the mouse.
+SW_PY int GetSecondsSinceComputerActive(){
+	if(SteamUtils() == NULL){
+		return 0;
+	}
+	return SteamUtils()->GetSecondsSinceComputerActive();
+}
+// Get the actual time.
+SW_PY int GetServerRealTime(){
+	if(SteamUtils() == NULL){
+		return 0;
+	}
+	return SteamUtils()->GetServerRealTime();
+}
+// Get the Steam user interface language.
+SW_PY const char* GetSteamUILanguage(){
+	if(SteamUtils() == NULL){
+		return "";
+	}
+	return SteamUtils()->GetSteamUILanguage();
+}
+// Returns true/false if Steam overlay is enabled.
+SW_PY bool IsOverlayEnabled(){
+	if(SteamUtils() == NULL){
+		return false;
+	}
+	return SteamUtils()->IsOverlayEnabled();
+}
+// Returns true if Steam & the Steam Overlay are running in Big Picture mode.
+SW_PY bool IsSteamInBigPictureMode(){
+	if(SteamUtils() == NULL){
+		return false;
+	}
+	return SteamUtils()->IsSteamInBigPictureMode();
+}
+// Is Steam running in VR?
+SW_PY bool IsSteamRunningInVR(){
+	if(SteamUtils() == NULL){
+		return 0;
+	}
+	return SteamUtils()->IsSteamRunningInVR();
+}
+// Checks if the HMD view will be streamed via Steam In-Home Streaming.
+SW_PY bool IsVRHeadsetStreamingEnabled(){
+	if(SteamUtils() == NULL){
+		return false;
+	}
+	return SteamUtils()->IsVRHeadsetStreamingEnabled();	
+}
+// Sets the inset of the overlay notification from the corner specified by SetOverlayNotificationPosition.
+SW_PY void SetOverlayNotificationInset(int horizontal, int vertical){
+	if(SteamUtils() == NULL){
+		return;
+	}
+	SteamUtils()->SetOverlayNotificationInset(horizontal, vertical);
+}
+// Set the position where overlay shows notifications.
+SW_PY void SetOverlayNotificationPosition(int pos){
+	if((pos < 0) || (pos > 3) || (SteamUtils() == NULL)){
+		return;
+	}
+	SteamUtils()->SetOverlayNotificationPosition(ENotificationPosition(pos));
+}
+// Set whether the HMD content will be streamed via Steam In-Home Streaming.
+SW_PY void SetVRHeadsetStreamingEnabled(bool enabled){
+	if(SteamUtils() == NULL){
+		return;
+	}
+	SteamUtils()->SetVRHeadsetStreamingEnabled(enabled);
+}
+// Activates the Big Picture text input dialog which only supports gamepad input.
+SW_PY bool ShowGamepadTextInput(int inputMode, int lineInputMode, const char* description, uint32 maxText, const char* presetText){
+	if(SteamUtils() == NULL){
+		return false;
+	}
+	// Convert modes
+	EGamepadTextInputMode mode;
+	if(inputMode == 0){
+		mode = k_EGamepadTextInputModeNormal;
+	}
+	else{
+		mode = k_EGamepadTextInputModePassword;
+	}
+	EGamepadTextInputLineMode lineMode;
+	if(lineInputMode == 0){
+		lineMode = k_EGamepadTextInputLineModeSingleLine;
+	}
+	else{
+		lineMode = k_EGamepadTextInputLineModeMultipleLines;
+	}
+	return SteamUtils()->ShowGamepadTextInput(mode, lineMode, description, maxText, presetText);
+}
+// Ask SteamUI to create and render its OpenVR dashboard.
+SW_PY void StartVRDashboard(){
+	if(SteamUtils() == NULL){
+		return;
+	}
+	SteamUtils()->StartVRDashboard();
+}
