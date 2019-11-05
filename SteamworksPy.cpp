@@ -20,6 +20,7 @@
 #endif
 
 #include <iostream>
+#include <string>
 
 //-----------------------------------------------
 // Definitions
@@ -165,33 +166,45 @@ private:
 	}
 };
 static Leaderboard leaderboard;
-//-----------------------------------------------
-// Steamworks functions
-//-----------------------------------------------
-SW_PY bool SteamInit(){
-	return SteamAPI_Init();
-	// Look for errors
-	bool IS_INIT_SUCCESS = SteamAPI_Init();
-	int err = FAILED;
-	if(IS_INIT_SUCCESS == 1){
-		err = OK;
+
+/////////////////////////////////////////////////
+///// MAIN FUNCTIONS ////////////////////////////
+/////////////////////////////////////////////////
+//
+// Checks if your executable was launched through Steam and relaunches it through Steam if it wasn't.
+SW_PY bool RestartAppIfNecessary(int value){
+	return SteamAPI_RestartAppIfNecessary((AppId_t)value);
+}
+// Initialize Steamworks
+SW_PY int SteamInit(){
+	// Attempt to initialize Steamworks
+	bool isInitSuccess = SteamAPI_Init();
+	// Set the default status response
+	int status = FAILED;
+	// Steamworks initialized with no problems
+	if(isInitSuccess){
+		status = OK;
 	}
+	// The Steam client is not running
 	if(!SteamAPI_IsSteamRunning()){
-		err = ERR_NO_CLIENT;
+		status = ERR_NO_CLIENT;
 	}
+	// The user is not logged into Steam or there is no active connection to Steam
 	else if(!SteamUser()->BLoggedOn()){
-		err = ERR_NO_CONNECTION;
+		status = ERR_NO_CONNECTION;
 	}
-	if(err == OK && SteamUserStats() != NULL){
-		// Load stats and achievements automatically
+	// Steam is connected and active, so load the stats and achievements
+	if(status == OK && SteamUserStats() != NULL){
 		SteamUserStats()->RequestCurrentStats();
 	}
-	return err;
+	// Return the Steamworks status
+	return status;
 }
 // Returns true/false if Steam is running
 SW_PY bool IsSteamRunning(void){
 	return SteamAPI_IsSteamRunning();
 }
+// Create a Steam ID
 CSteamID CreateSteamID(uint32 steamID, int accountType){
 	CSteamID cSteamID;
 	if(accountType < 0 || accountType >= k_EAccountTypeMax){
@@ -204,48 +217,164 @@ CSteamID CreateSteamID(uint32 steamID, int accountType){
 SW_PY void RunCallbacks(){
 	SteamAPI_RunCallbacks();
 }
-//-----------------------------------------------
-// Steam Apps
-//-----------------------------------------------
-SW_PY int HasOtherApp(int32 value){
+
+/////////////////////////////////////////////////
+///// APPS //////////////////////////////////////
+/////////////////////////////////////////////////
+//
+// Checks if the active user is subscribed to the current App ID.
+SW_PY bool IsSubscribed(){
 	if(SteamApps() == NULL){
 		return false;
 	}
-	return SteamApps()->BIsSubscribedApp((AppId_t)value);
+	return SteamApps()->BIsSubscribed();
 }
-SW_PY int GetDlcCount(){
-	if(SteamApps() == NULL){
-		return 0;
-	}
-	return SteamApps()->GetDLCCount();
-}
-SW_PY bool IsDlcInstalled(int32 value){
+// Checks if the license owned by the user provides low violence depots.
+SW_PY bool IsLowViolence(){
 	if(SteamApps() == NULL){
 		return false;
 	}
-	return SteamApps()->BIsDlcInstalled(value);
+	return SteamApps()->BIsLowViolence();
 }
-SW_PY void RequestAppProofOfPurchaseKey(int32 value){
-	if(SteamApps() == NULL){
-		return;
-	}
-	return SteamApps()->RequestAppProofOfPurchaseKey(value);
-}
-SW_PY bool IsAppInstalled(int32 value){
+// Checks whether the current App ID is for Cyber Cafes.
+SW_PY bool IsCybercafe(){
 	if(SteamApps() == NULL){
 		return false;
 	}
-	return SteamApps()->BIsAppInstalled((AppId_t)value);
+	return SteamApps()->BIsCybercafe();
 }
+// Checks if the user has a VAC ban on their account.
+SW_PY bool IsVACBanned(){
+	if(SteamApps() == NULL){
+		return false;
+	}
+	return SteamApps()->BIsVACBanned();
+}
+// Gets the current language that the user has set.
 SW_PY const char* GetCurrentGameLanguage(){
 	if(SteamApps() == NULL){
 		return "None";
 	}
 	return SteamApps()->GetCurrentGameLanguage();
 }
-//-----------------------------------------------
-// Steam Friends
-//-----------------------------------------------
+// Gets a comma separated list of the languages the current app supports.
+SW_PY const char* GetAvailableGameLanguages(){
+	if(SteamApps() == NULL){
+		return "None";
+	}
+	return SteamApps()->GetAvailableGameLanguages();
+}
+// Checks if the active user is subscribed to a specified AppId.
+SW_PY bool IsSubscribedApp(int value){
+	if(SteamApps() == NULL){
+		return false;
+	}
+	return SteamApps()->BIsSubscribedApp((AppId_t)value);
+}
+// Checks if the user owns a specific DLC and if the DLC is installed
+SW_PY bool IsDLCInstalled(int value){
+	if(SteamApps() == NULL){
+		return false;
+	}
+	return SteamApps()->BIsDlcInstalled(value);
+}
+// Gets the time of purchase of the specified app in Unix epoch format (time since Jan 1st, 1970).
+SW_PY int GetEarliestPurchaseUnixTime(int value){
+	if(SteamApps() == NULL){
+		return 0;
+	}
+	return SteamApps()->GetEarliestPurchaseUnixTime((AppId_t)value);
+}
+// Checks if the user is subscribed to the current app through a free weekend.
+// This function will return false for users who have a retail or other type of license.
+// Suggested you contact Valve on how to package and secure your free weekend properly.
+SW_PY bool IsSubscribedFromFreeWeekend(){
+	if(SteamApps() == NULL){
+		return false;
+	}
+	return SteamApps()->BIsSubscribedFromFreeWeekend();
+}
+// Get the number of DLC the user owns for a parent application/game.
+SW_PY int GetDLCCount(){
+	if(SteamApps() == NULL){
+		return false;
+	}
+	return SteamApps()->GetDLCCount();
+}
+// Allows you to install an optional DLC.
+SW_PY void InstallDLC(int value){
+	if(SteamApps() == NULL){
+		return;
+	}
+	SteamApps()->InstallDLC((AppId_t)value);
+}
+// Allows you to uninstall an optional DLC.
+SW_PY void UninstallDLC(int value){
+	if(SteamApps() == NULL){
+		return;
+	}
+	SteamApps()->UninstallDLC((AppId_t)value);
+}
+// Allows you to force verify game content on next launch.
+SW_PY bool MarkContentCorrupt(bool missingFilesOnly){
+	if(SteamApps() == NULL){
+		return false;
+	}
+	return SteamApps()->MarkContentCorrupt(missingFilesOnly);
+}
+// Gets the install folder for a specific AppID.
+SW_PY const char* GetAppInstallDir(AppId_t appID){
+	if(SteamApps() == NULL){
+		return "";
+	}
+	const uint32 folderBuffer = 256;
+	char *buffer = new char[folderBuffer];
+	SteamApps()->GetAppInstallDir(appID, (char*)buffer, folderBuffer);
+	const char* appDir = buffer;
+	delete buffer;
+	return appDir;
+}
+// Check if given application/game is installed, not necessarily owned.
+SW_PY bool IsAppInstalled(int value){
+	if(SteamApps() == NULL){
+		return false;
+	}
+	return SteamApps()->BIsAppInstalled((AppId_t)value);
+}
+// Gets the Steam ID of the original owner of the current app. If it's different from the current user then it is borrowed.
+SW_PY uint64_t GetAppOwner(){
+	if(SteamApps() == NULL){
+		return 0;
+	}
+	CSteamID cSteamID = SteamApps()->GetAppOwner();
+	return cSteamID.ConvertToUint64();
+}
+// Gets the associated launch parameter if the game is run via steam://run/<appid>/?param1=value1;param2=value2;param3=value3 etc.
+SW_PY const char* GetLaunchQueryParam(const char* key){
+	if(SteamApps() == NULL){
+		return "";
+	}
+	return SteamApps()->GetLaunchQueryParam(key);
+}
+// Return the build ID for this app; will change based on backend updates.
+SW_PY int GetAppBuildId(){
+	if(SteamApps() == NULL){
+		return 0;
+	}
+	return SteamApps()->GetAppBuildId();
+}
+// Asynchronously retrieves metadata details about a specific file in the depot manifest.
+SW_PY void GetFileDetails(const char* filename){
+	if(SteamApps() == NULL){
+		return;
+	}
+	SteamApps()->GetFileDetails(filename);
+}
+
+/////////////////////////////////////////////////
+///// FRIENDS ///////////////////////////////////
+/////////////////////////////////////////////////
+//
 SW_PY int GetFriendCount(int flag){
 	if(SteamFriends() == NULL){
 		return 0;
@@ -340,9 +469,10 @@ SW_PY void ActivateGameOverlayInviteDialog(int steamID){
 	CSteamID lobbyID = CreateSteamID(steamID, 1);
 	return SteamFriends()->ActivateGameOverlayInviteDialog(lobbyID);
 }
-//-----------------------------------------------
-// Steam Matchmaking
-//-----------------------------------------------
+/////////////////////////////////////////////////
+///// MATCHMAKING
+/////////////////////////////////////////////////
+//
 SW_PY void CreateLobby(int lobbyType, int cMaxMembers){
 	if(SteamMatchmaking() == NULL){
 		return;
@@ -385,96 +515,160 @@ SW_PY bool InviteUserToLobby(int steamIDLobby, int steamIDInvitee){
 	CSteamID inviteeID = CreateSteamID(steamIDInvitee, 1);
 	return SteamMatchmaking()->InviteUserToLobby(lobbyID, inviteeID);
 }
-//-----------------------------------------------
-// Steam Music
-//-----------------------------------------------
+
+/////////////////////////////////////////////////
+///// MUSIC /////////////////////////////////////
+/////////////////////////////////////////////////
+//
+// Is Steam music enabled.
 SW_PY bool MusicIsEnabled(){
 	if(SteamMusic() == NULL){
 		return false;
 	}
 	return SteamMusic()->BIsEnabled();
 }
+// Is Steam music playing something.
 SW_PY bool MusicIsPlaying(){
 	if(SteamMusic() == NULL){
 		return false;
 	}
 	return SteamMusic()->BIsPlaying();
 }
+// Get the volume level of the music.
 SW_PY float MusicGetVolume(){
 	if(SteamMusic() == NULL){
 		return 0;
 	}
 	return SteamMusic()->GetVolume();
 }
+// Pause whatever Steam music is playing.
 SW_PY void MusicPause(){
 	if(SteamMusic() == NULL){
 		return;
 	}
 	return SteamMusic()->Pause();
 }
+// Play current track/album.
 SW_PY void MusicPlay(){
 	if(SteamMusic() == NULL){
 		return;
 	}
 	return SteamMusic()->Play();
 }
+// Play next track/album.
 SW_PY void MusicPlayNext(){
 	if(SteamMusic() == NULL){
 		return;
 	}
 	return SteamMusic()->PlayNext();
 }
+// Play previous track/album.
 SW_PY void MusicPlayPrev(){
 	if(SteamMusic() == NULL){
 		return;
 	}
 	return SteamMusic()->PlayPrevious();
 }
+// Set the volume of Steam music.
 SW_PY void MusicSetVolume(float value){
 	if(SteamMusic() == NULL){
 		return;
 	}
 	return SteamMusic()->SetVolume(value);
 }
-//-----------------------------------------------
-// Steam Screenshots
-//-----------------------------------------------
+
+/////////////////////////////////////////////////
+///// SCREENSHOTS ///////////////////////////////
+/////////////////////////////////////////////////
+//
+// Adds a screenshot to the user's Steam screenshot library from disk.
+SW_PY uint32_t AddScreenshotToLibrary(const char* filename, const char* thumbnailFilename, int width, int height){
+	if(SteamScreenshots() == NULL){
+		return 0;
+	}
+	return SteamScreenshots()->AddScreenshotToLibrary(filename, thumbnailFilename, width, height);
+}
+// Toggles whether the overlay handles screenshots.
+SW_PY void HookScreenshots(bool hook){
+	if(SteamScreenshots() == NULL){
+		return;
+	}
+	SteamScreenshots()->HookScreenshots(hook);
+}
+// Checks if the app is hooking screenshots.
+SW_PY bool IsScreenshotsHooked(){
+	if(SteamScreenshots() == NULL){
+		return false;
+	}
+	return SteamScreenshots()->IsScreenshotsHooked();
+}
+// Sets optional metadata about a screenshot's location.
+SW_PY bool SetLocation(uint32_t screenshot, const char* location){
+	if(SteamScreenshots() == NULL){
+		return false;
+	}
+	ScreenshotHandle handle = (ScreenshotHandle)screenshot;
+	return SteamScreenshots()->SetLocation(handle, location);
+}
+// Causes Steam overlay to take a screenshot.
 SW_PY void TriggerScreenshot(){
 	if(SteamScreenshots() == NULL){
 		return;
 	}
 	SteamScreenshots()->TriggerScreenshot();
 }
-//-----------------------------------------------
-// Steam User
-//-----------------------------------------------
-SW_PY uint64 GetSteamID(){
+
+/////////////////////////////////////////////////
+///// USERS /////////////////////////////////////
+/////////////////////////////////////////////////
+//
+// Get user's Steam ID.
+SW_PY uint64_t GetSteamID(){
 	if(SteamUser() == NULL){
 		return 0;
 	}
 	CSteamID steamID = SteamUser()->GetSteamID();
 	return steamID.ConvertToUint64();
 }
+// Check, true/false, if user is logged into Steam currently.
+SW_PY bool LoggedOn(){
+	if(SteamUser() == NULL){
+		return false;
+	}
+	return SteamUser()->BLoggedOn();
+}
+// Get the user's Steam level.
 SW_PY int GetPlayerSteamLevel(){
 	if(SteamUser() == NULL){
 		return 0;
 	}
 	return SteamUser()->GetPlayerSteamLevel(); 
 }
+// Get the user's Steam installation path (this function is depreciated).
 SW_PY const char* GetUserDataFolder(){
 	if(SteamUser() == NULL){
 		return "";
 	}
-	const int cubBuffer = 256;
-	char *pchBuffer = new char[cubBuffer];
-	SteamUser()->GetUserDataFolder((char*)pchBuffer, cubBuffer);
-	char *data_path = pchBuffer;
-	delete pchBuffer;
+	const int bufferSize = 256;
+	char *buffer = new char[bufferSize];
+	SteamUser()->GetUserDataFolder((char*)buffer, bufferSize);
+	char *data_path = buffer;
+	delete buffer;
 	return data_path;
 }
-//-----------------------------------------------
-// Steam User Stats
-//-----------------------------------------------
+// Trading Card badges data access, if you only have one set of cards, the series will be 1.
+// The user has can have two different badges for a series; the regular (max level 5) and the foil (max level 1).
+SW_PY int GetGameBadgeLevel(int series, bool foil){
+	if(SteamUser()== NULL){
+		return 0;
+	}
+	return SteamUser()->GetGameBadgeLevel(series, foil);
+}
+
+/////////////////////////////////////////////////
+///// USER STATS ////////////////////////////////
+/////////////////////////////////////////////////
+//
 SW_PY bool ClearAchievement(const char* name){
 	if(SteamUser() == NULL){
 		return false;
