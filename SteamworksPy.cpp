@@ -21,7 +21,6 @@
 
 #include <iostream>
 #include <string>
-#include <Python.h>
 
 // Enumerated constants /////////////////////////
 enum {
