@@ -20,6 +20,7 @@
 #endif
 
 #include <iostream>
+#include <string>
 
 // Enumerated constants /////////////////////////
 enum {
@@ -272,21 +273,21 @@ SW_PY void GetFileDetails(const char* filename){
 /////////////////////////////////////////////////
 //
 // Reconfigure the controller to use the specified action set.
-void ActivateActionSet(uint64_t controllerHandle, uint64_t actionSetHandle){
+SW_PY void ActivateActionSet(uint64_t controllerHandle, uint64_t actionSetHandle){
 	if(SteamController() == NULL){
 		return;
 	}
 	SteamController()->ActivateActionSet((ControllerHandle_t)controllerHandle, (ControllerActionSetHandle_t)actionSetHandle);
 }
 // Lookup the handle for an Action Set.
-uint64_t GetActionSetHandle(const char *actionSetName){
+SW_PY uint64_t GetActionSetHandle(const char *actionSetName){
 	if(SteamController() == NULL){
 		return 0;
 	}
 	return (uint64_t)SteamController()->GetActionSetHandle(actionSetName);
 }
 // Returns the current state of the supplied analog game action.
-//Dictionary GetAnalogActionData(uint64_t controllerHandle, uint64_t analogActionHandle){
+//SW_PY Dictionary GetAnalogActionData(uint64_t controllerHandle, uint64_t analogActionHandle){
 //	ControllerAnalogActionData_t data;
 //	Dictionary d;
 //	memset(&data, 0, sizeof(data));
@@ -300,14 +301,14 @@ uint64_t GetActionSetHandle(const char *actionSetName){
 //	return d;
 //}
 // Get the handle of the specified Analog action.
-uint64_t GetAnalogActionHandle(const char *actionName){
+SW_PY uint64_t GetAnalogActionHandle(const char *actionName){
 	if(SteamController() == NULL){
 		return 0;
 	}
 	return (uint64_t)SteamController()->GetAnalogActionHandle(actionName);
 }
 // Get the origin(s) for an analog action within an action.
-//Array GetAnalogActionOrigins(uint64_t controllerHandle, uint64_t actionSetHandle, uint64_t analogActionHandle){
+//SW_PY Array GetAnalogActionOrigins(uint64_t controllerHandle, uint64_t actionSetHandle, uint64_t analogActionHandle){
 //	Array list;
 //	if(SteamController() == NULL){
 //		EControllerActionOrigin out[STEAM_CONTROLLER_MAX_ORIGINS];
@@ -319,7 +320,7 @@ uint64_t GetAnalogActionHandle(const char *actionName){
 //	return list;
 //}
 // Get current controllers handles.
-//Array GetConnectedControllers(){
+//SW_PY Array GetConnectedControllers(){
 //	Array list;
 //	if(SteamController() == NULL){
 //		ControllerHandle_t handles[STEAM_CONTROLLER_MAX_COUNT];
@@ -331,21 +332,21 @@ uint64_t GetAnalogActionHandle(const char *actionName){
 //	return list;
 //}
 // Returns the associated controller handle for the specified emulated gamepad.
-uint64_t GetControllerForGamepadIndex(int index){
+SW_PY uint64_t GetControllerForGamepadIndex(int index){
 	if(SteamController() == NULL){
 		return 0;
 	}
 	return (uint64_t)SteamController()->GetControllerForGamepadIndex(index);
 }
 // Get the currently active action set for the specified controller.
-uint64_t GetCurrentActionSet(uint64_t controllerHandle){
+SW_PY uint64_t GetCurrentActionSet(uint64_t controllerHandle){
 	if(SteamController() == NULL){
 		return 0;
 	}
 	return (uint64_t)SteamController()->GetCurrentActionSet((ControllerHandle_t)controllerHandle);
 }
 // Get the input type (device model) for the specified controller. 
-uint64_t GetInputTypeForHandle(uint64_t controllerHandle){
+SW_PY uint64_t GetInputTypeForHandle(uint64_t controllerHandle){
     if(SteamController() == NULL){
 		return 0;
 
@@ -353,7 +354,7 @@ uint64_t GetInputTypeForHandle(uint64_t controllerHandle){
 	return (uint64_t)SteamController()->GetInputTypeForHandle((ControllerHandle_t)controllerHandle);
 }
 // Returns the current state of the supplied digital game action.
-//Dictionary GetDigitalActionData(uint64_t controllerHandle, uint64_t digitalActionHandle){
+//SW_PY Dictionary GetDigitalActionData(uint64_t controllerHandle, uint64_t digitalActionHandle){
 //	ControllerDigitalActionData_t data;
 //	Dictionary d;
 //	memset(&data, 0, sizeof(data));
@@ -365,14 +366,14 @@ uint64_t GetInputTypeForHandle(uint64_t controllerHandle){
 //	return d;
 //}
 // Get the handle of the specified digital action.
-uint64_t GetDigitalActionHandle(const char *actionName){
+SW_PY uint64_t GetDigitalActionHandle(const char *actionName){
 	if(SteamController() == NULL){
 		return 0;
 	}
 	return (uint64_t)SteamController()->GetDigitalActionHandle(actionName);
 }
 // Get the origin(s) for an analog action within an action.
-//Array GetDigitalActionOrigins(uint64_t controllerHandle, uint64_t actionSetHandle, uint64_t digitalActionHandle){
+//SW_PY Array GetDigitalActionOrigins(uint64_t controllerHandle, uint64_t actionSetHandle, uint64_t digitalActionHandle){
 //	Array list;
 //	if(SteamController() == NULL){
 //		EControllerActionOrigin out[STEAM_CONTROLLER_MAX_ORIGINS];
@@ -384,14 +385,14 @@ uint64_t GetDigitalActionHandle(const char *actionName){
 //	return list;
 //}
 // Returns the associated gamepad index for the specified controller.
-int GetGamepadIndexForController(uint64_t controllerHandle){
+SW_PY int GetGamepadIndexForController(uint64_t controllerHandle){
 	if(SteamController() == NULL){
 		return -1;
 	}
 	return SteamController()->GetGamepadIndexForController((ControllerHandle_t)controllerHandle);
 }
 // Returns raw motion data for the specified controller.
-//Dictionary GetMotionData(uint64_t controllerHandle){
+//SW_PY Dictionary GetMotionData(uint64_t controllerHandle){
 //	ControllerMotionData_t data;
 //	Dictionary d;
 //	memset(&data, 0, sizeof(data));
@@ -411,34 +412,34 @@ int GetGamepadIndexForController(uint64_t controllerHandle){
 //	return d;
 //}
 // Start SteamControllers interface.
-bool ControllerInit(){
+SW_PY bool ControllerInit(){
 	if(SteamController() == NULL){
 		return false;
 	}
 	return SteamController()->Init();
 }
 // Syncronize controllers.
-void RunFrame(){
+SW_PY void RunFrame(){
 	if(SteamController() == NULL){
 		return;
 	}
 	SteamController()->RunFrame();
 }
 // Invokes the Steam overlay and brings up the binding screen.
-bool ShowBindingPanel(uint64_t controllerHandle){
+SW_PY bool ShowBindingPanel(uint64_t controllerHandle){
 	if(SteamController() == NULL){
 		return false;
 	}
 	return SteamController()->ShowBindingPanel((ControllerHandle_t)controllerHandle);
 }
 // Stop SteamControllers interface.
-bool ControllerShutdown(){
+SW_PY bool ControllerShutdown(){
 	if(SteamController() == NULL){
 		return false;
 	}
 	return SteamController()->Shutdown();
 }
-// Trigger a vibration event on supported controllers.
+SW_PY // Trigger a vibration event on supported controllers.
 void TriggerVibration(uint64_t controllerHandle, uint16_t leftSpeed, uint16_t rightSpeed){
 	if(SteamController() == NULL){
 		return;
@@ -546,6 +547,186 @@ SW_PY void TriggerScreenshot(){
 		return;
 	}
 	SteamScreenshots()->TriggerScreenshot();
+}
+
+/////////////////////////////////////////////////
+///// UGC ///////////////////////////////////////
+/////////////////////////////////////////////////
+//
+// Download new or update already installed item. If returns true, wait for DownloadItemResult_t. If item is already installed, then files on disk should not be used until callback received.
+// If item is not subscribed to, it will be cached for some time. If bHighPriority is set, any other item download will be suspended and this item downloaded ASAP.
+SW_PY bool DownloadItem(int publishedFileID, bool highPriority){
+	if(SteamUGC() == NULL){
+		return 0;
+	}
+	PublishedFileId_t fileID = (int)publishedFileID;
+	return SteamUGC()->DownloadItem(fileID, highPriority);
+}
+// SuspendDownloads( true ) will suspend all workshop downloads until SuspendDownloads( false ) is called or the game ends.
+SW_PY void SuspendDownloads(bool suspend){
+	return SteamUGC()->SuspendDownloads(suspend);
+}
+// Starts the item update process.
+SW_PY uint64_t StartItemUpdate(AppId_t appID, int publishedFileID){
+	PublishedFileId_t fileID = (int)publishedFileID;
+	return SteamUGC()->StartItemUpdate(appID, fileID);
+}
+// Gets the current state of a workshop item on this client.
+SW_PY int GetItemState(int publishedFileID){
+	if(SteamUGC() == NULL){
+		return 0;
+	}
+	PublishedFileId_t fileID = (int)publishedFileID;
+	return SteamUGC()->GetItemState(fileID);
+}
+// Creating a workshop item
+SW_PY void CreateItem(AppId_t appID, int fileType){
+	if(SteamUGC() == NULL){
+		return;
+	}
+	EWorkshopFileType workshopType;
+	// Convert the file type back over.
+	if(fileType == UGC_ITEM_MAX){
+		workshopType = k_EWorkshopFileTypeMax;
+	}
+	else if(fileType == UGC_ITEM_MICROTRANSACTION){
+		workshopType = k_EWorkshopFileTypeMicrotransaction;
+	}
+	else if(fileType == UGC_ITEM_COLLECTION){
+		workshopType = k_EWorkshopFileTypeCollection;
+	}
+	else if(fileType == UGC_ITEM_ART){
+		workshopType = k_EWorkshopFileTypeArt;
+	}
+	else if(fileType == UGC_ITEM_VIDEO){
+		workshopType = k_EWorkshopFileTypeVideo;
+	}
+	else if(fileType == UGC_ITEM_SCREENSHOT){
+		workshopType = k_EWorkshopFileTypeScreenshot;
+	}
+	else if(fileType == UGC_ITEM_GAME){
+		workshopType = k_EWorkshopFileTypeGame;
+	}
+	else if(fileType == UGC_ITEM_SOFTWARE){
+		workshopType = k_EWorkshopFileTypeSoftware;
+	}
+	else if(fileType == UGC_ITEM_CONCEPT){
+		workshopType = k_EWorkshopFileTypeConcept;
+	}
+	else if(fileType == UGC_ITEM_WEBGUIDE){
+		workshopType = k_EWorkshopFileTypeWebGuide;
+	}
+	else if(fileType == UGC_ITEM_INTEGRATEDGUIDE){
+		workshopType = k_EWorkshopFileTypeIntegratedGuide;
+	}
+	else if(fileType == UGC_ITEM_MERCH){
+		workshopType = k_EWorkshopFileTypeMerch;
+	}
+	else if(fileType == UGC_ITEM_CONTROLLERBINDING){
+		workshopType = k_EWorkshopFileTypeControllerBinding;
+	}
+	else if(fileType == UGC_ITEM_STEAMWORKSACCESSINVITE){
+		workshopType = k_EWorkshopFileTypeSteamworksAccessInvite;
+	}
+	else if(fileType == UGC_ITEM_STEAMVIDEO){
+		workshopType = k_EWorkshopFileTypeSteamVideo;
+	}
+	else if(fileType == UGC_ITEM_GAMEMANAGEDITEM){
+		workshopType = k_EWorkshopFileTypeGameManagedItem;
+	}
+	else{
+		workshopType = k_EWorkshopFileTypeCommunity;
+	}
+	// Callbacks must be functional
+//	SteamAPICall_t apiCall = SteamUGC()->CreateItem(appID, workshopType);
+//	callResultItemCreate.Set(apiCall, this, &_item_created);
+}
+// Sets a new title for an item.
+SW_PY bool SetItemTitle(uint64_t updateHandle, const char *title){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	if (strlen(title) > UGC_MAX_TITLE_CHARS){
+		printf("Title cannot have more than %ld ASCII characters. Title not set.", UGC_MAX_TITLE_CHARS);
+		return false;
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+	return SteamUGC()->SetItemTitle(handle, title);
+}
+// Sets a new description for an item.
+SW_PY bool SetItemDescription(uint64_t updateHandle, const char *description){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	if (strlen(description) > UGC_MAX_DESC_CHARS){
+		printf("Description cannot have more than %ld ASCII characters. Description not set.", UGC_MAX_DESC_CHARS);
+		return false;
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+	return SteamUGC()->SetItemDescription(handle, description);
+}
+// Sets the language of the title and description that will be set in this item update.
+SW_PY bool SetItemUpdateLanguage(uint64_t updateHandle, const char *language){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+	return SteamUGC()->SetItemUpdateLanguage(handle, language);
+}
+// Sets arbitrary metadata for an item. This metadata can be returned from queries without having to download and install the actual content.
+SW_PY bool SetItemMetadata(uint64_t updateHandle, const char *metadata){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	if (strlen(metadata) > UGC_MAX_METADATA_CHARS){
+		printf("Metadata cannot have more than %ld ASCII characters. Metadata not set.", UGC_MAX_METADATA_CHARS);
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+	return SteamUGC()->SetItemMetadata(handle, metadata);
+}
+// Sets the visibility of an item.
+SW_PY bool SetItemVisibility(uint64_t updateHandle, int visibility){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+	ERemoteStoragePublishedFileVisibility itemVisibility;
+	// Convert the visibility type back over.
+	if(visibility == UGC_FILE_VISIBLE_PUBLIC){
+		itemVisibility = k_ERemoteStoragePublishedFileVisibilityPublic;
+	}
+	else if(visibility == UGC_FILE_VISIBLE_FRIENDS){
+		itemVisibility = k_ERemoteStoragePublishedFileVisibilityFriendsOnly;
+	}
+	else{
+		itemVisibility = k_ERemoteStoragePublishedFileVisibilityPrivate;
+	}
+	return SteamUGC()->SetItemVisibility(handle, itemVisibility);
+}
+// Sets the folder that will be stored as the content for an item.
+SW_PY bool SetItemContent(uint64_t updateHandle, const char *contentFolder){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+	return SteamUGC()->SetItemContent(handle, contentFolder);
+}
+// Sets the primary preview image for the item.
+SW_PY bool SetItemPreview(uint64_t updateHandle, const char *previewFile){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+	return SteamUGC()->SetItemPreview(handle, previewFile);
+}
+// Uploads the changes made to an item to the Steam Workshop; to be called after setting your changes.
+SW_PY void SubmitItemUpdate(uint64_t updateHandle, const char *changeNote){
+	if(SteamUGC() == NULL){
+		return;
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+//	SteamAPICall_t apiCall = SteamUGC()->SubmitItemUpdate(handle, changeNote);
+//	callResultItemUpdate.Set(apiCall, this, &_item_updated);
 }
 
 /////////////////////////////////////////////////
