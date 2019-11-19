@@ -103,7 +103,7 @@ SW_PY int SteamInit(){
 		status = ERR_NO_CONNECTION;
 	}
 	// Steam is connected and active, so load the stats and achievements
-	if(status == OK && SteamUserStats() != NULL){
+	if(status == OK && SteamUserStats() == NULL){
 		SteamUserStats()->RequestCurrentStats();
 	}
 	// Return the Steamworks status
@@ -265,6 +265,185 @@ SW_PY void GetFileDetails(const char* filename){
 		return;
 	}
 	SteamApps()->GetFileDetails(filename);
+}
+
+/////////////////////////////////////////////////
+///// CONTROLLERS////////////////////////////////
+/////////////////////////////////////////////////
+//
+// Reconfigure the controller to use the specified action set.
+void ActivateActionSet(uint64_t controllerHandle, uint64_t actionSetHandle){
+	if(SteamController() == NULL){
+		return;
+	}
+	SteamController()->ActivateActionSet((ControllerHandle_t)controllerHandle, (ControllerActionSetHandle_t)actionSetHandle);
+}
+// Lookup the handle for an Action Set.
+uint64_t GetActionSetHandle(const char *actionSetName){
+	if(SteamController() == NULL){
+		return 0;
+	}
+	return (uint64_t)SteamController()->GetActionSetHandle(actionSetName);
+}
+// Returns the current state of the supplied analog game action.
+//Dictionary GetAnalogActionData(uint64_t controllerHandle, uint64_t analogActionHandle){
+//	ControllerAnalogActionData_t data;
+//	Dictionary d;
+//	memset(&data, 0, sizeof(data));
+//	if(SteamController() == NULL){
+//		data = SteamController()->GetAnalogActionData((ControllerHandle_t)controllerHandle, (ControllerAnalogActionHandle_t)analogActionHandle);
+//	}
+//	d["eMode"] = data.eMode;
+//	d["x"] = data.x;
+//	d["y"] = data.y;
+//	d["bActive"] = data.bActive;
+//	return d;
+//}
+// Get the handle of the specified Analog action.
+uint64_t GetAnalogActionHandle(const char *actionName){
+	if(SteamController() == NULL){
+		return 0;
+	}
+	return (uint64_t)SteamController()->GetAnalogActionHandle(actionName);
+}
+// Get the origin(s) for an analog action within an action.
+//Array GetAnalogActionOrigins(uint64_t controllerHandle, uint64_t actionSetHandle, uint64_t analogActionHandle){
+//	Array list;
+//	if(SteamController() == NULL){
+//		EControllerActionOrigin out[STEAM_CONTROLLER_MAX_ORIGINS];
+//		int ret = SteamController()->GetAnalogActionOrigins((ControllerHandle_t)controllerHandle, (ControllerActionSetHandle_t)actionSetHandle, (ControllerAnalogActionHandle_t)analogActionHandle, out);
+//		for (int i = 0; i < ret; i++){
+//			list.push_back((int)out[i]);
+//		}
+//	}
+//	return list;
+//}
+// Get current controllers handles.
+//Array GetConnectedControllers(){
+//	Array list;
+//	if(SteamController() == NULL){
+//		ControllerHandle_t handles[STEAM_CONTROLLER_MAX_COUNT];
+//		int ret = SteamController()->GetConnectedControllers(handles);
+//		for (int i = 0; i < ret; i++){
+//			list.push_back((uint64_t)handles[i]);
+//		}
+//	}
+//	return list;
+//}
+// Returns the associated controller handle for the specified emulated gamepad.
+uint64_t GetControllerForGamepadIndex(int index){
+	if(SteamController() == NULL){
+		return 0;
+	}
+	return (uint64_t)SteamController()->GetControllerForGamepadIndex(index);
+}
+// Get the currently active action set for the specified controller.
+uint64_t GetCurrentActionSet(uint64_t controllerHandle){
+	if(SteamController() == NULL){
+		return 0;
+	}
+	return (uint64_t)SteamController()->GetCurrentActionSet((ControllerHandle_t)controllerHandle);
+}
+// Get the input type (device model) for the specified controller. 
+uint64_t GetInputTypeForHandle(uint64_t controllerHandle){
+    if(SteamController() == NULL){
+		return 0;
+
+	}
+	return (uint64_t)SteamController()->GetInputTypeForHandle((ControllerHandle_t)controllerHandle);
+}
+// Returns the current state of the supplied digital game action.
+//Dictionary GetDigitalActionData(uint64_t controllerHandle, uint64_t digitalActionHandle){
+//	ControllerDigitalActionData_t data;
+//	Dictionary d;
+//	memset(&data, 0, sizeof(data));
+//	if(SteamController() == NULL){
+//		data = SteamController()->GetDigitalActionData((ControllerHandle_t)controllerHandle, (ControllerDigitalActionHandle_t)digitalActionHandle);
+//	}
+//	d["bState"] = data.bState;
+//	d["bActive"] = data.bActive;
+//	return d;
+//}
+// Get the handle of the specified digital action.
+uint64_t GetDigitalActionHandle(const char *actionName){
+	if(SteamController() == NULL){
+		return 0;
+	}
+	return (uint64_t)SteamController()->GetDigitalActionHandle(actionName);
+}
+// Get the origin(s) for an analog action within an action.
+//Array GetDigitalActionOrigins(uint64_t controllerHandle, uint64_t actionSetHandle, uint64_t digitalActionHandle){
+//	Array list;
+//	if(SteamController() == NULL){
+//		EControllerActionOrigin out[STEAM_CONTROLLER_MAX_ORIGINS];
+//		int ret = SteamController()->GetDigitalActionOrigins((ControllerHandle_t)controllerHandle, (ControllerActionSetHandle_t)actionSetHandle, (ControllerDigitalActionHandle_t)digitalActionHandle, out);
+//		for (int i=0; i<ret; i++){
+//			list.push_back((int)out[i]);
+//		}
+//	}
+//	return list;
+//}
+// Returns the associated gamepad index for the specified controller.
+int GetGamepadIndexForController(uint64_t controllerHandle){
+	if(SteamController() == NULL){
+		return -1;
+	}
+	return SteamController()->GetGamepadIndexForController((ControllerHandle_t)controllerHandle);
+}
+// Returns raw motion data for the specified controller.
+//Dictionary GetMotionData(uint64_t controllerHandle){
+//	ControllerMotionData_t data;
+//	Dictionary d;
+//	memset(&data, 0, sizeof(data));
+//	if(SteamController() == NULL){
+//		data = SteamController()->GetMotionData((ControllerHandle_t)controllerHandle);
+//	}
+//	d["rotQuatX"] = data.rotQuatX;
+//	d["rotQuatY"] = data.rotQuatY;
+//	d["rotQuatZ"] = data.rotQuatZ;
+//	d["rotQuatW"] = data.rotQuatW;
+//	d["posAccelX"] = data.posAccelX;
+//	d["posAccelY"] = data.posAccelY;
+//	d["posAccelZ"] = data.posAccelZ;
+//	d["rotVelX"] = data.rotVelX;
+//	d["rotVelY"] = data.rotVelY;
+//	d["rotVelZ"] = data.rotVelZ;
+//	return d;
+//}
+// Start SteamControllers interface.
+bool ControllerInit(){
+	if(SteamController() == NULL){
+		return false;
+	}
+	return SteamController()->Init();
+}
+// Syncronize controllers.
+void RunFrame(){
+	if(SteamController() == NULL){
+		return;
+	}
+	SteamController()->RunFrame();
+}
+// Invokes the Steam overlay and brings up the binding screen.
+bool ShowBindingPanel(uint64_t controllerHandle){
+	if(SteamController() == NULL){
+		return false;
+	}
+	return SteamController()->ShowBindingPanel((ControllerHandle_t)controllerHandle);
+}
+// Stop SteamControllers interface.
+bool ControllerShutdown(){
+	if(SteamController() == NULL){
+		return false;
+	}
+	return SteamController()->Shutdown();
+}
+// Trigger a vibration event on supported controllers.
+void TriggerVibration(uint64_t controllerHandle, uint16_t leftSpeed, uint16_t rightSpeed){
+	if(SteamController() == NULL){
+		return;
+	}
+	SteamController()->TriggerVibration((ControllerHandle_t)controllerHandle, (unsigned short)leftSpeed, (unsigned short)rightSpeed);
 }
 
 /////////////////////////////////////////////////
@@ -451,26 +630,26 @@ SW_PY uint32 GetIPCCallCount(){
 // Get the user's country by IP.
 SW_PY const char* GetIPCountry(){
 	if(SteamUtils() == NULL){
-		return "";
+		return "None";
 	}
 	return SteamUtils()->GetIPCountry();
 }
 // Return amount of time, in seconds, user has spent in this session.
-SW_PY int GetSecondsSinceAppActive(){
+SW_PY uint32 GetSecondsSinceAppActive(){
 	if(SteamUtils() == NULL){
 		return 0;
 	}
 	return SteamUtils()->GetSecondsSinceAppActive();
 }
 // Returns the number of seconds since the user last moved the mouse.
-SW_PY int GetSecondsSinceComputerActive(){
+SW_PY uint32 GetSecondsSinceComputerActive(){
 	if(SteamUtils() == NULL){
 		return 0;
 	}
 	return SteamUtils()->GetSecondsSinceComputerActive();
 }
 // Get the actual time.
-SW_PY int GetServerRealTime(){
+SW_PY uint32 GetServerRealTime(){
 	if(SteamUtils() == NULL){
 		return 0;
 	}
@@ -479,7 +658,7 @@ SW_PY int GetServerRealTime(){
 // Get the Steam user interface language.
 SW_PY const char* GetSteamUILanguage(){
 	if(SteamUtils() == NULL){
-		return "";
+		return "None";
 	}
 	return SteamUtils()->GetSteamUILanguage();
 }
