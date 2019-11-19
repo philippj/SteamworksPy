@@ -135,22 +135,6 @@ class Steam:
 		Steam.cdll.IsScreenshotsHooked.restype = bool
 		Steam.cdll.SetLocation.restype = bool
 		Steam.cdll.TriggerScreenshot.restype = None
-		# Set restype for UGC functions
-		Steam.cdll.DownloadItem.restype = bool
-		Steam.cdll.SuspendDownloads.restype = None
-		Steam.cdll.StartItemUpdate.restype = c_uint64
-		Steam.cdll.GetItemState.restype = int
-		Steam.cdll.CreateItem.restype = None
-		Steam.cdll.SetItemTitle.restype = bool
-		Steam.cdll.SetItemDescription.restype = bool
-		Steam.cdll.SetItemUpdateLanguage.restype = bool
-		Steam.cdll.SetItemUpdateLanguage.restype = bool
-		Steam.cdll.SetItemMetadata.restype = bool
-		Steam.cdll.SetItemMetadata.restype = bool
-		Steam.cdll.SetItemVisibility.restype = bool
-		Steam.cdll.SetItemContent.restype = bool
-		Steam.cdll.SetItemPreview.restype = bool
-		Steam.cdll.SubmitItemUpdate.restype = None
 		# Set restype for User functions
 		Steam.cdll.GetSteamID.restype = c_uint64
 		Steam.cdll.LoggedOn.restype = bool
@@ -588,103 +572,6 @@ class SteamScreenshots:
 		else:
 			return
 
-#------------------------------------------------
-# Class for Steam UGC / Workshop
-#------------------------------------------------
-class SteamUGC:
-	# Download new or update already installed item. If returns true, wait for DownloadItemResult_t. If item is already installed, then files on disk should not be used until callback received.
-	# If item is not subscribed to, it will be cached for some time. If bHighPriority is set, any other item download will be suspended and this item downloaded ASAP.
-	@staticmethod
-	def DownloadItem(publishedFileID, highPriority):
-		if Steam.IsSteamLoaded():
-			return Steam.cdll.DownloadItem(publishedFileID, highPriority)
-		else:
-			return False
-	# SuspendDownloads( true ) will suspend all workshop downloads until SuspendDownloads( false ) is called or the game ends.
-	@staticmethod
-	def SuspendDownloads(suspend):
-		if Steam.IsSteamLoaded():
-			return Steam.cdll.SuspendDownloads(suspend)
-		else:
-			return
-	# Starts the item update process.
-	@staticmethod
-	def StartItemUpdate(appID, publishedFileID):
-		if Steam.IsSteamLoaded():
-			return Steam.cdll.StartItemUpdate(appID, publishedFileID)
-		else:
-			return 0
-	# Gets the current state of a workshop item on this client.
-	@staticmethod
-	def GetItemState(publishedFileID):
-		if Steam.IsSteamLoaded():
-			return Steam.cdll.GetItemState(publishedFileID)
-		else:
-			return 0
-	# Creating a workshop item.
-	@staticmethod
-	def CreateItem(appID, fileType):
-		if Steam.IsSteamLoaded():
-			return Steam.cdll.CreateItem(appID, fileType)
-		else:
-			return
-	# Sets a new title for an item.
-	@staticmethod
-	def SetItemTitle(updateHandle, title):
-		if Steam.IsSteamLoaded():
-			return Steam.cdll.SetItemTitle(updateHandle, title)
-		else:
-			return False
-	# Sets a new description for an item.
-	@staticmethod
-	def SetItemDescription(updateHandle, description):
-		if Steam.IsSteamLoaded():
-			return Steam.cdll.SetItemDescription(updateHandle, description)
-		else:
-			return False
-	# Sets the language of the title and description that will be set in this item update.
-	@staticmethod
-	def SetItemUpdateLanguage(updateHandle, language):
-		if Steam.IsSteamLoaded():
-			return Steam.cdll.SetItemUpdateLanguage(updateHandle, language)
-		else:
-			return False
-
-	# Sets arbitrary metadata for an item. This metadata can be returned from queries without having to download and install the actual content.
-	@staticmethod
-	def SetItemMetadata(updateHandle, metadata):
-		if Steam.IsSteamLoaded():
-			return Steam.cdll.SetItemMetadata(updateHandle, metadata)
-		else:
-			return False
-	# Sets the visibility of an item.
-	@staticmethod
-	def SetItemVisibility(updateHandle, visibility):
-		if Steam.IsSteamLoaded():
-			return Steam.cdll.SetItemVisibility(updateHandle, visibility)
-		else:
-			return False
-	# Sets the folder that will be stored as the content for an item.
-	@staticmethod
-	def SetItemContent(updateHandle, contentFolder):
-		if Steam.IsSteamLoaded():
-			return Steam.cdll.SetItemContent(updateHandle, contentFolder)
-		else:
-			return False
-	# Sets the primary preview image for the item.
-	@staticmethod
-	def SetItemPreview(updateHandle, previewFile):
-		if Steam.IsSteamLoaded():
-			return Steam.cdll.SetItemPreview(updateHandle, previewFile)
-		else:
-			return False
-	# Uploads the changes made to an item to the Steam Workshop; to be called after setting your changes.
-	@staticmethod
-	def SubmitItemUpdate(updateHandle, changeNote):
-		if Steam.IsSteamLoaded():
-			return Steam.cdll.SubmitItemUpdate(updateHandle, changeNote)
-		else:
-			return
 #------------------------------------------------
 # Class for Steam Users
 #------------------------------------------------
