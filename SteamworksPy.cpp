@@ -20,6 +20,7 @@
 #endif
 
 #include <iostream>
+#include <string>
 
 // Enumerated constants /////////////////////////
 enum {
@@ -266,6 +267,7 @@ SW_PY void GetFileDetails(const char* filename){
 	}
 	SteamApps()->GetFileDetails(filename);
 }
+
 
 /////////////////////////////////////////////////
 ///// CONTROLLERS////////////////////////////////
@@ -546,6 +548,186 @@ SW_PY void TriggerScreenshot(){
 		return;
 	}
 	SteamScreenshots()->TriggerScreenshot();
+}
+
+/////////////////////////////////////////////////
+///// UGC ///////////////////////////////////////
+/////////////////////////////////////////////////
+//
+// Download new or update already installed item. If returns true, wait for DownloadItemResult_t. If item is already installed, then files on disk should not be used until callback received.
+// If item is not subscribed to, it will be cached for some time. If bHighPriority is set, any other item download will be suspended and this item downloaded ASAP.
+SW_PY bool DownloadItem(int publishedFileID, bool highPriority){
+	if(SteamUGC() == NULL){
+		return 0;
+	}
+	PublishedFileId_t fileID = (int)publishedFileID;
+	return SteamUGC()->DownloadItem(fileID, highPriority);
+}
+// SuspendDownloads( true ) will suspend all workshop downloads until SuspendDownloads( false ) is called or the game ends.
+SW_PY void SuspendDownloads(bool suspend){
+	return SteamUGC()->SuspendDownloads(suspend);
+}
+// Starts the item update process.
+SW_PY uint64_t StartItemUpdate(AppId_t appID, int publishedFileID){
+	PublishedFileId_t fileID = (int)publishedFileID;
+	return SteamUGC()->StartItemUpdate(appID, fileID);
+}
+// Gets the current state of a workshop item on this client.
+SW_PY int GetItemState(int publishedFileID){
+	if(SteamUGC() == NULL){
+		return 0;
+	}
+	PublishedFileId_t fileID = (int)publishedFileID;
+	return SteamUGC()->GetItemState(fileID);
+}
+// Creating a workshop item
+SW_PY void CreateItem(AppId_t appID, int fileType){
+	if(SteamUGC() == NULL){
+		return;
+	}
+	EWorkshopFileType workshopType;
+	// Convert the file type back over.
+	if(fileType == UGC_ITEM_MAX){
+		workshopType = k_EWorkshopFileTypeMax;
+	}
+	else if(fileType == UGC_ITEM_MICROTRANSACTION){
+		workshopType = k_EWorkshopFileTypeMicrotransaction;
+	}
+	else if(fileType == UGC_ITEM_COLLECTION){
+		workshopType = k_EWorkshopFileTypeCollection;
+	}
+	else if(fileType == UGC_ITEM_ART){
+		workshopType = k_EWorkshopFileTypeArt;
+	}
+	else if(fileType == UGC_ITEM_VIDEO){
+		workshopType = k_EWorkshopFileTypeVideo;
+	}
+	else if(fileType == UGC_ITEM_SCREENSHOT){
+		workshopType = k_EWorkshopFileTypeScreenshot;
+	}
+	else if(fileType == UGC_ITEM_GAME){
+		workshopType = k_EWorkshopFileTypeGame;
+	}
+	else if(fileType == UGC_ITEM_SOFTWARE){
+		workshopType = k_EWorkshopFileTypeSoftware;
+	}
+	else if(fileType == UGC_ITEM_CONCEPT){
+		workshopType = k_EWorkshopFileTypeConcept;
+	}
+	else if(fileType == UGC_ITEM_WEBGUIDE){
+		workshopType = k_EWorkshopFileTypeWebGuide;
+	}
+	else if(fileType == UGC_ITEM_INTEGRATEDGUIDE){
+		workshopType = k_EWorkshopFileTypeIntegratedGuide;
+	}
+	else if(fileType == UGC_ITEM_MERCH){
+		workshopType = k_EWorkshopFileTypeMerch;
+	}
+	else if(fileType == UGC_ITEM_CONTROLLERBINDING){
+		workshopType = k_EWorkshopFileTypeControllerBinding;
+	}
+	else if(fileType == UGC_ITEM_STEAMWORKSACCESSINVITE){
+		workshopType = k_EWorkshopFileTypeSteamworksAccessInvite;
+	}
+	else if(fileType == UGC_ITEM_STEAMVIDEO){
+		workshopType = k_EWorkshopFileTypeSteamVideo;
+	}
+	else if(fileType == UGC_ITEM_GAMEMANAGEDITEM){
+		workshopType = k_EWorkshopFileTypeGameManagedItem;
+	}
+	else{
+		workshopType = k_EWorkshopFileTypeCommunity;
+	}
+	// Callbacks must be functional
+//	SteamAPICall_t apiCall = SteamUGC()->CreateItem(appID, workshopType);
+//	callResultItemCreate.Set(apiCall, this, &_item_created);
+}
+// Sets a new title for an item.
+SW_PY bool SetItemTitle(uint64_t updateHandle, const char *title){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	if (strlen(title) > UGC_MAX_TITLE_CHARS){
+		printf("Title cannot have more than %ld ASCII characters. Title not set.", UGC_MAX_TITLE_CHARS);
+		return false;
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+	return SteamUGC()->SetItemTitle(handle, title);
+}
+// Sets a new description for an item.
+SW_PY bool SetItemDescription(uint64_t updateHandle, const char *description){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	if (strlen(description) > UGC_MAX_DESC_CHARS){
+		printf("Description cannot have more than %ld ASCII characters. Description not set.", UGC_MAX_DESC_CHARS);
+		return false;
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+	return SteamUGC()->SetItemDescription(handle, description);
+}
+// Sets the language of the title and description that will be set in this item update.
+SW_PY bool SetItemUpdateLanguage(uint64_t updateHandle, const char *language){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+	return SteamUGC()->SetItemUpdateLanguage(handle, language);
+}
+// Sets arbitrary metadata for an item. This metadata can be returned from queries without having to download and install the actual content.
+SW_PY bool SetItemMetadata(uint64_t updateHandle, const char *metadata){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	if (strlen(metadata) > UGC_MAX_METADATA_CHARS){
+		printf("Metadata cannot have more than %ld ASCII characters. Metadata not set.", UGC_MAX_METADATA_CHARS);
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+	return SteamUGC()->SetItemMetadata(handle, metadata);
+}
+// Sets the visibility of an item.
+SW_PY bool SetItemVisibility(uint64_t updateHandle, int visibility){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+	ERemoteStoragePublishedFileVisibility itemVisibility;
+	// Convert the visibility type back over.
+	if(visibility == UGC_FILE_VISIBLE_PUBLIC){
+		itemVisibility = k_ERemoteStoragePublishedFileVisibilityPublic;
+	}
+	else if(visibility == UGC_FILE_VISIBLE_FRIENDS){
+		itemVisibility = k_ERemoteStoragePublishedFileVisibilityFriendsOnly;
+	}
+	else{
+		itemVisibility = k_ERemoteStoragePublishedFileVisibilityPrivate;
+	}
+	return SteamUGC()->SetItemVisibility(handle, itemVisibility);
+}
+// Sets the folder that will be stored as the content for an item.
+SW_PY bool SetItemContent(uint64_t updateHandle, const char *contentFolder){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+	return SteamUGC()->SetItemContent(handle, contentFolder);
+}
+// Sets the primary preview image for the item.
+SW_PY bool SetItemPreview(uint64_t updateHandle, const char *previewFile){
+	if(SteamUGC() == NULL){
+		return false;
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+	return SteamUGC()->SetItemPreview(handle, previewFile);
+}
+// Uploads the changes made to an item to the Steam Workshop; to be called after setting your changes.
+SW_PY void SubmitItemUpdate(uint64_t updateHandle, const char *changeNote){
+	if(SteamUGC() == NULL){
+		return;
+	}
+	UGCUpdateHandle_t handle = uint64(updateHandle);
+//	SteamAPICall_t apiCall = SteamUGC()->SubmitItemUpdate(handle, changeNote);
+//	callResultItemUpdate.Set(apiCall, this, &_item_updated);
 }
 
 /////////////////////////////////////////////////
