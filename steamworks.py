@@ -145,6 +145,26 @@ class Steam:
 		Steam.cdll.ActivateGameOverlayToStore.argtypes = [c_uint32]
 		Steam.cdll.ActivateGameOverlayInviteDialog.restype = None
 		Steam.cdll.ActivateGameOverlayInviteDialog.argtypes = [c_uint64]
+		# Set restype for Controller functions
+		Steam.cdll.ActivateActionSet.restype = None
+		Steam.cdll.GetActionSetHandle.restype = c_uint64
+#		Steam.cdll.GetAnalogActionData.restype = dictionary?
+		Steam.cdll.GetAnalogActionHandle.restype = c_uint64
+#		Steam.cdll.GetAnalogActionOrigins.restype = array?
+#		Steam.cdll.GetConnectedControllers.restype = array?
+		Steam.cdll.GetControllerForGamepadIndex.restype = c_uint64
+		Steam.cdll.GetCurrentActionSet.restype = c_uint64
+		Steam.cdll.GetInputTypeForHandle.restype = c_uint64
+#		Steam.cdll.GetDigitalActionData.restype = dictionary?
+		Steam.cdll.GetDigitalActionHandle.restype = c_uint64
+#		Steam.cdll.GetDigitalActionOrigins.restype = array?
+		Steam.cdll.GetGamepadIndexForController.restype = int
+#		Steam.cdll.GetMotionData.restype = dictionary?
+		Steam.cdll.ControllerInit.restype = bool
+		Steam.cdll.RunFrame.restype = None
+		Steam.cdll.ShowBindingPanel.restype = bool
+		Steam.cdll.ControllerShutdown.restype = bool
+		Steam.cdll.TriggerVibration.restype = None
 		# Set restype for Matchmaking
 		Steam.cdll.CreateLobby.restype = None
 		Steam.cdll.CreateLobby.argtypes = [c_uint64, c_uint64]
@@ -266,6 +286,7 @@ class Steam:
 			return True
 		else:
 			return False
+
 #------------------------------------------------
 # Class for Steam Apps
 #------------------------------------------------
@@ -412,6 +433,7 @@ class SteamApps:
 			return Steam.cdll.GetFileDetails(filename)
 		else:
 			return
+
 #------------------------------------------------
 # Class for Steam Friends
 #------------------------------------------------
@@ -514,6 +536,145 @@ class SteamFriends:
 			return Steam.cdll.ActivateGameOverlayToWebPage(steamID)
 		else:
 			return
+
+#------------------------------------------------
+# Class for Steam Controller
+#------------------------------------------------
+class SteamController:
+	# Reconfigure the controller to use the specified action set.
+	@staticmethod
+	def ActivateActionSet(controllerHandle, actionSetHandle):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.ActivateActionSet()
+		else:
+			return
+	# Lookup the handle for an Action Set.
+	@staticmethod
+	def GetActionSetHandle(actionSetName):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetActionSetHandle(actionSetName)
+		else:
+			return 0
+	# Returns the current state of the supplied analog game action.
+#	@staticmethod
+#	def GetAnalogActionData(controllerHandle, analogActionHandle):
+#		if Steam.IsSteamLoaded():
+#			return Steam.cdll.GetAnalogActionData(controllerHandle, analogActionHandle)
+#		else:
+#			return ""
+	# Get the handle of the specified Analog action.
+	@staticmethod
+	def GetAnalogActionHandle(actionName):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetAnalogActionHandle(actionName)
+		else:
+			return 0
+	# Get the origin(s) for an analog action within an action.
+#	@staticmethod
+#	def GetAnalogActionOrigins(controllerHandle, actionSetHandle, analogActionHandle):
+#		if Steam.IsSteamLoaded():
+#			return Steam.cdll.GetAnalogActionOrigins(controllerHandle, actionSetHandle, analogActionHandle)
+#		else:
+#			return []
+	# Get current controllers handles.
+#	@staticmethod
+#	def GetConnectedControllers():
+#		if Steam.IsSteamLoaded():
+#			return Steam.cdll.GetConnectedControllers()
+#		else:
+#			return []
+	# Returns the associated controller handle for the specified emulated gamepad.
+	@staticmethod
+	def GetControllerForGamepadIndex(index):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetControllerForGamepadIndex(index)
+		else:
+			return 0
+	# Get the currently active action set for the specified controller.
+	@staticmethod
+	def GetCurrentActionSet(controllerHandle):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetCurrentActionSet(controllerHandle)
+		else:
+			return 0
+	# Get the input type (device model) for the specified controller. 
+	@staticmethod
+	def GetInputTypeForHandle(controllerHandle):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetInputTypeForHandle(controllerHandle)
+		else:
+			return 0
+	# Returns the current state of the supplied digital game action.
+#	@staticmethod
+#	def GetDigitalActionData(controllerHandle, digitalActionHandle):
+#		if Steam.IsSteamLoaded():
+#			return Steam.cdll.GetDigitalActionData(controllerHandle, digitalActionHandle)
+#		else:
+#			return {}
+	# Get the handle of the specified digital action. 
+	@staticmethod
+	def GetDigitalActionHandle(actionName):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetDigitalActionHandle(actionName)
+		else:
+			return 0
+	# Get the origin(s) for an analog action within an action.
+#	@staticmethod
+#	def GetDigitalActionOrigins(controllerHandle, actionSetHandle, digitalActionHandle):
+#		if Steam.IsSteamLoaded():
+#			return Steam.cdll.GetDigitalActionOrigins(controllerHandle, actionSetHandle, digitalActionHandle)
+#		else:
+#			return []
+	# Returns the associated gamepad index for the specified controller.
+	@staticmethod
+	def GetGamepadIndexForController(controllerHandle):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.GetGamepadIndexForController(controllerHandle)
+		else:
+			return 0
+	# Returns raw motion data for the specified controller.
+#	@staticmethod
+#	def GetMotionData(controllerHandle):
+#		if Steam.IsSteamLoaded():
+#			return Steam.cdll.GetMotionData(controllerHandle)
+#		else:
+#			return {}
+	# Start SteamControllers interface.
+	@staticmethod
+	def ControllerInit():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.ControllerInit()
+		else:
+			return False
+	# Syncronize controllers.
+	@staticmethod
+	def RunFrame():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.RunFrame()
+		else:
+			return
+	# Invokes the Steam overlay and brings up the binding screen.
+	@staticmethod
+	def ShowBindingPanel(controllerHandle):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.ShowBindingPanel(controllerHandle)
+		else:
+			return False
+	# Stop SteamControllers interface.
+	@staticmethod
+	def ControllerShutdown():
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.ControllerShutdown()
+		else:
+			return False
+	# Trigger a vibration event on supported controllers.
+	@staticmethod
+	def TriggerVibration(controllerHandle):
+		if Steam.IsSteamLoaded():
+			return Steam.cdll.TriggerVibration(controllerHandle, leftSpeed, rightSpeed)
+		else:
+			return
+
 #------------------------------------------------
 # Class for Steam Matchmaking
 #------------------------------------------------ 
@@ -546,6 +707,7 @@ class SteamMatchmaking:
 			return Steam.cdll.InviteUserToLobby(lobbyID, steamID)
 		else:
 			return
+
 #------------------------------------------------
 # Class for Steam Music
 #------------------------------------------------
@@ -606,6 +768,7 @@ class SteamMusic:
 			return Steam.cdll.MusicSetVolume(volume)
 		else:
 			return
+
 #------------------------------------------------
 # Class for Steam Screenshots
 #------------------------------------------------
@@ -645,6 +808,7 @@ class SteamScreenshots:
 			return Steam.cdll.TriggerScreenshot()
 		else:
 			return
+
 #------------------------------------------------
 # Class for Steam Users
 #------------------------------------------------
@@ -685,6 +849,7 @@ class SteamUsers:
 			return Steam.cdll.GetGameBadgeLevel(series, foil)
 		else:
 			return 0
+
 #------------------------------------------------
 # Class for Steam User Statistics
 #------------------------------------------------
@@ -789,6 +954,7 @@ class SteamUserStats:
 			return True
 		else:
 			return False
+
 #------------------------------------------------
 # Class for Steam Utils
 #------------------------------------------------
@@ -912,6 +1078,7 @@ class SteamUtils:
 			return Steam.cdll.StartVRDashboard()
 		else:
 			return
+
 #------------------------------------------------
 # Class for Steam Workshop
 #------------------------------------------------

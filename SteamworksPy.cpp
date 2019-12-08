@@ -469,6 +469,186 @@ SW_PY void ActivateGameOverlayInviteDialog(int steamID){
 	CSteamID lobbyID = CreateSteamID(steamID, 1);
 	return SteamFriends()->ActivateGameOverlayInviteDialog(lobbyID);
 }
+
+/////////////////////////////////////////////////
+///// CONTROLLERS////////////////////////////////
+/////////////////////////////////////////////////
+//
+// Reconfigure the controller to use the specified action set.
+SW_PY void ActivateActionSet(uint64_t controllerHandle, uint64_t actionSetHandle){
+	if(SteamController() == NULL){
+		return;
+	}
+	SteamController()->ActivateActionSet((ControllerHandle_t)controllerHandle, (ControllerActionSetHandle_t)actionSetHandle);
+}
+// Lookup the handle for an Action Set.
+SW_PY uint64_t GetActionSetHandle(const char *actionSetName){
+	if(SteamController() == NULL){
+		return 0;
+	}
+	return (uint64_t)SteamController()->GetActionSetHandle(actionSetName);
+}
+// Returns the current state of the supplied analog game action.
+//SW_PY Dictionary GetAnalogActionData(uint64_t controllerHandle, uint64_t analogActionHandle){
+//	ControllerAnalogActionData_t data;
+//	Dictionary d;
+//	memset(&data, 0, sizeof(data));
+//	if(SteamController() == NULL){
+//		data = SteamController()->GetAnalogActionData((ControllerHandle_t)controllerHandle, (ControllerAnalogActionHandle_t)analogActionHandle);
+//	}
+//	d["eMode"] = data.eMode;
+//	d["x"] = data.x;
+//	d["y"] = data.y;
+//	d["bActive"] = data.bActive;
+//	return d;
+//}
+// Get the handle of the specified Analog action.
+SW_PY uint64_t GetAnalogActionHandle(const char *actionName){
+	if(SteamController() == NULL){
+		return 0;
+	}
+	return (uint64_t)SteamController()->GetAnalogActionHandle(actionName);
+}
+// Get the origin(s) for an analog action within an action.
+//SW_PY Array GetAnalogActionOrigins(uint64_t controllerHandle, uint64_t actionSetHandle, uint64_t analogActionHandle){
+//	Array list;
+//	if(SteamController() == NULL){
+//		EControllerActionOrigin out[STEAM_CONTROLLER_MAX_ORIGINS];
+//		int ret = SteamController()->GetAnalogActionOrigins((ControllerHandle_t)controllerHandle, (ControllerActionSetHandle_t)actionSetHandle, (ControllerAnalogActionHandle_t)analogActionHandle, out);
+//		for (int i = 0; i < ret; i++){
+//			list.push_back((int)out[i]);
+//		}
+//	}
+//	return list;
+//}
+// Get current controllers handles.
+//SW_PY Array GetConnectedControllers(){
+//	Array list;
+//	if(SteamController() == NULL){
+//		ControllerHandle_t handles[STEAM_CONTROLLER_MAX_COUNT];
+//		int ret = SteamController()->GetConnectedControllers(handles);
+//		for (int i = 0; i < ret; i++){
+//			list.push_back((uint64_t)handles[i]);
+//		}
+//	}
+//	return list;
+//}
+// Returns the associated controller handle for the specified emulated gamepad.
+SW_PY uint64_t GetControllerForGamepadIndex(int index){
+	if(SteamController() == NULL){
+		return 0;
+	}
+	return (uint64_t)SteamController()->GetControllerForGamepadIndex(index);
+}
+// Get the currently active action set for the specified controller.
+SW_PY uint64_t GetCurrentActionSet(uint64_t controllerHandle){
+	if(SteamController() == NULL){
+		return 0;
+	}
+	return (uint64_t)SteamController()->GetCurrentActionSet((ControllerHandle_t)controllerHandle);
+}
+// Get the input type (device model) for the specified controller. 
+SW_PY uint64_t GetInputTypeForHandle(uint64_t controllerHandle){
+    if(SteamController() == NULL){
+		return 0;
+
+	}
+	return (uint64_t)SteamController()->GetInputTypeForHandle((ControllerHandle_t)controllerHandle);
+}
+// Returns the current state of the supplied digital game action.
+//SW_PY Dictionary GetDigitalActionData(uint64_t controllerHandle, uint64_t digitalActionHandle){
+//	ControllerDigitalActionData_t data;
+//	Dictionary d;
+//	memset(&data, 0, sizeof(data));
+//	if(SteamController() == NULL){
+//		data = SteamController()->GetDigitalActionData((ControllerHandle_t)controllerHandle, (ControllerDigitalActionHandle_t)digitalActionHandle);
+//	}
+//	d["bState"] = data.bState;
+//	d["bActive"] = data.bActive;
+//	return d;
+//}
+// Get the handle of the specified digital action.
+SW_PY uint64_t GetDigitalActionHandle(const char *actionName){
+	if(SteamController() == NULL){
+		return 0;
+	}
+	return (uint64_t)SteamController()->GetDigitalActionHandle(actionName);
+}
+// Get the origin(s) for an analog action within an action.
+//SW_PY Array GetDigitalActionOrigins(uint64_t controllerHandle, uint64_t actionSetHandle, uint64_t digitalActionHandle){
+//	Array list;
+//	if(SteamController() == NULL){
+//		EControllerActionOrigin out[STEAM_CONTROLLER_MAX_ORIGINS];
+//		int ret = SteamController()->GetDigitalActionOrigins((ControllerHandle_t)controllerHandle, (ControllerActionSetHandle_t)actionSetHandle, (ControllerDigitalActionHandle_t)digitalActionHandle, out);
+//		for (int i=0; i<ret; i++){
+//			list.push_back((int)out[i]);
+//		}
+//	}
+//	return list;
+//}
+// Returns the associated gamepad index for the specified controller.
+SW_PY int GetGamepadIndexForController(uint64_t controllerHandle){
+	if(SteamController() == NULL){
+		return -1;
+	}
+	return SteamController()->GetGamepadIndexForController((ControllerHandle_t)controllerHandle);
+}
+// Returns raw motion data for the specified controller.
+//SW_PY Dictionary GetMotionData(uint64_t controllerHandle){
+//	ControllerMotionData_t data;
+//	Dictionary d;
+//	memset(&data, 0, sizeof(data));
+//	if(SteamController() == NULL){
+//		data = SteamController()->GetMotionData((ControllerHandle_t)controllerHandle);
+//	}
+//	d["rotQuatX"] = data.rotQuatX;
+//	d["rotQuatY"] = data.rotQuatY;
+//	d["rotQuatZ"] = data.rotQuatZ;
+//	d["rotQuatW"] = data.rotQuatW;
+//	d["posAccelX"] = data.posAccelX;
+//	d["posAccelY"] = data.posAccelY;
+//	d["posAccelZ"] = data.posAccelZ;
+//	d["rotVelX"] = data.rotVelX;
+//	d["rotVelY"] = data.rotVelY;
+//	d["rotVelZ"] = data.rotVelZ;
+//	return d;
+//}
+// Start SteamControllers interface.
+SW_PY bool ControllerInit(){
+	if(SteamController() == NULL){
+		return false;
+	}
+	return SteamController()->Init();
+}
+// Syncronize controllers.
+SW_PY void RunFrame(){
+	if(SteamController() == NULL){
+		return;
+	}
+	SteamController()->RunFrame();
+}
+// Invokes the Steam overlay and brings up the binding screen.
+SW_PY bool ShowBindingPanel(uint64_t controllerHandle){
+	if(SteamController() == NULL){
+		return false;
+	}
+	return SteamController()->ShowBindingPanel((ControllerHandle_t)controllerHandle);
+}
+// Stop SteamControllers interface.
+SW_PY bool ControllerShutdown(){
+	if(SteamController() == NULL){
+		return false;
+	}
+	return SteamController()->Shutdown();
+}
+SW_PY // Trigger a vibration event on supported controllers.
+void TriggerVibration(uint64_t controllerHandle, uint16_t leftSpeed, uint16_t rightSpeed){
+	if(SteamController() == NULL){
+		return;
+	}
+	SteamController()->TriggerVibration((ControllerHandle_t)controllerHandle, (unsigned short)leftSpeed, (unsigned short)rightSpeed);
+}
+
 /////////////////////////////////////////////////
 ///// MATCHMAKING
 /////////////////////////////////////////////////
