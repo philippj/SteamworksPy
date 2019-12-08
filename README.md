@@ -11,10 +11,11 @@ For a fuller (yet outdated) tutorial, with images, on SteamworksPy please read o
 
 There is now an experimental branch for converting the project to match my [Godot Engine module](https://github.com/Gramps/GodotSteam) in functionality and fix some problems with the original.  Once completed, it will move to the master branch.
 
-# Latest Updates - Version 1.6
+# Latest Updates - Version 1.6.1
 - Added: all Apps functions from Experimental branch
 - Added: all Screenshot functions from Experimental branch
 - Added: all User functions from Experimental branch
+- Added: all Controller functions from Experimental branch
 - Changed: steamInit to give correct feedback, now returns INT instead of BOOL
 	- Note: if you used version 1.5 or lower, you need to update how your steamInit() works in your project or it may crash
 - Changed: some commenting formats
