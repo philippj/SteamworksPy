@@ -294,63 +294,63 @@ class SteamApps:
 	# Checks if the active user is subscribed to the current App ID.
 	@staticmethod
 	def IsSubscribed():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.IsSubscribed()
 		else:
 			return False
 	# Checks if the license owned by the user provides low violence depots.
 	@staticmethod
 	def IsLowViolence():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.IsLowViolence()
 		else:
 			return False
 	# Checks whether the current App ID is for Cyber Cafes.
 	@staticmethod
 	def IsCybercafe():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.IsCybercafe()
 		else:
 			return False
 	# Checks if the user has a VAC ban on their account.
 	@staticmethod
 	def IsVACBanned():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.IsVACBanned()
 		else:
 			return "None"
 	# Gets the current language that the user has set.
 	@staticmethod
 	def GetCurrentGameLanguage():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetCurrentGameLanguage()
 		else:
 			return "None"
 	# Gets a comma separated list of the languages the current app supports.
 	@staticmethod
 	def GetAvailableGameLanguages():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetAvailableGameLanguages()
 		else:
 			return "None"
 	# Checks if the active user is subscribed to a specified AppId.
 	@staticmethod
 	def IsSubscribedApp(appID):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.IsSubscribedApp(appID)
 		else:
 			return False
 	# Checks if the user owns a specific DLC and if the DLC is installed.
 	@staticmethod
 	def IsDLCInstalled(dlcID):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.IsDLCInstalled(dlcID)
 		else:
 			return False
 	# Gets the time of purchase of the specified app in Unix epoch format (time since Jan 1st, 1970).
 	@staticmethod
 	def GetEarliestPurchaseUnixTime(appID):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetEarliestPurchaseUnixTime(appID)
 		else:
 			return 0
@@ -359,77 +359,77 @@ class SteamApps:
 	# Suggested you contact Valve on how to package and secure your free weekend properly.
 	@staticmethod
 	def IsSubscribedFromFreeWeekend():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.IsSubscribedFromFreeWeekend()
 		else:
 			return False
 	# Get the number of DLC the user owns for a parent application/game.
 	@staticmethod
 	def GetDLCCount():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetDLCCount()
 		else:
 			return 0
 	# Allows you to install an optional DLC.
 	@staticmethod
 	def InstallDLC(dlcID):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.InstallDLC(dlcID)
 		else:
 			return
 	# Allows you to uninstall an optional DLC.
 	@staticmethod
 	def UninstallDLC(dlcID):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.UninstallDLC(dlcID)
 		else:
 			return
 	# Allows you to force verify game content on next launch.
 	@staticmethod
 	def MarkContentCorrupt(missingFilesOnly):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.MarkContentCorrupt(missingFilesOnly)
 		else:
 			return False
 	# Gets the install folder for a specific AppID.
 	@staticmethod
 	def GetAppInstallDir(appID):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetAppInstallDir(appID)
 		else:
 			return ""
 	# Check if given application/game is installed, not necessarily owned.
 	@staticmethod
 	def IsAppInstalled(appID):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.IsAppInstalled(appID)
 		else:
 			return False
 	# Gets the Steam ID of the original owner of the current app. If it's different from the current user then it is borrowed.
 	@staticmethod
 	def GetAppOwner():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetAppOwner()
 		else:
 			return 0
 	# Gets the associated launch parameter if the game is run via steam://run/<appid>/?param1=value1;param2=value2;param3=value3 etc.
 	@staticmethod
 	def GetLaunchQueryParam(key):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetLaunchQueryParam(key)
 		else:
 			return ""
 	# Return the build ID for this app; will change based on backend updates.
 	@staticmethod
 	def GetAppBuildId():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetAppBuildId()
 		else:
 			return 0
 	# Asynchronously retrieves metadata details about a specific file in the depot manifest.
 	@staticmethod
 	def GetFileDetails(filename):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetFileDetails(filename)
 		else:
 			return
@@ -544,133 +544,133 @@ class SteamController:
 	# Reconfigure the controller to use the specified action set.
 	@staticmethod
 	def ActivateActionSet(controllerHandle, actionSetHandle):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.ActivateActionSet()
 		else:
 			return
 	# Lookup the handle for an Action Set.
 	@staticmethod
 	def GetActionSetHandle(actionSetName):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetActionSetHandle(actionSetName)
 		else:
 			return 0
 	# Returns the current state of the supplied analog game action.
 #	@staticmethod
 #	def GetAnalogActionData(controllerHandle, analogActionHandle):
-#		if Steam.IsSteamLoaded():
+#		if Steam.isSteamLoaded():
 #			return Steam.cdll.GetAnalogActionData(controllerHandle, analogActionHandle)
 #		else:
 #			return ""
 	# Get the handle of the specified Analog action.
 	@staticmethod
 	def GetAnalogActionHandle(actionName):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetAnalogActionHandle(actionName)
 		else:
 			return 0
 	# Get the origin(s) for an analog action within an action.
 #	@staticmethod
 #	def GetAnalogActionOrigins(controllerHandle, actionSetHandle, analogActionHandle):
-#		if Steam.IsSteamLoaded():
+#		if Steam.isSteamLoaded():
 #			return Steam.cdll.GetAnalogActionOrigins(controllerHandle, actionSetHandle, analogActionHandle)
 #		else:
 #			return []
 	# Get current controllers handles.
 #	@staticmethod
 #	def GetConnectedControllers():
-#		if Steam.IsSteamLoaded():
+#		if Steam.isSteamLoaded():
 #			return Steam.cdll.GetConnectedControllers()
 #		else:
 #			return []
 	# Returns the associated controller handle for the specified emulated gamepad.
 	@staticmethod
 	def GetControllerForGamepadIndex(index):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetControllerForGamepadIndex(index)
 		else:
 			return 0
 	# Get the currently active action set for the specified controller.
 	@staticmethod
 	def GetCurrentActionSet(controllerHandle):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetCurrentActionSet(controllerHandle)
 		else:
 			return 0
 	# Get the input type (device model) for the specified controller. 
 	@staticmethod
 	def GetInputTypeForHandle(controllerHandle):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetInputTypeForHandle(controllerHandle)
 		else:
 			return 0
 	# Returns the current state of the supplied digital game action.
 #	@staticmethod
 #	def GetDigitalActionData(controllerHandle, digitalActionHandle):
-#		if Steam.IsSteamLoaded():
+#		if Steam.isSteamLoaded():
 #			return Steam.cdll.GetDigitalActionData(controllerHandle, digitalActionHandle)
 #		else:
 #			return {}
 	# Get the handle of the specified digital action. 
 	@staticmethod
 	def GetDigitalActionHandle(actionName):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetDigitalActionHandle(actionName)
 		else:
 			return 0
 	# Get the origin(s) for an analog action within an action.
 #	@staticmethod
 #	def GetDigitalActionOrigins(controllerHandle, actionSetHandle, digitalActionHandle):
-#		if Steam.IsSteamLoaded():
+#		if Steam.isSteamLoaded():
 #			return Steam.cdll.GetDigitalActionOrigins(controllerHandle, actionSetHandle, digitalActionHandle)
 #		else:
 #			return []
 	# Returns the associated gamepad index for the specified controller.
 	@staticmethod
 	def GetGamepadIndexForController(controllerHandle):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetGamepadIndexForController(controllerHandle)
 		else:
 			return 0
 	# Returns raw motion data for the specified controller.
 #	@staticmethod
 #	def GetMotionData(controllerHandle):
-#		if Steam.IsSteamLoaded():
+#		if Steam.isSteamLoaded():
 #			return Steam.cdll.GetMotionData(controllerHandle)
 #		else:
 #			return {}
 	# Start SteamControllers interface.
 	@staticmethod
 	def ControllerInit():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.ControllerInit()
 		else:
 			return False
 	# Syncronize controllers.
 	@staticmethod
 	def RunFrame():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.RunFrame()
 		else:
 			return
 	# Invokes the Steam overlay and brings up the binding screen.
 	@staticmethod
 	def ShowBindingPanel(controllerHandle):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.ShowBindingPanel(controllerHandle)
 		else:
 			return False
 	# Stop SteamControllers interface.
 	@staticmethod
 	def ControllerShutdown():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.ControllerShutdown()
 		else:
 			return False
 	# Trigger a vibration event on supported controllers.
 	@staticmethod
 	def TriggerVibration(controllerHandle):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.TriggerVibration(controllerHandle, leftSpeed, rightSpeed)
 		else:
 			return
@@ -715,56 +715,56 @@ class SteamMusic:
 	# Is Steam music enabled.
 	@staticmethod
 	def MusicIsEnabled():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.MusicIsEnabled()
 		else:
 			return False
 	# Is Steam music playing something.
 	@staticmethod
 	def MusicIsPlaying():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.MusicIsPlaying()
 		else:
 			return False
 	# Get the volume level of the music.
 	@staticmethod
 	def MusicGetVolume():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.MusicGetVolume()
 		else:
 			return 0
 	# Pause whatever Steam music is playing.
 	@staticmethod
 	def MusicPause():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.MusicPause()
 		else:
 			return
 	# Play current track/album.
 	@staticmethod
 	def MusicPlay():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.MusicPlay()
 		else:
 			return
 	# Play next track/album.
 	@staticmethod
 	def MusicPlayNext():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.MusicPlayNext()
 		else:
 			return
 	# Play previous track/album.
 	@staticmethod
 	def MusicPlayPrev():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.MusicPlayPrev()
 		else:
 			return
 	# Set the volume of Steam music.
 	@staticmethod
 	def MusicSetVolume(volume):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.MusicSetVolume(volume)
 		else:
 			return
@@ -776,35 +776,35 @@ class SteamScreenshots:
 	# Adds a screenshot to the user's Steam screenshot library from disk.
 	@staticmethod
 	def AddScreenshotToLibrary(filename, thumbnailFilename, width, height):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.AddScreenshotToLibrary(filename, thumbnailFilename, width, height)
 		else:
 			return 0
 	# Toggles whether the overlay handles screenshots.
 	@staticmethod
 	def HookScreenshots(hook):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.HookScreenshots(hook)
 		else:
 			return
 	# Checks if the app is hooking screenshots.
 	@staticmethod
 	def IsScreenshotsHooked():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.IsScreenshotsHooked()
 		else:
 			return False
 	# Sets optional metadata about a screenshot's location.
 	@staticmethod
 	def SetLocation(screenshot, location):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.SetLocation(screenshot, location)
 		else:
 			return False
 	# Causes Steam overlay to take a screenshot.
 	@staticmethod
 	def TriggerScreenshot():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.TriggerScreenshot()
 		else:
 			return
@@ -816,28 +816,28 @@ class SteamUsers:
 	# Get user's Steam ID.
 	@staticmethod
 	def GetSteamID():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetSteamID()
 		else:
 			return 0
 	# Check, true/false, if user is logged into Steam currently.
 	@staticmethod
 	def LoggedOn():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.LoggedOn()
 		else:
 			return False
 	# Get the user's Steam level.
 	@staticmethod
 	def GetPlayerSteamLevel():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetPlayerSteamLevel()
 		else:
 			return 0
 	# Get the user's Steam installation path (this function is depreciated).
 	@staticmethod
 	def GetUserDataFolder():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetUserDataFolder()
 		else:
 			return ""
@@ -845,7 +845,7 @@ class SteamUsers:
 	# The user has can have two different badges for a series; the regular (max level 5) and the foil (max level 1).
 	@staticmethod
 	def GetGameBadgeLevel(series, foil):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetGameBadgeLevel(series, foil)
 		else:
 			return 0
@@ -962,119 +962,119 @@ class SteamUtils:
 	# Checks if the Overlay needs a present. Only required if using event driven render updates.
 	@staticmethod
 	def OverlayNeedsPresent():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.OverlayNeedsPresent()
 		else:
 			return False
 	# Get the Steam ID of the running application/game.
 	@staticmethod
 	def GetAppID():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetAppID()
 		else:
 			return 0
 	# Get the amount of battery power, clearly for laptops.
 	@staticmethod
 	def GetCurrentBatteryPower():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetCurrentBatteryPower()
 		else:
 			return 0
 	# Returns the number of IPC calls made since the last time this function was called.
 	@staticmethod
 	def GetIPCCallCount():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetIPCCallCount()
 		else:
 			return 0
 	# Get the user's country by IP.
 	@staticmethod
 	def GetIPCountry():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetIPCountry()
 		else:
 			return ""
 	# Return amount of time, in seconds, user has spent in this session.
 	@staticmethod
 	def GetSecondsSinceAppActive():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetSecondsSinceAppActive()
 		else:
 			return 0
 	# Returns the number of seconds since the user last moved the mouse.
 	@staticmethod
 	def GetSecondsSinceComputerActive():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetSecondsSinceComputerActive()
 		else:
 			return 0
 	# Get the actual time.
 	@staticmethod
 	def GetServerRealTime():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetServerRealTime()
 		else:
 			return 0
 	# Get the Steam user interface language.
 	@staticmethod
 	def GetSteamUILanguage():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.GetSteamUILanguage()
 		else:
 			return ""
 	# Returns true/false if Steam overlay is enabled.
 	@staticmethod
 	def IsOverlayEnabled():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.IsOverlayEnabled()
 		else:
 			return False
 	# Returns true if Steam & the Steam Overlay are running in Big Picture mode.
 	@staticmethod
 	def IsSteamInBigPictureMode():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.IsSteamInBigPictureMode()
 		else:
 			return False
 	# Is Steam running in VR?
 	@staticmethod
 	def IsVRHeadsetStreamingEnabled():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.IsVRHeadsetStreamingEnabled()
 		else:
 			return False
 	# Sets the inset of the overlay notification from the corner specified by SetOverlayNotificationPosition.
 	@staticmethod
 	def SetOverlayNotificationInset(horizontal, vertical):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.SetOverlayNotificationInset(horizontal, vertical)
 		else:
 			return
 	# Set the position where overlay shows notifications.
 	@staticmethod
 	def SetOverlayNotificationPosition(pos):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.SetOverlayNotificationPosition(pos)
 		else:
 			return
 	# Set whether the HMD content will be streamed via Steam In-Home Streaming.
 	@staticmethod
 	def SetVRHeadsetStreamingEnabled(enabled):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.SetVRHeadsetStreamingEnabled(enabled)
 		else:
 			return
 	# Activates the Big Picture text input dialog which only supports gamepad input.
 	@staticmethod
 	def ShowGamepadTextInput(inputMode, lineInputMode, description, maxText, presetText):
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.ShowGamepadTextInput()
 		else:
 			return False
 	# Ask SteamUI to create and render its OpenVR dashboard.
 	@staticmethod
 	def StartVRDashboard():
-		if Steam.IsSteamLoaded():
+		if Steam.isSteamLoaded():
 			return Steam.cdll.StartVRDashboard()
 		else:
 			return
