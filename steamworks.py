@@ -91,9 +91,14 @@ class Steam:
 			print("INFO: Steam is running")
 		else:
 			print("ERROR: Steam is not running")
-		# Boot up the Steam API 
-		if Steam.cdll.SteamInit() == 1:
+		# Boot up the Steam API
+		InitializeResult = Steam.cdll.SteamInit()
+		if InitializeResult == 1:
 			print("INFO: Steamworks initialized!")
+		else if InitializeResult == 2:
+			print("INFO: Steam not running!")
+		else if InitializeResult == 3:
+			print("INFO: Not logged on / no connection to Steam!")
 		else:
 			print("ERROR: Steamworks failed to initialize!")
 		#----------------------------------------
