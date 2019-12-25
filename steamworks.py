@@ -1107,6 +1107,18 @@ class SteamWorkshop:
 			("appId", c_uint32),
 			("publishedFileId", c_uint64)
 		]
+	# A class that describes Steam's RemoteStorageSubscribePublishedFileResult_t C struct
+	class RemoteStorageSubscribePublishedFileResult_t(Structure):
+		_fields_ = [
+			("result", c_int),
+			("publishedFileId", c_uint64)
+		]
+	# A class that describes Steam's RemoteStorageUnubscribePublishedFileResult_t C struct
+	class RemoteStorageUnubscribePublishedFileResult_t(Structure):
+		_fields_ = [
+			("result", c_int),
+			("publishedFileId", c_uint64)
+		]
 	# We want to keep callbacks in the class scope, so that they don't get
 	# garbage collected while we still need them.
 	ITEM_CREATED_CALLBACK_TYPE = CFUNCTYPE(None, CreateItemResult_t)
@@ -1117,6 +1129,12 @@ class SteamWorkshop:
 
 	ITEM_INSTALLED_CALLBACK_TYPE = CFUNCTYPE(None, ItemInstalled_t)
 	itemInstalledCallback = None
+
+	ITEM_SUBSCRIBED_CALLBACK_TYPE = CFUNCTYPE(None, RemoteStorageSubscribePublishedFileResult_t)
+	itemSubscribedCallback = None
+
+	ITEM_UNSUBSCRIBED_CALLBACK_TYPE = CFUNCTYPE(None, RemoteStorageUnubscribePublishedFileResult_t)
+	itemUnsubscribedCallback = None
 	#
 	@classmethod
 	def SetItemCreatedCallback(cls, callback):
@@ -1150,6 +1168,24 @@ class SteamWorkshop:
 		if Steam.isSteamLoaded():
 			itemInstalledCallback = None
 			Steam.cdll.Workshop_ClearItemInstalledCallback()
+	#
+	@classmethod
+	def SetItemSubscribedCallback(cls, callback):
+		if Steam.isSteamLoaded():
+			cls.itemSubscribedCallback = cls.ITEM_SUBSCRIBED_CALLBACK_TYPE(callback)
+
+			Steam.cdll.Workshop_SetItemSubscribedCallback(cls.itemSubscribedCallback)
+		else:
+			return False
+	#
+	@classmethod
+	def SetItemUnubscribedCallback(cls, callback):
+		if Steam.isSteamLoaded():
+			cls.itemUnubscribedCallback = cls.ITEM_UNSUBSCRIBED_CALLBACK_TYPE(callback)
+
+			Steam.cdll.Workshop_SetItemUnubscribedCallback(cls.itemUnubscribedCallback)
+		else:
+			return False
 	# Create a UGC (Workshop) item
 	#
 	# Arguments:
@@ -1167,6 +1203,38 @@ class SteamWorkshop:
 				SteamWorkshop.SetItemCreatedCallback(callback)
 
 			Steam.cdll.Workshop_CreateItem(appId, filetype)
+			return True
+		else:
+			return False
+	# Subscribe to a UGC (Workshop) item
+	#
+	# Arguments:
+	# publishedFileId -- The ID of the Workshop file you want to subscribe to
+	#
+	# callback -- The function to call once the item creation is finished.
+	@staticmethod
+	def SubscribeItem(publishedFileId, callback = None):
+		if Steam.isSteamLoaded():
+			if callback != None:
+				SteamWorkshop.SetItemSubscribedCallback(callback)
+
+			Steam.cdll.SubscribeItem(publishedFileId)
+			return True
+		else:
+			return False
+	# Unsubscribe from a UGC (Workshop) item
+	#
+	# Arguments:
+	# publishedFileId -- The ID of the Workshop file you want to unsubscribe from
+	#
+	# callback -- The function to call once the item creation is finished.
+	@staticmethod
+	def UnsubscribeItem(publishedFileId, callback = None):
+		if Steam.isSteamLoaded():
+			if callback != None:
+				SteamWorkshop.SetItemUnsubscribedCallback(callback)
+
+			Steam.cdll.UnsubscribeItem(publishedFileId)
 			return True
 		else:
 			return False
