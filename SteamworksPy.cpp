@@ -85,6 +85,8 @@ typedef void(*CreateItemResultCallback_t) (CreateItemResult_t);
 typedef void(*SubmitItemUpdateResultCallback_t) (SubmitItemUpdateResult_t);
 typedef void(*ItemInstalledCallback_t) (ItemInstalled_t);
 typedef void(*LeaderboardFindResultCallback_t) (LeaderboardFindResult_t);
+typedef void(*RemoteStorageSubscribeFileResultCallback_t) (RemoteStorageSubscribePublishedFileResult_t);
+typedef void(*RemoteStorageUnsubscribeFileResultCallback_t) (RemoteStorageUnsubscribePublishedFileResult_t);
 //-----------------------------------------------
 // Workshop Class
 //-----------------------------------------------
@@ -94,13 +96,19 @@ public:
 	CreateItemResultCallback_t _pyItemCreatedCallback;
 	SubmitItemUpdateResultCallback_t _pyItemUpdatedCallback;
 	ItemInstalledCallback_t _pyItemInstalledCallback;
+    RemoteStorageSubscribeFileResultCallback_t _pyItemSubscribedCallback;
+    RemoteStorageUnsubscribeFileResultCallback_t _pyItemUnubscribedCallback;
 
 	CCallResult<Workshop, CreateItemResult_t> _itemCreatedCallback;
 	CCallResult<Workshop, SubmitItemUpdateResult_t> _itemUpdatedCallback;
 
 	CCallback<Workshop, ItemInstalled_t> _itemInstalledCallback;
+    CCallResult<Workshop, RemoteStorageSubscribePublishedFileResult_t> _itemSubscribedCallback;
+    CCallResult<Workshop, RemoteStorageUnsubscribePublishedFileResult_t> _itemUnsubscribedCallback;
 
 	Workshop() : _itemInstalledCallback(this, &Workshop::OnItemInstalled) {}
+    Workshop() : _itemSubscribedCallback(this, &Workshop::OnItemSubscribed) {}
+    Workshop() : _itemUnsubscribedCallback(this, &Workshop::OnItemUnsubscribed) {}
 
 	void SetItemCreatedCallback(CreateItemResultCallback_t callback){
 		_pyItemCreatedCallback = callback;
@@ -114,15 +122,29 @@ public:
 	void ClearItemInstallCallback(){
 		_pyItemInstalledCallback = nullptr;
 	}
+    void SetItemSubscribedCallback(RemoteStorageSubscribeFileResultCallback_t callback){
+        _pyItemSubscribedCallback = callback;
+    }
+    void SetItemUnubscribedCallback(RemoteStorageUnsubscribeFileResultCallback_t callback){
+        _pyItemUnubscribedCallback = callback;
+    }
 	void CreateItem(AppId_t consumerAppId, EWorkshopFileType fileType){
 		//TODO: Check if fileType is a valid value?
 		SteamAPICall_t createItemCall = SteamUGC()->CreateItem(consumerAppId, fileType);
 		_itemCreatedCallback.Set(createItemCall, this, &Workshop::OnWorkshopItemCreated);
 	}
 	void SubmitItemUpdate(UGCUpdateHandle_t updateHandle, const char *pChangeNote){
-		SteamAPICall_t submitItemUpdateCall = SteamUGC()->SubmitItemUpdate(updateHandle, pChangeNote);
-		_itemUpdatedCallback.Set(submitItemUpdateCall, this, &Workshop::OnItemUpdateSubmitted);
-	}
+        SteamAPICall_t submitItemUpdateCall = SteamUGC()->SubmitItemUpdate(updateHandle, pChangeNote);
+        _itemUpdatedCallback.Set(submitItemUpdateCall, this, &Workshop::OnItemUpdateSubmitted);
+    }
+    void SubscribeItem(PublishedFileId_t publishedFileID){
+        SteamAPICall_t subscribeItemCall = SteamUGC()->SubscribeItem(publishedFileID);
+        _itemSubscribedCallback.Set(subscribeItemCall, this, &Workshop::OnItemSubscribed);
+    }
+    void UnubscribeItem(PublishedFileId_t publishedFileID){
+        SteamAPICall_t unubscribeItemCall = SteamUGC()->UnubscribeItem(publishedFileID);
+        _itemUnubscribedCallback.Set(unubscribeItemCall, this, &Workshop::OnItemUnubscribed);
+    }
 private:
 	void OnWorkshopItemCreated(CreateItemResult_t* createItemResult, bool bIOFailure){
 		if(_pyItemCreatedCallback != nullptr){
@@ -139,6 +161,16 @@ private:
 			_pyItemInstalledCallback(*itemInstalledResult);
 		}
 	}
+    void OnItemSubscribed(RemoteStorageSubscribePublishedFileResult_t* itemSubscribedResult){
+        if(_pyItemSubscribedCallback != nullptr){
+            _pyItemSubscribedCallback(*itemSubscribedResult);
+        }
+    }
+    void OnItemUnubscribed(RemoteStorageUnsubscribeFileResultCallback_t* itemUnubscribedResult){
+        if(_pyItemUnubscribedCallback != nullptr){
+            _pyItemUnubscribedCallback(*itemUnubscribedResult);
+        }
+    }
 };
 static Workshop workshop;
 //-----------------------------------------------
@@ -1203,6 +1235,13 @@ SW_PY bool Workshop_GetItemDownloadInfo(PublishedFileId_t publishedFileID, uint6
 	}
 	return SteamUGC()->GetItemDownloadInfo(publishedFileID, punBytesDownloaded, punBytesTotal);
 }
+SW_PY void Workshop_SuspendDownloads(bool bSuspend){
+    if(SteamUGC() == NULL){
+        return false;
+    }
+    SteamUGC()->SuspendDownloads(bSuspend);
+}
+
 //-----------------------------------------------
 // Steam Leaderboard
 //-----------------------------------------------
