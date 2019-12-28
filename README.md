@@ -9,18 +9,11 @@ Full documentation is now available here: https://gramps.github.io/SteamworksPy/
 
 For a fuller (yet outdated) tutorial, with images, on SteamworksPy please read our post: http://coaguco.tumblr.com/post/128240756897/steamworks-for-python-tutorial-linux.
 
-There is now an experimental branch for converting the project to match my [Godot Engine module](https://github.com/Gramps/GodotSteam) in functionality and fix some problems with the original.  Once completed, it will move to the master branch.
+# Latest Updates - Version 2.0
+- Changed: wrapper reworked as a module; huge thanks to philippj for starting it
 
-# Latest Updates - Version 1.6.1
-- Added: all Apps functions from Experimental branch
-- Added: all Screenshot functions from Experimental branch
-- Added: all User functions from Experimental branch
-- Added: all Controller functions from Experimental branch
-- Changed: steamInit to give correct feedback, now returns INT instead of BOOL
-	- Note: if you used version 1.5 or lower, you need to update how your steamInit() works in your project or it may crash
-- Changed: some commenting formats
-- Removed: HasOtherApp() which is now IsSubscribedApp()
-
+# Looking for the previous incarnation?
+The wrapper has been reworked as a Python module.  You can find the older version in the **Legacy branch**.
 
 # Some Notes
 While I am still tinkering away with this, here are some things to note:
