@@ -1,4 +1,7 @@
-# Version 1.6.1
+# 2.0.0
+- Reworked into python module, legacy source is located in the github legacy branch
+
+# 1.6.1
 - Added: all Apps functions from Experimental branch
 - Added: all Screenshot functions from Experimental branch
 - Added: all User functions from Experimental branch
