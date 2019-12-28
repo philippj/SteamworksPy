@@ -9,27 +9,21 @@ Full documentation is now available here: https://gramps.github.io/SteamworksPy/
 
 For a fuller (yet outdated) tutorial, with images, on SteamworksPy please read our post: http://coaguco.tumblr.com/post/128240756897/steamworks-for-python-tutorial-linux.
 
-# Latest Updates - Version 2.0
-- Changed: wrapper reworked as a module; huge thanks to philippj for starting it
+There is now an experimental branch for converting the project to match my [Godot Engine module](https://github.com/Gramps/GodotSteam) in functionality and fix some problems with the original.  Once completed, it will move to the master branch.
 
-# Looking for the previous incarnation?
-The wrapper has been reworked as a Python module.  You can find the older version in the **Legacy branch**.
+# Requirements
+Following files are required to be located in your project working directory:
+- steam_appid.txt - Stating your games app id or any other valid app id given the account owns a license
+- steam_api library (.dll, .so, .darwin) and the corresponding steam_api.lib
+- SteamworksPy library (.dll, .so, .darwin)
+
+The library will only function if the Steam client is running and logged in. Otherwise you will encounter exceptions.
 
 # Some Notes
 While I am still tinkering away with this, here are some things to note:
 
-- You will need the Steamworks SDK
-- You will most likely need a Steamworks account, with a valid AppID, to use more advanced functions (set achievements, set stats, etc.)
-- You will need to be logged into Steam for anything to function, obviously.  As it assumes the game is run from Steam itself and is online.
+- You will need a Steamworks account, with a valid AppID, to use more advanced functions (set achievements, set stats, etc.)
 - Steam Overlay will only work if your game is using OpenGL or D3D!  Overlay will only work if the game is actually launched from Steam itself.  Possible if the SteamRestart command is fired; however, this is not implemented yet in SteamworksPy.
 
-# To Do
-- Add in more features from the Steamworks SDK
-
-From here you should be able to call various functions of the steamworks.py.  A (mostly complete) list of available functions is listed below; take a closer look at the steamworks.py for a better understanding.  In addition, you should be able to read the Steamworks API documentation to see what all is available and cross-reference with the steamworks.py!
-
-# Further Usage
-I recommend trying the included tests to get an idea of how it works. Opening the test files will give you some insight on how to use it in your game, as well as looking through the Steamworks.py file itself.  Also, don't hesitate to contact me for help or with questions. Or comment / open issue on GitHub.
-
-# More To Come
-I am still digging through the code and trying to get more functions working.  Some things like controller might not be necessary as Python can usually handle these; though they may have more to do with the new Steam Controller.
+# Usage
+Please check the examples in the "examples" directory for a basic understanding of the module. For further reference you can go through the interface implementations itself or use the official Steamworks documentation (https://partner.steamgames.com/doc/api)
