@@ -9,10 +9,13 @@ jobs:
     - choco install visualstudio2017-workload-vctools -y
     - cd library
     - ./build/kit/build_windows.bat
+    before_deploy:
+    - echo "Working directory: %CD%"
     deploy:
       provider: releases
       token: $GITHUB_TOKEN
       file:
       - SteamworksPy64.dll
       cleanup: false
+      skip_cleanup: false
       draft: true
