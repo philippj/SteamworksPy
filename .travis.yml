@@ -1,0 +1,18 @@
+language: cpp
+os: linux
+jobs:
+  include:
+  - name: Windows build 64bit
+    os: windows
+    language: cpp
+    script:
+    - choco install visualstudio2017-workload-vctools -y
+    - cd library
+    - ./build/kit/build_windows.bat
+    deploy:
+      provider: releases
+      token: $GITHUB_TOKEN
+      file:
+      - SteamworksPy64.dll
+      cleanup: false
+      draft: true

@@ -1,6 +1,12 @@
 from ctypes import *
 
 STEAMWORKS_METHODS = {
+    'SteamShutdown': {
+        'restype': None
+    },
+    'RestartAppIfNecessary': {
+        'restype': bool
+    },
     'IsSteamRunning': {
         'restype': c_bool
     },
@@ -13,7 +19,7 @@ STEAMWORKS_METHODS = {
     'IsCybercafe': {
         'restype': bool
     },
-    'IsAppInstalled': {
+    'IsVACBanned': {
         'restype': bool
     },
     'GetCurrentGameLanguage': {
@@ -362,4 +368,16 @@ STEAMWORKS_METHODS = {
         'restype': bool,
         'argtypes': [c_uint64, POINTER(c_uint64), POINTER(c_uint64)]
     },
+    'Workshop_SuspendDownloads': {
+        'restype': None,
+        'argtypes': [bool]
+    },
+    'Workshop_SubscribeItem': {
+        'restype': None,
+        'argtypes': [c_uint64]
+    },
+    'Workshop_UnsubscribeItem': {
+        'restype': None,
+        'argtypes': [c_uint64]
+    }
 }

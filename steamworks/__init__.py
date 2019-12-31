@@ -113,9 +113,17 @@ class STEAMWORKS(object):
 
             setattr(self, method_name, f)
 
-        self.Apps       = SteamApps(self)
-        self.Friends    = SteamFriends(self)
-        self.Matchmaking = SteamMatchmaking(self)
+        self._reload_steamworks_interfaces()
+
+
+    def _reload_steamworks_interfaces(self) -> None:
+        """Reload all interface classes
+
+        :return: None
+        """
+        self.Apps           = SteamApps(self)
+        self.Friends        = SteamFriends(self)
+        self.Matchmaking    = SteamMatchmaking(self)
         self.Music          = SteamMusic(self)
         self.Screenshots    = SteamScreenshots(self)
         self.Users          = SteamUsers(self)
@@ -147,6 +155,23 @@ class STEAMWORKS(object):
             raise GenericSteamException('Failed to initialize STEAMWORKS API')
 
         return True
+
+    def relaunch(self, app_id: int) -> bool:
+        """
+
+        :param app_id: int
+        :return: None
+        """
+        return self._cdll.RestartAppIfNecessary()
+
+    def unload(self) -> None:
+        """Shuts down the Steamworks API, releases pointers and frees memory.
+
+        :return: None
+        """
+        self._cdll.SteamShutdown()
+        self._loaded    = False
+        self._cdll      = None
 
 
     def loaded(self) -> bool:

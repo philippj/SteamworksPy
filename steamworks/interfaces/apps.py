@@ -140,7 +140,7 @@ class SteamApps(object):
         :param app_id: int
         :return: str install location
         """
-        return self.steam.GetAppInstallDir(app_id)
+        return self.steam.GetAppInstallDir(app_id).decode()
 
 
     def IsAppInstalled(self, app_id: int) -> bool:
