@@ -1,1 +1,7 @@
 *.pyc
+*.dll
+*.so
+*.dylib
+!redist/windows/*.dll
+!redist/osx/*.dylib
+!redist/linux/*.so

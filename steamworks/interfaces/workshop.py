@@ -276,7 +276,7 @@ class SteamWorkshop(object):
         # TODO: We might need to add an exception check here to catch any errors while
         # writing to the 'pvecPublishedFileIds' array.
         actual_item_count = Steam.cdll.Workshop_GetSubscribedItems(published_files, max_items)
-        # According to steam's example, it is possible for numItems to be greater than maxEntries so we crop.
+        # According to sdk's example, it is possible for numItems to be greater than maxEntries so we crop.
         if actual_item_count > max_items:
             published_files = published_files[:max_items]
 

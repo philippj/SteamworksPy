@@ -161,7 +161,7 @@ class SteamApps(object):
 
 
     def GetLaunchQueryParam(self, key: str) -> str:
-        """Gets the associated launch parameter if the game is run via steam://run/<appid>/?param1=value1;param2=value2;param3=value3 etc
+        """Gets the associated launch parameter if the game is run via sdk://run/<appid>/?param1=value1;param2=value2;param3=value3 etc
 
         :param key: str
         :return: str

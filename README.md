@@ -1,4 +1,4 @@
-# SteamworksPy ![alt text](https://api.travis-ci.org/Gramps/SteamworksPy.svg?branch=master)
+# SteamworksPy
 Howdy!  This project originally started as a fork of Easimer's SteamworksForPython in an attempt to bring a fully-functional Python module for Steam out for the public.  Since then it has grown beyond that and added a lot of functionality.
 
 Feel free to fork or contribute to this module.

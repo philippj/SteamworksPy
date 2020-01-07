@@ -6,14 +6,14 @@
 //
 // Include the Steamworks API header
 #if defined( _WIN32 )
-#include "steam\steam_api.h"
+#include "sdk\steam_api.h"
 #define SW_PY extern "C" __declspec(dllexport)
 #elif defined( __APPLE__ )
-#include "steam/steam_api.h"
+#include "sdk/steam_api.h"
 #include "TargetConditionals.h"
 #define SW_PY extern "C" __attribute__ ((visibility("default")))
 #elif defined( __linux__ )
-#include "steam/steam_api.h"
+#include "sdk/steam_api.h"
 #define SW_PY extern "C" __attribute__ ((visibility("default")))
 #else
 #error "Unsupported platform"
@@ -425,7 +425,7 @@ GetAppOwner() {
     return cSteamID.ConvertToUint64();
 }
 
-// Gets the associated launch parameter if the game is run via steam://run/<appid>/?param1=value1;param2=value2;param3=value3 etc.
+// Gets the associated launch parameter if the game is run via sdk://run/<appid>/?param1=value1;param2=value2;param3=value3 etc.
 SW_PY const char *GetLaunchQueryParam(const char *key) {
     if (SteamApps() == NULL) {
         return "";
