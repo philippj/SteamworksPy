@@ -29,7 +29,7 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3.7',
     ],
-    keywords = 'steamworks steam valve steamapi api',
+    keywords = 'steamworks sdk valve steamapi api',
     packages = ['steamworks'] + ['steamworks.' + package for package in find_packages(where = 'steamworks')],
     install_requires = [],
     extras_require = {},

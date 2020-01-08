@@ -34,7 +34,7 @@ class SteamWorkshop(object):
         :return: bool
         """
         self._CreateItemResult = SteamWorkshop._CreateItemResult_t(callback)
-        self.steam.Workshop_SetItemCreatedCallback(self._CreateItemResult)
+        self.steam._cdll.Workshop_SetItemCreatedCallback(self._CreateItemResult)
         return True
 
 
@@ -45,7 +45,7 @@ class SteamWorkshop(object):
         :return: bool
         """
         self._SubmitItemUpdateResult = self._SubmitItemUpdateResult_t(callback)
-        self.steam.Workshop_SetItemUpdatedCallback(self._SubmitItemUpdateResult)
+        self.steam._cdll.Workshop_SetItemUpdatedCallback(self._SubmitItemUpdateResult)
         return True
 
 
@@ -56,7 +56,7 @@ class SteamWorkshop(object):
         :return: bool
         """
         self._ItemInstalled = self._ItemInstalled_t(callback)
-        self.steam.Workshop_SetItemInstalledCallback(self._ItemInstalled)
+        self.steam._cdll.Workshop_SetItemInstalledCallback(self._ItemInstalled)
         return True
 
 
@@ -66,7 +66,7 @@ class SteamWorkshop(object):
         :return: None
         """
         self._ItemInstalled = None
-        self.steam.Workshop_ClearItemInstalledCallback()
+        self.steam._cdll.Workshop_ClearItemInstalledCallback()
 
 
     def SetItemSubscribedCallback(self, callback: object) -> bool:
@@ -76,7 +76,7 @@ class SteamWorkshop(object):
         :return: bool
         """
         self._RemoteStorageSubscribePublishedFileResult = self._RemoteStorageSubscribePublishedFileResult_t(callback)
-        self.steam.Workshop_SetItemSubscribedCallback(self._RemoteStorageSubscribePublishedFileResult)
+        self.steam._cdll.Workshop_SetItemSubscribedCallback(self._RemoteStorageSubscribePublishedFileResult)
         return True
 
 
@@ -87,7 +87,7 @@ class SteamWorkshop(object):
         :return: bool
         """
         self._RemoteStorageUnubscribePublishedFileResult = self._RemoteStorageUnubscribePublishedFileResult_t(callback)
-        self.steam.Workshop_SetItemUnubscribedCallback(self._RemoteStorageUnubscribePublishedFileResult)
+        self.steam._cdll.Workshop_SetItemUnubscribedCallback(self._RemoteStorageUnubscribePublishedFileResult)
         return True
 
 
@@ -249,6 +249,15 @@ class SteamWorkshop(object):
         return self.steam.Workshop_GetNumSubscribedItems()
 
 
+    def SuspendDownloads(self, paused: bool = True) -> None:
+        """Suspend active workshop downloads
+
+        :param paused: bool
+        :return: None
+        """
+        return self.steam.Workshop_SuspendDownloads(paused)
+
+
     def GetSubscribedItems(self, max_items: int = 0) -> list:
         """Get a list of published file IDs that the user is subscribed to
 
@@ -267,7 +276,7 @@ class SteamWorkshop(object):
         # TODO: We might need to add an exception check here to catch any errors while
         # writing to the 'pvecPublishedFileIds' array.
         actual_item_count = Steam.cdll.Workshop_GetSubscribedItems(published_files, max_items)
-        # According to steam's example, it is possible for numItems to be greater than maxEntries so we crop.
+        # According to sdk's example, it is possible for numItems to be greater than maxEntries so we crop.
         if actual_item_count > max_items:
             published_files = published_files[:max_items]
 
