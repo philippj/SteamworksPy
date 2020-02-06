@@ -370,7 +370,7 @@ STEAMWORKS_METHODS = {
     },
     'Workshop_SuspendDownloads': {
         'restype': None,
-        'argtypes': [bool]
+        'argtypes': [c_bool]
     },
     'Workshop_SubscribeItem': {
         'restype': None,
