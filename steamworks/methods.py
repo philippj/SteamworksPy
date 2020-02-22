@@ -230,6 +230,12 @@ STEAMWORKS_METHODS = {
     'GetAchievement': {
         'restype': bool
     },
+    'GetNumAchievements': {
+        'restype': int
+    },
+    'GetAchievementName': {
+        'restype': c_char_p
+    },
     'GetStatInt': {
         'restype': int
     },

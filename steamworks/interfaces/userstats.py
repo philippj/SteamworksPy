@@ -26,6 +26,23 @@ class SteamUserStats(object):
         return self.steam.GetAchievement(name)
 
 
+    def GetNumAchievements(self) -> int:
+        """Return number of achievements
+
+        :return: int
+        """
+        return self.steam.GetNumAchievements()
+
+
+    def GetAchievementName(self, index: int) -> str:
+        """Return the name of the achievement by index
+
+        :param index: int
+        :return: str
+        """
+        return self.steam.GetAchievementName(index)
+
+
     def GetStatFloat(self, name: str) -> float:
         """Get the value of a float statistic
 
