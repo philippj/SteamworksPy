@@ -236,6 +236,9 @@ STEAMWORKS_METHODS = {
     'GetAchievementName': {
         'restype': c_char_p
     },
+    'GetAchievementDisplayAttribute': {
+        'restype': c_char_p
+    },
     'GetStatInt': {
         'restype': int
     },

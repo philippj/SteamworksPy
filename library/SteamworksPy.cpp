@@ -989,6 +989,10 @@ SW_PY const char *GetAchievementName(int index){
     return SteamUserStats()->GetAchievementName(index);
 }
 
+SW_PY const char *GetAchievementDisplayAttribute(const char *name, const char *key) {
+    return SteamUserStats()->GetAchievementDisplayAttribute(name, key);
+}
+
 SW_PY float GetStatFloat(const char *name) {
     if (SteamUser() == NULL) {
         return 0;

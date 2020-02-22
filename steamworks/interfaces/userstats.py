@@ -27,7 +27,7 @@ class SteamUserStats(object):
 
 
     def GetNumAchievements(self) -> int:
-        """Return number of achievements
+        """Get the number of achievements defined in the App Admin panel of the Steamworks website.
 
         :return: int
         """
@@ -35,12 +35,22 @@ class SteamUserStats(object):
 
 
     def GetAchievementName(self, index: int) -> str:
-        """Return the name of the achievement by index
+        """Gets the 'API name' for an achievement index between 0 and GetNumAchievements.
 
         :param index: int
         :return: str
         """
         return self.steam.GetAchievementName(index)
+
+
+    def GetAchievementDisplayAttribute(self, name: str, key: str) -> str:
+        """Get general attributes for an achievement. Currently provides: Name, Description, and Hidden status.
+
+        :param name: str
+        :param key: str
+        :return: str
+        """
+        return self.steam.GetAchievementDisplayAttribute(name, key)
 
 
     def GetStatFloat(self, name: str) -> float:
