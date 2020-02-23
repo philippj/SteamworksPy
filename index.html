@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title>SteamworksPy - A Python Wrapper For Steamworks</title>
+		<title>SteamworksPy - A Python module For Steamworks</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="css/main.css" />
@@ -14,7 +14,7 @@
 			<section class="wrapper style1 align-center">
 				<div class="inner">
 					<h1>SteamworksPy</h1>
-					<p>This is the documentation page for SteamworksPy, a Python wrapper for Steamworks. <a href="https://github.com/Gramps/SteamworksPy" target="_blank">You can find the GitHub repository here.</a> Additionally, you can acquire the <a href="https://github.com/Gramps/SteamworksForPython/releases" target="_blank">pre-built versions of the Linux SO files and Windows DLL files here.</a></p>
+					<p>This is the documentation page for SteamworksPy, a Python module for Steamworks. <a href="https://github.com/Gramps/SteamworksPy" target="_blank">You can find the GitHub repository here.</a> Additionally, you can acquire the <a href="https://github.com/Gramps/SteamworksForPython/releases" target="_blank">pre-built versions of the Linux SO files and Windows DLL files here.</a></p>
 					<div class="index align-left">
 					<!-- Starting -->
 					<section>
@@ -22,12 +22,14 @@
 							<h3>Starting Out</h3>
 						</header>
 						<div class="content">
-							<p>You will need the following things to begin working with the wrapper:</p>
+							<p>You will need the following things to begin working with the module:</p>
 							<ul>
 								<li><a href="https://partner.steamgames.com" target="_blank">The Steamworks SDK</a></li>
 								<li>A Steamworks account</li>
 								<li>A valid AppID for more advanced functions (set achievements, set stats, etc.)</li>
-								<li>Alternatively you can use the SpaceWars AppID of 480 for testing the basics</li>
+								<ul>
+									<li>Alternatively you can use the SpaceWars AppID of 480 for testing the basics</li>
+								</ul>
 							</ul>
 							<p>Once you have those basics, you'll probably need these too:</p>
 							<ul>
@@ -55,7 +57,7 @@
 							<pre><code>
 g++ -std=c++11 -o SteamworksPy.so -shared -fPIC SteamworksPy.cpp -l steam_api -L.
 							</code></pre>
-							<p>This should result in the SteamworksPy.so file you need to use with the wrapper.</p>
+							<p>This should result in the SteamworksPy.so file you need to use with the module.</p>
 							<hr/>
 							<h3>Windows</h3>
 							<p>Look in either the base of the /sdk/redistributable_bin or the win64 folder, depending on your installation, and copy the steam_api.dll and steam_api.lib or the steam_api64.dll and steam_api64.lib files to your project folder.</p>
@@ -108,14 +110,18 @@ cl /D_USRDLL /D_WINDLL SteamworksPy.cpp steam_api.lib /link /DLL /OUT:Steamworks
 						</header>
 						<div class="content">
 							<p>Copy the <strong>steamworks.py</strong> file and the newly compiled <strong>SteamworksPy.dll or SteamworksPy.so or SteamworksPy.dylib</strong> file to your project folder. You may also have to copy the libsteam_api.so, steam_api.so, or libsteam_api.dylib file as well.</p>
+							<p>You will also need to copy the Steamworks module folder from the repo into your project. This contains the full Python module for Steamworks.</p>
 							<p>Add the following code to your main file or whatever file you plan on calling Steam from:</p>
 							<pre><code>
-from steamworks import *
+from steamworks import STEAMWORKS
 
-#Initialize Steam
-Steam.Init()
+# Declare the steamworks variable and create a new instance of the Steamworks class
+steamworks = STEAMWORKS()
+
+# Initialize Steam
+steamworks.initialize()
 							</code></pre>
-							<p>This will import the steamworks.py file and initialize the Steamworks API. At this point you can start adding in additional functions as you need them.</p>
+							<p>At this point you can start adding in additional functions as you need them.</p>
 						</div>
 					</section>
 					<!-- Closing -->
@@ -124,7 +130,7 @@ Steam.Init()
 							<h3>In Closing</h3>
 						</header>
 						<div class="content">
-							<p>And those are the basics to using the SteamworksPy wrapper. A list of available functions, their responses, and what they do will be available in the repository's wiki page soon. In addition, you should be able to read the Steamworks API documentation to see what all is available and cross-reference with the steamworks.py!
+							<p>And those are the basics to using the SteamworksPy module. A list of available functions, their responses, and what they do will be available in the repository's wiki page soon. In addition, you should be able to read the Steamworks API documentation to see what all is available and cross-reference with the steamworks.py!
 						</div>
 					</section>
 				</div>
