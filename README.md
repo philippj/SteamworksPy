@@ -5,13 +5,17 @@ Feel free to fork or contribute to this module.
 
 Pre-builds for Windows and Linux here: https://github.com/Gramps/SteamworksPy/releases
 
-Full documentation is now available here: https://gramps.github.io/SteamworksPy/
+Full documentation on getting started is now available here: https://gramps.github.io/SteamworksPy/
 
-For a fuller (yet outdated) tutorial, with images, on SteamworksPy please read our post: http://coaguco.tumblr.com/post/128240756897/steamworks-for-python-tutorial-linux.
+## What's New
+Updates since February 1st, 2020
+- Added: GetNumAchievements, GetAchievementName, GetAChievementDisplayAttribute by **aveao**
+- Added: missing file for packaging by **tpchanho**
+- Changed: organized Apps and Friends functions alphabetically to make editing easier
+- Changed: ClearGameInfo to actual Steamworks function ClearRichPresence
+- Fixed: argtypes for Workshop_SuspendDownloads by **tpchanho**
 
-There is now an experimental branch for converting the project to match my [Godot Engine module](https://github.com/Gramps/GodotSteam) in functionality and fix some problems with the original.  Once completed, it will move to the master branch.
-
-# Requirements
+## Requirements
 Following files are required to be located in your project working directory:
 - steam_appid.txt - Stating your games app id or any other valid app id given the account owns a license
 - steam_api library (.dll, .so, .darwin) and the corresponding steam_api.lib
@@ -19,11 +23,12 @@ Following files are required to be located in your project working directory:
 
 The library will only function if the Steam client is running and logged in. Otherwise you will encounter exceptions.
 
-# Some Notes
+## Some Notes
 While I am still tinkering away with this, here are some things to note:
 
 - You will need a Steamworks account, with a valid AppID, to use more advanced functions (set achievements, set stats, etc.)
 - Steam Overlay will only work if your game is using OpenGL or D3D!  Overlay will only work if the game is actually launched from Steam itself.  Possible if the SteamRestart command is fired; however, this is not implemented yet in SteamworksPy.
+- Do not install Python from the Microsoft App Store. Make sure to [download and install it from Python's main site.](https://www.python.org/)
 
-# Usage
+## Usage
 Please check the examples in the "examples" directory for a basic understanding of the module. For further reference you can go through the interface implementations itself or use the official Steamworks documentation (https://partner.steamgames.com/doc/api)
