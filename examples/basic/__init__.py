@@ -2,6 +2,12 @@
 Basic example on how to instance a STEAMWORKS API object and execute a basic call
 """
 
+import os
+import sys
+
+if sys.version_info >= (3, 8):
+  os.add_dll_directory(os.getcwd()) # Required since Python 3.8
+
 from steamworks import STEAMWORKS # Import main STEAMWORKS class
 
 """
