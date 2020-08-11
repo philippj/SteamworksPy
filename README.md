@@ -3,9 +3,9 @@ Howdy!  This project originally started as a fork of Easimer's SteamworksForPyth
 
 Feel free to fork or contribute to this module.
 
-Pre-builds for Windows and Linux here: https://github.com/Gramps/SteamworksPy/releases
+Pre-builds for Windows and Linux here: https://github.com/philippj/SteamworksPy/releases
 
-Full documentation on getting started is now available here: https://gramps.github.io/SteamworksPy/
+Full documentation on getting started is now available here: https://philippj.github.io/SteamworksPy/
 
 ## What's New
 Updates since February 1st, 2020
