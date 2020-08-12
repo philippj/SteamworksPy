@@ -47,3 +47,12 @@ class SteamUsers(object):
         :return: int
         """
         return self.steam.GetGameBadgeLevel(series, foil)
+		
+    def GetAuthSessionTicket(self) -> str:
+		"""Retrieves an authentication ticket. Immediately usable in AuthenticateUserTicket.
+		
+		:return: str
+		"""
+        buffer = create_string_buffer(1024)
+        length = self.steam.GetAuthSessionTicket(buffer)
+        return buffer[0:length].hex().upper()

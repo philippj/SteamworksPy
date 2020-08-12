@@ -958,6 +958,16 @@ SW_PY int GetGameBadgeLevel(int series, bool foil) {
     return SteamUser()->GetGameBadgeLevel(series, foil);
 }
 
+// Returns the info needed to obtain a Session Ticket.
+SW_PY int GetAuthSessionTicket(char* buffer) {
+    if (SteamUser() == NULL) {
+        return 0;
+    }
+    uint32 size{};
+    SteamUser()->GetAuthSessionTicket(buffer, 1024, &size);
+    return size;
+}
+
 /////////////////////////////////////////////////
 ///// USER STATS ////////////////////////////////
 /////////////////////////////////////////////////

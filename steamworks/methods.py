@@ -227,6 +227,10 @@ STEAMWORKS_METHODS = {
     'GetGameBadgeLevel': {
         'restype': int
     },
+    'GetAuthSessionTicket': {
+        'restype': c_int,
+        'argtypes': [c_char_p]
+    },
     'GetAchievement': {
         'restype': bool
     },
