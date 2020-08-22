@@ -45,7 +45,7 @@ echo [*] Copying Steamworks redist bins to build root
 copy ".\library\sdk\redist\*" ".\%dirname%\"
 
 echo [*] Linking SteamworksSDK into build root
-mklink /J ".\%dirname%\sdk" ".\library\sdk\steam"
+mklink /J ".\%dirname%\sdk" ".\library\sdk\"
 
 cd %dirname%
 
