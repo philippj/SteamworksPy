@@ -190,7 +190,7 @@ class STEAMWORKS(object):
         if not self.loaded():
             raise SteamNotLoadedException('STEAMWORKS not yet loaded')
 
-        self.RunCallbacks()
+        self._cdll.RunCallbacks()
         return True
 
     def run_forever(self, base_interval: float = 1.0) -> None:
