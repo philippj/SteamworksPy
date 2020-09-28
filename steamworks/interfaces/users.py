@@ -49,7 +49,7 @@ class SteamUsers(object):
         return self.steam.GetGameBadgeLevel(series, foil)
 		
     def GetAuthSessionTicket(self) -> str:
-		"""Retrieves an authentication ticket. Immediately usable in AuthenticateUserTicket.
+        """Retrieves an authentication ticket. Immediately usable in AuthenticateUserTicket.
 		
 		:return: str
 		"""

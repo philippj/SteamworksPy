@@ -20,7 +20,7 @@ class SteamFriends(object):
         :param flag: FriendFlags
         :return: int
         """
-        return self.steam.GetFriendCount(flag)
+        return self.steam.GetFriendCount(flag.value)
 
     #
     def GetFriendByIndex(self, friend_index: int, flag: bytes = FriendFlags.ALL) -> int:
@@ -30,7 +30,7 @@ class SteamFriends(object):
         :param flag: FriendFlags
         :return: int steam64
         """
-        return self.steam.GetFriendByIndex(friend_index, flag)
+        return self.steam.GetFriendByIndex(friend_index, flag.value)
 
 
     def GetPlayerName(self) -> str:
