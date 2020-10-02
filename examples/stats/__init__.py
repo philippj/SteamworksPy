@@ -1,5 +1,5 @@
 """
-Basic example on how to instance a STEAMWORKS API object and execute a basic call
+Basic example on how to request stat values from Steamworks. 
 """
 
 import os
@@ -10,6 +10,9 @@ if sys.version_info >= (3, 8):
 
 from steamworks import STEAMWORKS # Import main STEAMWORKS class
 
+"""
+Initialise Steamworks as shown in the basic example. We'll assume your game is Spacewar. 
+"""
 
 steamworks = STEAMWORKS()
 
