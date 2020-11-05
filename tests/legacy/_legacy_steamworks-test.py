@@ -15,6 +15,11 @@ Steam.Init()
 #------------------------------------------------
 # Test Steam Apps functions
 def appsTest():
+    """
+    List all available apps
+
+    Args:
+    """
 	print("\n#------------------------------------------------\nINFO: Running apps test.....\n")
 	print("Has Other App/Game (using Spacewars): %s") % (SteamApps.HasOtherApp(480))
 	print("DLC Count: %s") % (SteamApps.GetDlcCount())
@@ -24,6 +29,11 @@ def appsTest():
 #------------------------------------------------
 # Test Steam Friends functions
 def friendsTest():
+    """
+    List all friends
+
+    Args:
+    """
 	print("\n#------------------------------------------------\nINFO: Running friends test.....\n")
 	print("Friend Count: %s") % (SteamFriends.GetFriendCount())
 	print("Player Name: %s") % (SteamFriends.GetPlayerName())
@@ -33,6 +43,11 @@ def friendsTest():
 #------------------------------------------------
 # Test Steam Music functions
 def musicTest():
+    """
+    This function will show
+
+    Args:
+    """
 	print("\n#------------------------------------------------\nINFO: Running music test.....\n")
 	print("Music Enabled?: "+str(SteamMusic.MusicIsEnabled()))
 	print("Music Playing?: "+str(SteamMusic.MusicIsPlaying()))
@@ -56,6 +71,11 @@ def musicTest():
 #------------------------------------------------
 # Test Steam Users functions
 def userTest():
+    """
+    List all users
+
+    Args:
+    """
 	print("\n#------------------------------------------------\nINFO: Running user test.....\n")
 	print("Steam ID: %s") % (SteamUser.GetPlayerID())
 	print("Steam Level: %s") % (SteamUser.GetPlayerSteamLevel())
@@ -64,12 +84,22 @@ def userTest():
 #------------------------------------------------
 # Test Steam User Stats functions
 def statsTest():
+    """
+    Print stats
+
+    Args:
+    """
 	print("\n#------------------------------------------------\nINFO: Running stats test.....\n")
 	print("This test only works in a game with statistics and achievements enabled. Sorry!")
 	raw_input("INFO: Stats test done. Press any key to continue.\n")
 #------------------------------------------------
 # Test Steam Utilities functions
 def utilitiesTest():
+    """
+    This function islay.
+
+    Args:
+    """
 	print("\n#------------------------------------------------\nINFO: Running utilities test.....\n")
 	print("Computer Battery Power: "+str(SteamUtilities.GetCurrentBatteryPower()))
 	print("User Country: "+str(SteamUtilities.GetIPCountry()))
