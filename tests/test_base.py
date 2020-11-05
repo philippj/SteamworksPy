@@ -19,10 +19,22 @@ if not _steam_running:
 
 class TestCaseSTEAMWORKS(unittest.TestCase):
     def setUp(self):
+        """
+        Sets the steam steam.
+
+        Args:
+            self: (todo): write your description
+        """
         self.steam = STEAMWORKS()
         self.steam.initialize()
 
     def test_populated(self):
+        """
+        Populate the steam steam.
+
+        Args:
+            self: (todo): write your description
+        """
         for interface in ['Apps', 'Friends', 'Matchmaking', 'Music', 'Screenshots', 'Users', 'UserStats', 'Utils', \
                           'Workshop']:
             self.assertTrue((hasattr(self.steam, interface) and getattr(self.steam, interface) is not None))

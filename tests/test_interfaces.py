@@ -19,11 +19,29 @@ if not _steam_running:
 
 class TestCaseInterfaces(unittest.TestCase):
     def setUp(self):
+        """
+        Sets the steam steam.
+
+        Args:
+            self: (todo): write your description
+        """
         self.steam = STEAMWORKS()
         self.steam.initialize()
 
     def test_app_id(self):
+        """
+        Test if app id is valid.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(self.steam.Utils.GetAppID(), 480)
 
     def test_app_owner(self):
+        """
+        Test if app owner.
+
+        Args:
+            self: (todo): write your description
+        """
         self.assertEqual(self.steam.Apps.GetAppOwner(), self.steam.Users.GetSteamID())

@@ -41,6 +41,13 @@ class STEAMWORKS(object):
     _native_supported_platforms = ['linux', 'linux2', 'darwin', 'win32']
 
     def __init__(self, supported_platforms: list = []) -> None:
+        """
+        Initialize the application.
+
+        Args:
+            self: (todo): write your description
+            supported_platforms: (int): write your description
+        """
         self._supported_platforms = supported_platforms
         self._loaded 	= False
         self._cdll 		= None

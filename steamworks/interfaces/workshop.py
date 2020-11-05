@@ -22,6 +22,13 @@ class SteamWorkshop(object):
 
 
     def __init__(self, steam: object):
+        """
+        Initialize a steam steam object.
+
+        Args:
+            self: (todo): write your description
+            steam: (todo): write your description
+        """
         self.steam = steam
         if not self.steam.loaded():
             raise SteamNotLoadedException('STEAMWORKS not yet loaded')
