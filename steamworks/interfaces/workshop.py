@@ -12,13 +12,13 @@ class SteamWorkshop(object):
     _SubmitItemUpdateResult_t 	= CFUNCTYPE(None, SubmitItemUpdateResult_t)
     _ItemInstalled_t 			= CFUNCTYPE(None, ItemInstalled_t)
     _RemoteStorageSubscribePublishedFileResult_t 	= CFUNCTYPE(None, RemoteStorageSubscribePublishedFileResult_t)
-    _RemoteStorageUnubscribePublishedFileResult_t 	= CFUNCTYPE(None, RemoteStorageUnubscribePublishedFileResult_t)
+    _RemoteStorageUnsubscribePublishedFileResult_t 	= CFUNCTYPE(None, RemoteStorageUnsubscribePublishedFileResult_t)
 
     _CreateItemResult			= None
     _SubmitItemUpdateResult 	= None
     _ItemInstalled 				= None
     _RemoteStorageSubscribePublishedFileResult 	= None
-    _RemoteStorageUnubscribePublishedFileResult = None
+    _RemoteStorageUnsubscribePublishedFileResult = None
 
 
     def __init__(self, steam: object):
@@ -80,14 +80,14 @@ class SteamWorkshop(object):
         return True
 
 
-    def SetItemUnubscribedCallback(self, callback: object) -> bool:
+    def SetItemUnsubscribedCallback(self, callback: object) -> bool:
         """Set callback for item unsubscribed
 
         :param callback: callable
         :return: bool
         """
-        self._RemoteStorageUnubscribePublishedFileResult = self._RemoteStorageUnubscribePublishedFileResult_t(callback)
-        self.steam._cdll.Workshop_SetItemUnubscribedCallback(self._RemoteStorageUnubscribePublishedFileResult)
+        self._RemoteStorageUnsubscribePublishedFileResult = self._RemoteStorageUnsubscribePublishedFileResult_t(callback)
+        self.steam._cdll.Workshop_SetItemUnsubscribedCallback(self._RemoteStorageUnsubscribePublishedFileResult)
         return True
 
 
@@ -129,7 +129,7 @@ class SteamWorkshop(object):
 
 
     def UnsubscribeItem(self, published_file_id: int, callback: object = None, override_callback: bool = False) -> None:
-        """ Unubscribe to a UGC (Workshp) item
+        """ Unsubscribe to a UGC (Workshp) item
 
         :param published_file_id: int
         :param callback: callable
@@ -143,7 +143,7 @@ class SteamWorkshop(object):
         else:
             self.SetItemUnsubscribedCallback(callback)
 
-        self.steam.Workshop_UnubscribeItem(published_file_id)
+        self.steam.Workshop_UnsubscribeItem(published_file_id)
 
 
     def StartItemUpdate(self, app_id: int, published_file_id: int) -> int:
