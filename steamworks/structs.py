@@ -38,7 +38,7 @@ class RemoteStorageSubscribePublishedFileResult_t(Structure):
     ]
 
 
-class RemoteStorageUnubscribePublishedFileResult_t(Structure):
+class RemoteStorageUnsubscribePublishedFileResult_t(Structure):
     _fields_ = [
         ("result", c_int),
         ("publishedFileId", c_uint64)
