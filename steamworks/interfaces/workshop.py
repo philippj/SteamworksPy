@@ -26,6 +26,8 @@ class SteamWorkshop(object):
         if not self.steam.loaded():
             raise SteamNotLoadedException('STEAMWORKS not yet loaded')
 
+        self.GetNumSubscribedItems() # This fixes #58
+
 
     def SetItemCreatedCallback(self, callback: object) -> bool:
         """Set callback for item created
@@ -123,7 +125,8 @@ class SteamWorkshop(object):
                 self.SetItemSubscribedCallback(callback)
 
         else:
-            self.SetItemSubscribedCallback(callback)
+            if self._RemoteStorageSubscribePublishedFileResult is None:
+                raise SetupRequired('Call `SetItemSubscribedCallback` first or supply a `callback`')
 
         self.steam.Workshop_SubscribeItem(published_file_id)
 
@@ -141,7 +144,8 @@ class SteamWorkshop(object):
                 self.SetItemUnsubscribedCallback(callback)
 
         else:
-            self.SetItemUnsubscribedCallback(callback)
+            if self._RemoteStorageUnsubscribePublishedFileResult is None:
+                raise SetupRequired('Call `SetItemUnsubscribedCallback` first or supply a `callback`')
 
         self.steam.Workshop_UnsubscribeItem(published_file_id)
 
@@ -310,7 +314,7 @@ class SteamWorkshop(object):
             return {}
 
         return {
-            'disk_size' : pchFolder.contents.value,
+            'disk_size' : punSizeOnDisk,
             'folder' : pchFolder.value.decode(),
             'timestamp' : punTimeStamp.contents.value
         }

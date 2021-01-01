@@ -34,3 +34,7 @@ class SteamConnectionException(SteamException):
 
 class UnsupportedSteamStatValue(SteamException):
     pass
+
+
+class SetupRequired(SteamException):
+    pass
