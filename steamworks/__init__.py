@@ -14,7 +14,7 @@ import sys, os, time
 from ctypes import *
 from enum import Enum
 
-import steamworks.util 		as s_util
+import steamworks.util 		as steamworks_util
 from steamworks.enums 		import *
 from steamworks.structs 	import *
 from steamworks.exceptions 	import *
@@ -37,7 +37,7 @@ class STEAMWORKS(object):
     """
         Primary STEAMWORKS class used for fundamental handling of the STEAMWORKS API
     """
-    _arch = s_util.get_arch()
+    _arch = steamworks_util.get_arch()
     _native_supported_platforms = ['linux', 'linux2', 'darwin', 'win32']
 
     def __init__(self, supported_platforms: list = []) -> None:
