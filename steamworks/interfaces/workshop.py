@@ -232,7 +232,7 @@ class SteamWorkshop(object):
         return self.steam.Workshop_SetItemPreview(update_handle, preview_image.encode())
 
 
-    def SubmitItemUpdate(self, update_handle: int, change_note: int, callback: object = None, \
+    def SubmitItemUpdate(self, update_handle: int, change_note: str, callback: object = None, \
                          override_callback: bool = False) -> None:
         """Submit the item update with the given handle to Steam
 
@@ -249,7 +249,12 @@ class SteamWorkshop(object):
         else:
             self.SetItemUpdatedCallback(callback)
 
-        self.steam.Workshop_SubmitItemUpdate(update_handle, change_note.encode())
+        if change_note:
+            change_note = change_note.encode()
+        else:
+            change_note = None
+
+        self.steam.Workshop_SubmitItemUpdate(update_handle, change_note)
 
 
     def GetItemUpdateProgress(self, update_handle: int) -> dict:
