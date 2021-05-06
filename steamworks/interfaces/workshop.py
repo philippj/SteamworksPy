@@ -102,11 +102,10 @@ class SteamWorkshop(object):
         :param override_callback: bool
         :return: None
         """
-        if callback:
-            if self._CreateItemResult and override_callback:
-                self.SetItemCreatedCallback(callback)
+        if override_callback:
+            self.SetItemCreatedCallback(callback)
 
-        else:
+        elif callback and not self._CreateItemResult:
             self.SetItemCreatedCallback(callback)
 
         self.steam.Workshop_CreateItem(app_id, filetype.value)
@@ -120,13 +119,14 @@ class SteamWorkshop(object):
         :param override_callback: bool
         :return:
         """
-        if callback:
-            if self._RemoteStorageSubscribePublishedFileResult and override_callback:
-                self.SetItemSubscribedCallback(callback)
+        if override_callback:
+            self.SetItemSubscribedCallback(callback)
 
-        else:
-            if self._RemoteStorageSubscribePublishedFileResult is None:
-                raise SetupRequired('Call `SetItemSubscribedCallback` first or supply a `callback`')
+        elif callback and not self._RemoteStorageSubscribePublishedFileResult:
+            self.SetItemSubscribedCallback(callback)
+
+        if self._RemoteStorageSubscribePublishedFileResult is None:
+            raise SetupRequired('Call `SetItemSubscribedCallback` first or supply a `callback`')
 
         self.steam.Workshop_SubscribeItem(published_file_id)
 
@@ -139,13 +139,14 @@ class SteamWorkshop(object):
         :param override_callback: bool
         :return:
         """
-        if callback:
-            if self._RemoteStorageUnsubscribePublishedFileResult and override_callback:
-                self.SetItemUnsubscribedCallback(callback)
+        if override_callback:
+            self.SetItemUnsubscribedCallback(callback)
 
-        else:
-            if self._RemoteStorageUnsubscribePublishedFileResult is None:
-                raise SetupRequired('Call `SetItemUnsubscribedCallback` first or supply a `callback`')
+        elif callback and not self._RemoteStorageUnsubscribePublishedFileResult:
+            self.SetItemUnsubscribedCallback(callback)
+
+        if self._RemoteStorageUnsubscribePublishedFileResult is None:
+            raise SetupRequired('Call `SetItemUnsubscribedCallback` first or supply a `callback`')
 
         self.steam.Workshop_UnsubscribeItem(published_file_id)
 
@@ -242,11 +243,10 @@ class SteamWorkshop(object):
         :param override_callback: bool
         :return: None
         """
-        if callback:
-            if self._SubmitItemUpdateResult and override_callback:
-                self.SetItemUpdatedCallback(callback)
+        if override_callback:
+            self.SetItemUpdatedCallback(callback)
 
-        else:
+        elif callback and not self._SubmitItemUpdateResult:
             self.SetItemUpdatedCallback(callback)
 
         if change_note:
