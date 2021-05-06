@@ -186,6 +186,32 @@ class SteamWorkshop(object):
         return self.steam.Workshop_SetItemDescription(update_handle, description.encode())
 
 
+    def SetItemTags(self, update_handle: int, tags: list) -> bool:
+        """Sets which tags apply to the Workshop item
+
+        :param update_handle: int
+        :param tags: string list
+        :return: bool
+        """
+
+        pointer_storage = (c_char_p * len(tags))()
+        for index, tag in enumerate(tags):
+            pointer_storage[index] = tag.encode()
+
+        return self.steam.Workshop_SetItemTags(update_handle, pointer_storage, len(tags))
+
+
+    def SetItemVisibility(self, update_handle: int, vis: ERemoteStoragePublishedFileVisibility) -> bool:
+        """Sets which users can see the Workshop item
+
+        :param update_handle: int
+        :param vis: ERemoteStoragePublishedFileVisibility
+        :return: bool
+        """
+
+        return self.steam.Workshop_SetItemVisibility(update_handle, vis.value)
+
+
     def SetItemContent(self, update_handle: int, content_directory: str) -> bool:
         """ Set the directory containing the content you wish to upload to Workshop
 
