@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntFlag
 
 
 class Arch(Enum):
@@ -42,7 +42,7 @@ class EWorkshopFileType(Enum):
     MAX                     = 0x16
 
 
-class EItemState(Enum):
+class EItemState(IntFlag):
     """ EItemState """
     NONE                = 0
     SUBSCRIBED          = 1
