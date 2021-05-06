@@ -258,16 +258,19 @@ class SteamWorkshop(object):
         :param update_handle: int
         :return: dict
         """
-        punBytesProcessed = pointer(c_uint64)
-        punBytesTotal = pointer(c_uint64)
+        punBytesProcessed = c_uint64()
+        punBytesTotal = c_uint64()
 
-        update_status = self.steam.Workshop_GetItemUpdateProgress(update_handle, punBytesProcessed, punBytesTotal)
+        update_status = self.steam.Workshop_GetItemUpdateProgress(
+            update_handle,
+            pointer(punBytesProcessed),
+            pointer(punBytesTotal))
 
         return {
             'status' : EItemUpdateStatus(update_status),
-            'processed' : punBytesProcessed.contents.value,
-            'total' : punBytesTotal.contents.value,
-            'progress' : ( punBytesProcessed.contents.value / punBytesTotal.contents.value )
+            'processed' : punBytesProcessed.value,
+            'total' : punBytesTotal.value,
+            'progress' : ( punBytesProcessed.value / (punBytesTotal.value or 1) )
         }
 
 
