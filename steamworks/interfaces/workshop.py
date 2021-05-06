@@ -109,7 +109,7 @@ class SteamWorkshop(object):
         else:
             self.SetItemCreatedCallback(callback)
 
-        self.steam.Workshop_CreateItem(app_id, filetype)
+        self.steam.Workshop_CreateItem(app_id, filetype.value)
 
 
     def SubscribeItem(self, published_file_id: int, callback: object = None, override_callback: bool = False) -> None:
