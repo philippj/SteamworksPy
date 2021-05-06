@@ -295,17 +295,17 @@ class SteamWorkshop(object):
         :return:
         """
         if max_items <= 0:
-            max_items = SteamWorkshop.GetNumSubscribedItems()
+            max_items = self.GetNumSubscribedItems()
 
         if max_items == 0:
             return []
 
-        published_files_ctype = c_uint64 * maxEntries
+        published_files_ctype = c_uint64 * max_items
         published_files = published_files_ctype()
 
         # TODO: We might need to add an exception check here to catch any errors while
         # writing to the 'pvecPublishedFileIds' array.
-        actual_item_count = Steam.cdll.Workshop_GetSubscribedItems(published_files, max_items)
+        actual_item_count = self.steam.Workshop_GetSubscribedItems(published_files, max_items)
         # According to sdk's example, it is possible for numItems to be greater than maxEntries so we crop.
         if actual_item_count > max_items:
             published_files = published_files[:max_items]
