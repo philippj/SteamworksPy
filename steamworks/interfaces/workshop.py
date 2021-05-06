@@ -36,7 +36,7 @@ class SteamWorkshop(object):
         :return: bool
         """
         self._CreateItemResult = SteamWorkshop._CreateItemResult_t(callback)
-        self.steam._cdll.Workshop_SetItemCreatedCallback(self._CreateItemResult)
+        self.steam.Workshop_SetItemCreatedCallback(self._CreateItemResult)
         return True
 
 
@@ -47,7 +47,7 @@ class SteamWorkshop(object):
         :return: bool
         """
         self._SubmitItemUpdateResult = self._SubmitItemUpdateResult_t(callback)
-        self.steam._cdll.Workshop_SetItemUpdatedCallback(self._SubmitItemUpdateResult)
+        self.steam.Workshop_SetItemUpdatedCallback(self._SubmitItemUpdateResult)
         return True
 
 
@@ -58,7 +58,7 @@ class SteamWorkshop(object):
         :return: bool
         """
         self._ItemInstalled = self._ItemInstalled_t(callback)
-        self.steam._cdll.Workshop_SetItemInstalledCallback(self._ItemInstalled)
+        self.steam.Workshop_SetItemInstalledCallback(self._ItemInstalled)
         return True
 
 
@@ -68,7 +68,7 @@ class SteamWorkshop(object):
         :return: None
         """
         self._ItemInstalled = None
-        self.steam._cdll.Workshop_ClearItemInstalledCallback()
+        self.steam.Workshop_ClearItemInstalledCallback()
 
 
     def SetItemSubscribedCallback(self, callback: object) -> bool:
@@ -78,7 +78,7 @@ class SteamWorkshop(object):
         :return: bool
         """
         self._RemoteStorageSubscribePublishedFileResult = self._RemoteStorageSubscribePublishedFileResult_t(callback)
-        self.steam._cdll.Workshop_SetItemSubscribedCallback(self._RemoteStorageSubscribePublishedFileResult)
+        self.steam.Workshop_SetItemSubscribedCallback(self._RemoteStorageSubscribePublishedFileResult)
         return True
 
 
@@ -89,7 +89,7 @@ class SteamWorkshop(object):
         :return: bool
         """
         self._RemoteStorageUnsubscribePublishedFileResult = self._RemoteStorageUnsubscribePublishedFileResult_t(callback)
-        self.steam._cdll.Workshop_SetItemUnsubscribedCallback(self._RemoteStorageUnsubscribePublishedFileResult)
+        self.steam.Workshop_SetItemUnsubscribedCallback(self._RemoteStorageUnsubscribePublishedFileResult)
         return True
 
 

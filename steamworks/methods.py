@@ -408,6 +408,21 @@ STEAMWORKS_METHODS = {
         'restype': bool,
         'argtypes': [c_uint64, POINTER(c_uint64), POINTER(c_uint64)]
     },
+    'Workshop_SetItemInstalledCallback': {
+        'restype': None,
+        'argtypes': [MAKE_CALLBACK(None, structs.ItemInstalled_t)]
+    },
+    'Workshop_ClearItemInstalledCallback': {
+        'restype': None
+    },
+    'Workshop_SetItemSubscribedCallback': {
+        'restype': None,
+        'argtypes': [MAKE_CALLBACK(None, structs.RemoteStorageSubscribePublishedFileResult_t)]
+    },
+    'Workshop_SetItemUnsubscribedCallback': {
+        'restype': None,
+        'argtypes': [MAKE_CALLBACK(None, structs.RemoteStorageUnsubscribePublishedFileResult_t)]
+    },
     'Workshop_SuspendDownloads': {
         'restype': None,
         'argtypes': [c_bool]
