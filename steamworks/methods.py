@@ -1,4 +1,10 @@
+import steamworks.structs as structs
+
 from ctypes import *
+
+# May require some OS checks in future to pick the right calling convention
+# (ala CFUNCTYPE vs WINFUNCTYPE), but so far even on Win64, it's all cdecl
+MAKE_CALLBACK = CFUNCTYPE
 
 STEAMWORKS_METHODS = {
     'SteamShutdown': {
@@ -328,8 +334,21 @@ STEAMWORKS_METHODS = {
     'StartVRDashboard': {
         'restype': None
     },
+    'Workshop_SetItemCreatedCallback': {
+        'restype': None,
+        'argtypes': [MAKE_CALLBACK(None, structs.CreateItemResult_t)]
+    },
+    'Workshop_CreateItem': {
+        'restype': None,
+        'argtypes': [c_uint32, c_int32]
+    },
+    'Workshop_SetItemUpdatedCallback': {
+        'restype': None,
+        'argtypes': [MAKE_CALLBACK(None, structs.SubmitItemUpdateResult_t)]
+    },
     'Workshop_StartItemUpdate': {
-        'restype': c_uint64
+        'restype': c_uint64,
+        'argtypes': [c_uint32, c_uint64]
     },
     'Workshop_SetItemTitle': {
         'restype': bool,
@@ -340,16 +359,20 @@ STEAMWORKS_METHODS = {
         'argtypes': [c_uint64, c_char_p]
     },
     'Workshop_SetItemUpdateLanguage': {
-        'restype': bool
+        'restype': bool,
+        'argtypes': [c_uint64, c_char_p]
     },
     'Workshop_SetItemMetadata': {
-        'restype': bool
+        'restype': bool,
+        'argtypes': [c_uint64, c_char_p]
     },
     'Workshop_SetItemVisibility': {
-        'restype': bool
+        'restype': bool,
+        'argtypes': [c_uint64, c_int32]
     },
     'Workshop_SetItemTags': {
-        'restype': bool
+        'restype': bool,
+        'argtypes': [c_uint64, POINTER(c_char_p), c_int32]
     },
     'Workshop_SetItemContent': {
         'restype': bool,
@@ -361,6 +384,10 @@ STEAMWORKS_METHODS = {
     },
     'Workshop_SubmitItemUpdate': {
         'argtypes': [c_uint64, c_char_p]
+    },
+    'Workshop_GetItemUpdateProgress': {
+        'restype': c_int32,
+        'argtypes': [c_uint64, POINTER(c_uint64), POINTER(c_uint64)]
     },
     'Workshop_GetNumSubscribedItems': {
         'restype': c_uint32
@@ -380,6 +407,21 @@ STEAMWORKS_METHODS = {
     'Workshop_GetItemDownloadInfo': {
         'restype': bool,
         'argtypes': [c_uint64, POINTER(c_uint64), POINTER(c_uint64)]
+    },
+    'Workshop_SetItemInstalledCallback': {
+        'restype': None,
+        'argtypes': [MAKE_CALLBACK(None, structs.ItemInstalled_t)]
+    },
+    'Workshop_ClearItemInstalledCallback': {
+        'restype': None
+    },
+    'Workshop_SetItemSubscribedCallback': {
+        'restype': None,
+        'argtypes': [MAKE_CALLBACK(None, structs.RemoteStorageSubscribePublishedFileResult_t)]
+    },
+    'Workshop_SetItemUnsubscribedCallback': {
+        'restype': None,
+        'argtypes': [MAKE_CALLBACK(None, structs.RemoteStorageUnsubscribePublishedFileResult_t)]
     },
     'Workshop_SuspendDownloads': {
         'restype': None,
