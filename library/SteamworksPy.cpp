@@ -87,6 +87,7 @@ typedef void(*ItemInstalledCallback_t)(ItemInstalled_t);
 typedef void(*RemoteStorageSubscribeFileResultCallback_t)(RemoteStorageSubscribePublishedFileResult_t);
 typedef void(*RemoteStorageUnsubscribeFileResultCallback_t)(RemoteStorageUnsubscribePublishedFileResult_t);
 typedef void(*LeaderboardFindResultCallback_t)(LeaderboardFindResult_t);
+typedef void(*MicroTxnAuthorizationResponseCallback_t)(MicroTxnAuthorizationResponse_t);
 
 //-----------------------------------------------
 // Workshop Class
@@ -214,6 +215,31 @@ private:
 };
 
 static Leaderboard leaderboard;
+
+//-----------------------------------------------
+// MicroTxn Class
+//-----------------------------------------------
+class MicroTxn {
+public:
+    MicroTxnAuthorizationResponseCallback_t _pyMicroTxnAuthorizationResponseCallback;
+
+    CCallback <MicroTxn, MicroTxnAuthorizationResponse_t> _microTxnAuthorizationResponseCallback;
+
+    MicroTxn() : _microTxnAuthorizationResponseCallback(this, &MicroTxn::OnAuthorizationResponse) {}
+
+    void SetAuthorizationResponseCallback(MicroTxnAuthorizationResponseCallback_t callback) {
+        _pyMicroTxnAuthorizationResponseCallback = callback;
+    }
+
+private:
+    void OnAuthorizationResponse(MicroTxnAuthorizationResponse_t *authorizationResponse) {
+        if (_pyMicroTxnAuthorizationResponseCallback != nullptr) {
+            _pyMicroTxnAuthorizationResponseCallback(*authorizationResponse);
+        }
+    }
+};
+
+static MicroTxn microtxn;
 
 /////////////////////////////////////////////////
 ///// MAIN FUNCTIONS ////////////////////////////
@@ -1437,4 +1463,14 @@ SW_PY void Leaderboard_FindLeaderboard(const char *pchLeaderboardName) {
         return;
     }
     leaderboard.FindLeaderboard(pchLeaderboardName);
+}
+
+//-----------------------------------------------
+// Steam MicroTxn
+//-----------------------------------------------
+SW_PY void MicroTxn_SetAuthorizationResponseCallback(MicroTxnAuthorizationResponseCallback_t callback) {
+    if (SteamUser() == NULL) {
+        return;
+    }
+    microtxn.SetAuthorizationResponseCallback(callback);
 }
