@@ -29,6 +29,7 @@ from steamworks.interfaces.users        import SteamUsers
 from steamworks.interfaces.userstats    import SteamUserStats
 from steamworks.interfaces.utils        import SteamUtils
 from steamworks.interfaces.workshop     import SteamWorkshop
+from steamworks.interfaces.microtxn     import SteamMicroTxn
 
 os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
@@ -130,6 +131,7 @@ class STEAMWORKS(object):
         self.UserStats      = SteamUserStats(self)
         self.Utils          = SteamUtils(self)
         self.Workshop       = SteamWorkshop(self)
+        self.MicroTxn       = SteamMicroTxn(self)
 
 
     def initialize(self) -> bool:
