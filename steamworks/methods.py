@@ -434,5 +434,9 @@ STEAMWORKS_METHODS = {
     'Workshop_UnsubscribeItem': {
         'restype': None,
         'argtypes': [c_uint64]
-    }
+    },
+    'MicroTxn_SetAuthorizationResponseCallback': {
+        'restype': None,
+        'argtypes': [MAKE_CALLBACK(None, structs.MicroTxnAuthorizationResponse_t)]
+    },
 }
