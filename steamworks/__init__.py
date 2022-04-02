@@ -66,6 +66,7 @@ class STEAMWORKS(object):
         library_file_name = ''
         if platform in ['linux', 'linux2']:
             library_file_name = 'SteamworksPy.so'
+            cdll.LoadLibrary(os.path.join(os.getcwd(), 'libsteam_api.so')) #if i do this then linux works
 
         elif platform == 'darwin':
             library_file_name = 'SteamworksPy.dylib'
