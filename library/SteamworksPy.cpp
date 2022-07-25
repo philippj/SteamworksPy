@@ -84,8 +84,14 @@
 typedef void(*CreateItemResultCallback_t)(CreateItemResult_t);
 typedef void(*SubmitItemUpdateResultCallback_t)(SubmitItemUpdateResult_t);
 typedef void(*ItemInstalledCallback_t)(ItemInstalled_t);
-typedef void(*RemoteStorageSubscribeFileResultCallback_t)(RemoteStorageSubscribePublishedFileResult_t);
-typedef void(*RemoteStorageUnsubscribeFileResultCallback_t)(RemoteStorageUnsubscribePublishedFileResult_t);
+
+struct SubscriptionResult {
+	std::int32_t result;
+	std::uint64_t publishedFileId;
+};
+
+typedef void(*RemoteStorageSubscribeFileResultCallback_t)(SubscriptionResult);
+typedef void(*RemoteStorageUnsubscribeFileResultCallback_t)(SubscriptionResult);
 typedef void(*LeaderboardFindResultCallback_t)(LeaderboardFindResult_t);
 typedef void(*MicroTxnAuthorizationResponseCallback_t)(MicroTxnAuthorizationResponse_t);
 
@@ -175,13 +181,15 @@ private:
 
     void OnItemSubscribed(RemoteStorageSubscribePublishedFileResult_t *itemSubscribedResult, bool bIOFailure) {
         if (_pyItemSubscribedCallback != nullptr) {
-            _pyItemSubscribedCallback(*itemSubscribedResult);
+            SubscriptionResult result{itemSubscribedResult->m_eResult, itemSubscribedResult->m_nPublishedFileId};
+            _pyItemSubscribedCallback(result);
         }
     }
 
     void OnItemUnsubscribed(RemoteStorageUnsubscribePublishedFileResult_t *itemUnsubscribedResult, bool bIOFailure) {
         if (_pyItemUnsubscribedCallback != nullptr) {
-            _pyItemUnsubscribedCallback(*itemUnsubscribedResult);
+            SubscriptionResult result{itemUnsubscribedResult->m_eResult, itemUnsubscribedResult->m_nPublishedFileId};
+            _pyItemUnsubscribedCallback(result);
         }
     }
 };
