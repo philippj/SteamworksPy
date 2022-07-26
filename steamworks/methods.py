@@ -417,11 +417,11 @@ STEAMWORKS_METHODS = {
     },
     'Workshop_SetItemSubscribedCallback': {
         'restype': None,
-        'argtypes': [MAKE_CALLBACK(None, structs.RemoteStorageSubscribePublishedFileResult_t)]
+        'argtypes': [MAKE_CALLBACK(None, structs.SubscriptionResult)]
     },
     'Workshop_SetItemUnsubscribedCallback': {
         'restype': None,
-        'argtypes': [MAKE_CALLBACK(None, structs.RemoteStorageUnsubscribePublishedFileResult_t)]
+        'argtypes': [MAKE_CALLBACK(None, structs.SubscriptionResult)]
     },
     'Workshop_SuspendDownloads': {
         'restype': None,

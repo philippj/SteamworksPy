@@ -31,19 +31,11 @@ class ItemInstalled_t(Structure):
     ]
 
 
-class RemoteStorageSubscribePublishedFileResult_t(Structure):
+class SubscriptionResult(Structure):
     _fields_ = [
-        ("result", c_int),
+        ("result", c_int32),
         ("publishedFileId", c_uint64)
     ]
-
-
-class RemoteStorageUnsubscribePublishedFileResult_t(Structure):
-    _fields_ = [
-        ("result", c_int),
-        ("publishedFileId", c_uint64)
-    ]
-
 
 class MicroTxnAuthorizationResponse_t(Structure):
     _fields_ = [

@@ -11,8 +11,8 @@ class SteamWorkshop(object):
     _CreateItemResult_t 		= CFUNCTYPE(None, CreateItemResult_t)
     _SubmitItemUpdateResult_t 	= CFUNCTYPE(None, SubmitItemUpdateResult_t)
     _ItemInstalled_t 			= CFUNCTYPE(None, ItemInstalled_t)
-    _RemoteStorageSubscribePublishedFileResult_t 	= CFUNCTYPE(None, RemoteStorageSubscribePublishedFileResult_t)
-    _RemoteStorageUnsubscribePublishedFileResult_t 	= CFUNCTYPE(None, RemoteStorageUnsubscribePublishedFileResult_t)
+    _RemoteStorageSubscribePublishedFileResult_t 	= CFUNCTYPE(None, SubscriptionResult)
+    _RemoteStorageUnsubscribePublishedFileResult_t 	= CFUNCTYPE(None, SubscriptionResult)
 
     _CreateItemResult			= None
     _SubmitItemUpdateResult 	= None
