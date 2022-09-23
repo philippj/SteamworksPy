@@ -20,7 +20,8 @@ class CreateItemResult_t(Structure):
 class SubmitItemUpdateResult_t(Structure):
     _fields_ = [
         ("result", c_int),
-        ("userNeedsToAcceptWorkshopLegalAgreement", c_bool)
+        ("userNeedsToAcceptWorkshopLegalAgreement", c_bool),
+        ("publishedFileId", c_uint64)
     ]
 
 
