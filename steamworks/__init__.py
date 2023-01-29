@@ -67,7 +67,12 @@ class STEAMWORKS(object):
         library_file_name = ''
         if platform in ['linux', 'linux2']:
             library_file_name = 'SteamworksPy.so'
-            cdll.LoadLibrary(os.path.join(os.getcwd(), 'libsteam_api.so')) #if i do this then linux works
+            if os.path.isfile(os.path.join(os.getcwd(), 'libsteam_api.so')):
+                cdll.LoadLibrary(os.path.join(os.getcwd(), 'libsteam_api.so')) #if i do this then linux works
+            elif os.path.isfile(os.path.join(os.path.dirname(__file__), 'libsteam_api.so')):
+                cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), 'libsteam_api.so'))
+            else:
+                raise MissingSteamworksLibraryException(f'Missing library "libsteam_api.so"')
 
         elif platform == 'darwin':
             library_file_name = 'SteamworksPy.dylib'
@@ -79,9 +84,12 @@ class STEAMWORKS(object):
             # This case is theoretically unreachable
             raise UnsupportedPlatformException(f'"{platform}" is not being supported')
 
-        library_path = os.path.join(os.getcwd(), library_file_name)
-        if not os.path.isfile(library_path):
-            raise MissingSteamworksLibraryException(f'Missing library at {library_path}')
+        if os.path.isfile(os.path.join(os.getcwd(), library_file_name)):
+            library_path = os.path.join(os.getcwd(), library_file_name)
+        elif os.path.isfile(os.path.join(os.path.dirname(__file__), library_file_name)):
+            library_path = os.path.join(os.path.dirname(__file__), library_file_name)
+        else:
+            raise MissingSteamworksLibraryException(f'Missing library {library_file_name}')
 
         app_id_file = os.path.join(os.getcwd(), 'steam_appid.txt')
         if not os.path.isfile(app_id_file):
