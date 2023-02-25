@@ -601,39 +601,32 @@ SW_PY void ActivateGameOverlayInviteDialog(int steamID) {
 //
 // Reconfigure the controller to use the specified action set.
 SW_PY void ActivateActionSet(uint64_t controllerHandle, uint64_t actionSetHandle){
-    if(SteamController() == NULL){
+    if(SteamInput() == NULL){
         return;
     }
-    SteamController()->ActivateActionSet((ControllerHandle_t) controllerHandle, (ControllerActionSetHandle_t)actionSetHandle);
+    SteamInput()->ActivateActionSet((InputHandle_t) controllerHandle, (InputActionSetHandle_t)actionSetHandle);
 }
 // Lookup the handle for an Action Set.
-SW_PY uint64_t GetActionSetHandle(const char *actionSetName) {
-    if (SteamController() == NULL) {
+SW_PY uint64_t GetActionSetHandle(char *actionSetName) {
+    if (SteamInput() == NULL) {
         return 0;
     }
-    return (uint64_t) SteamController()->GetActionSetHandle(actionSetName);
+    return (uint64_t) SteamInput()->GetActionSetHandle(actionSetName);
 }
-
 // Returns the current state of the supplied analog game action.
-//SW_PY Dictionary GetAnalogActionData(uint64_t controllerHandle, uint64_t analogActionHandle){
-//	ControllerAnalogActionData_t data;
-//	Dictionary d;
-//	memset(&data, 0, sizeof(data));
-//	if(SteamController() == NULL){
-//		data = SteamController()->GetAnalogActionData((ControllerHandle_t)controllerHandle, (ControllerAnalogActionHandle_t)analogActionHandle);
-//	}
-//	d["eMode"] = data.eMode;
-//	d["x"] = data.x;
-//	d["y"] = data.y;
-//	d["bActive"] = data.bActive;
-//	return d;
-//}
+SW_PY InputAnalogActionData_t GetAnalogActionData(uint64_t controllerHandle, uint64_t analogActionHandle){
+    InputAnalogActionData_t data;
+    if(SteamInput() != NULL){
+        data = SteamInput()->GetAnalogActionData((InputHandle_t)controllerHandle, (InputAnalogActionHandle_t)analogActionHandle);
+    }
+    return data;
+}
 // Get the handle of the specified Analog action.
 SW_PY uint64_t GetAnalogActionHandle(const char *actionName) {
-    if (SteamController() == NULL) {
+    if (SteamInput() == NULL) {
         return 0;
     }
-    return (uint64_t) SteamController()->GetAnalogActionHandle(actionName);
+    return (uint64_t) SteamInput()->GetAnalogActionHandle(actionName);
 }
 
 // Get the origin(s) for an analog action within an action.
@@ -649,57 +642,50 @@ SW_PY uint64_t GetAnalogActionHandle(const char *actionName) {
 //	return list;
 //}
 // Get current controllers handles.
-//SW_PY Array GetConnectedControllers(){
-//	Array list;
-//	if(SteamController() == NULL){
-//		ControllerHandle_t handles[STEAM_CONTROLLER_MAX_COUNT];
-//		int ret = SteamController()->GetConnectedControllers(handles);
-//		for (int i = 0; i < ret; i++){
-//			list.push_back((uint64_t)handles[i]);
-//		}
-//	}
-//	return list;
-//}
+InputHandle_t connectedControllers[STEAM_INPUT_MAX_COUNT];
+SW_PY void* GetConnectedControllers(){
+	for(int i=0; i<STEAM_INPUT_MAX_COUNT; i++){
+        connectedControllers[i] = 0;
+    }
+    if(SteamInput() != NULL) SteamInput()->GetConnectedControllers(connectedControllers);
+    return connectedControllers;
+}
 // Returns the associated controller handle for the specified emulated gamepad.
 SW_PY uint64_t GetControllerForGamepadIndex(int index) {
-    if (SteamController() == NULL) {
+    if (SteamInput() == NULL) {
         return 0;
     }
-    return (uint64_t) SteamController()->GetControllerForGamepadIndex(index);
+    return (uint64_t) SteamInput()->GetControllerForGamepadIndex(index);
 }
 
 // Get the currently active action set for the specified controller.
 SW_PY uint64_t GetCurrentActionSet(uint64_t controllerHandle){
-    if(SteamController() == NULL){
+    if(SteamInput() == NULL){
         return 0;
     }
-    return (uint64_t) SteamController()->GetCurrentActionSet((ControllerHandle_t) controllerHandle);
+    return (uint64_t) SteamInput()->GetCurrentActionSet((InputHandle_t) controllerHandle);
 }
 // Get the input type (device model) for the specified controller. 
 SW_PY uint64_t GetInputTypeForHandle(uint64_t controllerHandle){
-    if(SteamController() == NULL){
+    if(SteamInput() == NULL){
         return 0;
     }
-    return (uint64_t) SteamController()->GetInputTypeForHandle((ControllerHandle_t)controllerHandle);
+    return (uint64_t) SteamInput()->GetInputTypeForHandle((ControllerHandle_t)controllerHandle);
 }
 // Returns the current state of the supplied digital game action.
-//SW_PY Dictionary GetDigitalActionData(uint64_t controllerHandle, uint64_t digitalActionHandle){
-//	ControllerDigitalActionData_t data;
-//	Dictionary d;
-//	memset(&data, 0, sizeof(data));
-//	if(SteamController() == NULL){
-//		data = SteamController()->GetDigitalActionData((ControllerHandle_t)controllerHandle, (ControllerDigitalActionHandle_t)digitalActionHandle);
-//	}
-//	d["bState"] = data.bState;
-//	d["bActive"] = data.bActive;
-//	return d;
-//}
+SW_PY InputDigitalActionData_t GetDigitalActionData(uint64_t controllerHandle, uint64_t digitalActionHandle){
+	InputDigitalActionData_t data;
+	if(SteamInput() != NULL){
+		data = SteamInput()->GetDigitalActionData((ControllerHandle_t)controllerHandle, (ControllerDigitalActionHandle_t)digitalActionHandle);
+	}
+	return data;
+}
 // Get the handle of the specified digital action.
 SW_PY uint64_t GetDigitalActionHandle(const char *actionName) {
-    if (SteamController() == NULL) {
+    if (SteamInput() == NULL) {
         return 0;
     }
-    return (uint64_t) SteamController()->GetDigitalActionHandle(actionName);
+    return (uint64_t) SteamInput()->GetDigitalActionHandle(actionName);
 }
 
 // Get the origin(s) for an analog action within an action.
@@ -716,10 +702,10 @@ SW_PY uint64_t GetDigitalActionHandle(const char *actionName) {
 //}
 // Returns the associated gamepad index for the specified controller.
 SW_PY int GetGamepadIndexForController(uint64_t controllerHandle){
-    if(SteamController() == NULL){
+    if(SteamInput() == NULL){
         return -1;
     }
-    return SteamController()->GetGamepadIndexForController((ControllerHandle_t) controllerHandle);
+    return SteamInput()->GetGamepadIndexForController((ControllerHandle_t) controllerHandle);
 }
 
 // Returns raw motion data for the specified controller.
@@ -743,42 +729,42 @@ SW_PY int GetGamepadIndexForController(uint64_t controllerHandle){
 //	return d;
 //}
 // Start SteamControllers interface.
-SW_PY bool ControllerInit() {
-    if (SteamController() == NULL) {
+SW_PY bool ControllerInit(bool bExplicitlyCallRunFrame) {
+    if (SteamInput() == NULL) {
         return false;
     }
-    return SteamController()->Init();
+    return SteamInput()->Init(bExplicitlyCallRunFrame);
 }
 
 // Syncronize controllers.
 SW_PY void RunFrame() {
-    if (SteamController() == NULL) {
+    if (SteamInput() == NULL) {
         return;
     }
-    SteamController()->RunFrame();
+    SteamInput()->RunFrame();
 }
 
 // Invokes the Steam overlay and brings up the binding screen.
 SW_PY bool ShowBindingPanel(uint64_t controllerHandle){
-    if(SteamController()== NULL){
+    if(SteamInput()== NULL){
         return false;
     }
-    return SteamController()->ShowBindingPanel((ControllerHandle_t) controllerHandle);
+    return SteamInput()->ShowBindingPanel((ControllerHandle_t) controllerHandle);
 }
 
 // Stop SteamControllers interface.
 SW_PY bool ControllerShutdown() {
-    if (SteamController() == NULL) {
+    if (SteamInput() == NULL) {
         return false;
     }
-    return SteamController()->Shutdown();
+    return SteamInput()->Shutdown();
 }
 // Trigger a vibration event on supported controllers.
 SW_PY void TriggerVibration(uint64_t controllerHandle, uint16_t leftSpeed, uint16_t rightSpeed){
-    if(SteamController()== NULL){
+    if(SteamInput()== NULL){
         return;
     }
-    SteamController()->TriggerVibration((ControllerHandle_t) controllerHandle, (unsigned short)leftSpeed, (unsigned short)rightSpeed);
+    SteamInput()->TriggerVibration((ControllerHandle_t) controllerHandle, (unsigned short)leftSpeed, (unsigned short)rightSpeed);
 }
 
 /////////////////////////////////////////////////
