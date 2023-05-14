@@ -12,6 +12,9 @@ class SteamInput:
     def Init(self, explicitlyCallRunFrame=False):
         return self.steam.ControllerInit(explicitlyCallRunFrame)
 
+    def SetInputActionManifestFilePath(self, path):
+        return self.steam.SetInputActionManifestFilePath(path.encode())
+
     def RunFrame(self):
         return self.steam.RunFrame()
 

@@ -13,6 +13,7 @@
 #include "TargetConditionals.h"
 #define SW_PY extern "C" __attribute__ ((visibility("default")))
 #elif defined( __linux__ )
+#include <cstdint>
 #include "sdk/steam/steam_api.h"
 #define SW_PY extern "C" __attribute__ ((visibility("default")))
 #else
@@ -665,7 +666,7 @@ SW_PY uint64_t GetCurrentActionSet(uint64_t controllerHandle){
     }
     return (uint64_t) SteamInput()->GetCurrentActionSet((InputHandle_t) controllerHandle);
 }
-// Get the input type (device model) for the specified controller. 
+// Get the input type (device model) for the specified controller.
 SW_PY uint64_t GetInputTypeForHandle(uint64_t controllerHandle){
     if(SteamInput() == NULL){
         return 0;
@@ -734,6 +735,13 @@ SW_PY bool ControllerInit(bool bExplicitlyCallRunFrame) {
         return false;
     }
     return SteamInput()->Init(bExplicitlyCallRunFrame);
+}
+
+SW_PY bool SetInputActionManifestFilePath(const char *path) {
+    if (SteamInput() == NULL) {
+        return false;
+    }
+    return SteamInput()->SetInputActionManifestFilePath(path);
 }
 
 // Syncronize controllers.
@@ -1468,3 +1476,4 @@ SW_PY void MicroTxn_SetAuthorizationResponseCallback(MicroTxnAuthorizationRespon
     }
     microtxn.SetAuthorizationResponseCallback(callback);
 }
+

@@ -135,6 +135,10 @@ STEAMWORKS_METHODS = {
         'restype': None,
         'argtypes': [c_uint64]
     },
+    'SetInputActionManifestFilePath': {
+        'restype': bool,
+        'argtypes': [c_char_p]
+    },
     'ActivateActionSet': {
         'restype': None,
         'argtypes': [c_uint64, c_uint64]
