@@ -85,11 +85,20 @@ typedef void(*CreateItemResultCallback_t)(CreateItemResult_t);
 typedef void(*SubmitItemUpdateResultCallback_t)(SubmitItemUpdateResult_t);
 typedef void(*ItemInstalledCallback_t)(ItemInstalled_t);
 
+struct GetAppDependenciesResult {
+    std::int32_t result;
+    std::uint64_t publishedFileId;
+    std::uint32_t* array_app_dependencies;
+    std::uint32_t array_num_app_dependencies;
+    std::uint32_t total_num_app_dependencies;
+};
+
 struct SubscriptionResult {
 	std::int32_t result;
 	std::uint64_t publishedFileId;
 };
 
+typedef void(*GetAppDependenciesResultCallback_t)(GetAppDependenciesResult);
 typedef void(*RemoteStorageSubscribeFileResultCallback_t)(SubscriptionResult);
 typedef void(*RemoteStorageUnsubscribeFileResultCallback_t)(SubscriptionResult);
 typedef void(*LeaderboardFindResultCallback_t)(LeaderboardFindResult_t);
@@ -103,11 +112,13 @@ public:
     CreateItemResultCallback_t _pyItemCreatedCallback;
     SubmitItemUpdateResultCallback_t _pyItemUpdatedCallback;
     ItemInstalledCallback_t _pyItemInstalledCallback;
+    GetAppDependenciesResultCallback_t _pyGetAppDependenciesCallback;
     RemoteStorageSubscribeFileResultCallback_t _pyItemSubscribedCallback;
     RemoteStorageUnsubscribeFileResultCallback_t _pyItemUnsubscribedCallback;
 
     CCallResult <Workshop, CreateItemResult_t> _itemCreatedCallback;
     CCallResult <Workshop, SubmitItemUpdateResult_t> _itemUpdatedCallback;
+    CCallResult <Workshop, GetAppDependenciesResult_t> _getAppDependenciesCallback;
     CCallResult <Workshop, RemoteStorageSubscribePublishedFileResult_t> _itemSubscribedCallback;
     CCallResult <Workshop, RemoteStorageUnsubscribePublishedFileResult_t> _itemUnsubscribedCallback;
 
@@ -131,6 +142,10 @@ public:
         _pyItemInstalledCallback = nullptr;
     }
 
+    void SetGetAppDependenciesResultCallback(GetAppDependenciesResultCallback_t callback) {
+        _pyGetAppDependenciesCallback = callback;
+    }
+
     void SetItemSubscribedCallback(RemoteStorageSubscribeFileResultCallback_t callback) {
         _pyItemSubscribedCallback = callback;
     }
@@ -148,6 +163,11 @@ public:
     void SubmitItemUpdate(UGCUpdateHandle_t updateHandle, const char *pChangeNote) {
         SteamAPICall_t submitItemUpdateCall = SteamUGC()->SubmitItemUpdate(updateHandle, pChangeNote);
         _itemUpdatedCallback.Set(submitItemUpdateCall, this, &Workshop::OnItemUpdateSubmitted);
+    }
+
+    void GetAppDependencies(PublishedFileId_t publishedFileID) {
+        SteamAPICall_t getAppDependenciesCall = SteamUGC()->GetAppDependencies(publishedFileID);
+        _getAppDependenciesCallback.Set(getAppDependenciesCall, this, &Workshop::OnGetAppDependencies);
     }
 
     void SubscribeItem(PublishedFileId_t publishedFileID) {
@@ -176,6 +196,22 @@ private:
     void OnItemInstalled(ItemInstalled_t *itemInstalledResult) {
         if (_pyItemInstalledCallback != nullptr) {
             _pyItemInstalledCallback(*itemInstalledResult);
+        }
+    }
+
+    void OnGetAppDependencies(GetAppDependenciesResult_t* getAppDependenciesResult, bool bIOFailure) {
+        if (_pyGetAppDependenciesCallback != nullptr) {
+            GetAppDependenciesResult result;
+            result.result = getAppDependenciesResult->m_eResult;
+            result.publishedFileId = getAppDependenciesResult->m_nPublishedFileId;
+            result.array_num_app_dependencies = getAppDependenciesResult->m_nNumAppDependencies;
+            result.total_num_app_dependencies = getAppDependenciesResult->m_nTotalNumAppDependencies;
+            result.array_app_dependencies = new std::uint32_t[result.array_num_app_dependencies];
+            std::copy(getAppDependenciesResult->m_rgAppIDs,
+                    getAppDependenciesResult->m_rgAppIDs + result.array_num_app_dependencies,
+                    result.array_app_dependencies);
+            _pyGetAppDependenciesCallback(result);
+            delete[] result.array_app_dependencies;
         }
     }
 
@@ -1405,6 +1441,20 @@ SW_PY void Workshop_ClearItemInstalledCallback() {
         return;
     }
     workshop.ClearItemInstallCallback();
+}
+
+SW_PY void Workshop_GetAppDependencies(PublishedFileId_t publishedFileID) {
+    if(SteamUGC() == NULL){
+        return;
+    }
+    workshop.GetAppDependencies(publishedFileID);
+}
+
+SW_PY void Workshop_SetGetAppDependenciesResultCallback(GetAppDependenciesResultCallback_t callback) {
+    if (SteamUGC() == NULL) {
+        return;
+    }
+    workshop.SetGetAppDependenciesResultCallback(callback);
 }
 
 SW_PY void Workshop_SetItemSubscribedCallback(RemoteStorageSubscribeFileResultCallback_t callback) {
