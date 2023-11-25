@@ -45,12 +45,14 @@ class STEAMWORKS(object):
     _arch = steamworks_util.get_arch()
     _native_supported_platforms = ["linux", "linux2", "darwin", "win32"]
 
-    def __init__(self, supported_platforms: list = []) -> None:
+    def __init__(self, supported_platforms: list = [], _libs=None) -> None:
         self._supported_platforms = supported_platforms
         self._loaded = False
         self._cdll = None
 
         self.app_id = 0
+
+        self._libs = _libs
 
         self._initialize()
 
@@ -69,7 +71,17 @@ class STEAMWORKS(object):
         library_file_name = ""
         if platform in ["linux", "linux2"]:
             library_file_name = "SteamworksPy.so"
-            if os.path.isfile(os.path.join(os.getcwd(), "libsteam_api.so")):
+            if self._libs and os.path.exists(
+                os.path.join(self._libs, "libsteam_api.so")
+            ):
+                cdll.LoadLibrary(os.path.join(self._libs, "libsteam_api.so"))
+            elif os.environ.get("SWPY_PATH") and os.path.exists(
+                os.path.join(os.environ["SWPY_PATH"], "libsteam_api.so")
+            ):
+                cdll.LoadLibrary(
+                    os.path.join(os.environ["SWPY_PATH"], "libsteam_api.so")
+                )
+            elif os.path.isfile(os.path.join(os.getcwd(), "libsteam_api.so")):
                 cdll.LoadLibrary(
                     os.path.join(os.getcwd(), "libsteam_api.so")
                 )  # if i do this then linux works
@@ -106,8 +118,13 @@ class STEAMWORKS(object):
         else:
             # This case is theoretically unreachable
             raise UnsupportedPlatformException(f'"{platform}" is not being supported')
-
-        if os.path.isfile(os.path.join(os.getcwd(), library_file_name)):
+        if self._libs and os.path.exists(os.path.join(self._libs, library_file_name)):
+            library_path = os.path.join(self._libs, library_file_name)
+        elif os.environ.get("SWPY_PATH") and os.path.exists(
+            os.path.join(os.environ["SWPY_PATH"], library_file_name)
+        ):
+            library_path = os.path.join(os.environ["SWPY_PATH"], library_file_name)
+        elif os.path.isfile(os.path.join(os.getcwd(), library_file_name)):
             library_path = os.path.join(os.getcwd(), library_file_name)
         elif os.path.isfile(os.path.join(os.path.dirname(__file__), library_file_name)):
             library_path = os.path.join(os.path.dirname(__file__), library_file_name)
