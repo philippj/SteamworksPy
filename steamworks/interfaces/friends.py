@@ -129,7 +129,7 @@ class SteamFriends(object):
         :param app_id: int
         :return: None
         """
-        self.steam.ActivateGameOverlayToWebPage(app_id)
+        self.steam.ActivateGameOverlayToStore(app_id)
 
 
     def ActivateGameOverlayInviteDialog(self, steam_lobby_id: int) -> None:
