@@ -31,6 +31,7 @@ from steamworks.interfaces.utils        import SteamUtils
 from steamworks.interfaces.workshop     import SteamWorkshop
 from steamworks.interfaces.microtxn     import SteamMicroTxn
 from steamworks.interfaces.input        import SteamInput
+from steamworks.interfaces.p2p_networking import SteamP2PNetworking
 
 os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
@@ -143,6 +144,7 @@ class STEAMWORKS(object):
         self.Workshop       = SteamWorkshop(self)
         self.MicroTxn       = SteamMicroTxn(self)
         self.Input          = SteamInput(self)
+        self.P2PNetworking  = SteamP2PNetworking(self)
 
 
     def initialize(self) -> bool:

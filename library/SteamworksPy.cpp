@@ -1468,3 +1468,45 @@ SW_PY void MicroTxn_SetAuthorizationResponseCallback(MicroTxnAuthorizationRespon
     }
     microtxn.SetAuthorizationResponseCallback(callback);
 }
+
+/////////////////////////////////////////////////
+///// P2P NETWORKING ////////////////////////////
+/////////////////////////////////////////////////
+//
+// Create a P2P session with a specified user.
+SW_PY bool CreateP2PSessionWithUser(uint64_t steamIDRemote) {
+    if (SteamNetworking() == NULL) {
+        return false;
+    }
+    CSteamID remoteID = CreateSteamID(steamIDRemote, 1);
+    return SteamNetworking()->AcceptP2PSessionWithUser(remoteID);
+}
+
+// Close an existing P2P session with a specified user.
+SW_PY bool CloseP2PSessionWithUser(uint64_t steamIDRemote) {
+    if (SteamNetworking() == NULL) {
+        return false;
+    }
+    CSteamID remoteID = CreateSteamID(steamIDRemote, 1);
+    return SteamNetworking()->CloseP2PSessionWithUser(remoteID);
+}
+
+// Send a P2P packet to a specified user.
+SW_PY bool SendP2PPacket(uint64_t steamIDRemote, const void *pubData, uint32 cubData, int eP2PSendType) {
+    if (SteamNetworking() == NULL) {
+        return false;
+    }
+    CSteamID remoteID = CreateSteamID(steamIDRemote, 1);
+    return SteamNetworking()->SendP2PPacket(remoteID, pubData, cubData, EP2PSend(eP2PSendType));
+}
+
+// Read a P2P packet from the incoming queue.
+SW_PY bool ReadP2PPacket(void *pubDest, uint32 cubDest, uint32 *pcubMsgSize, uint64_t *psteamIDRemote) {
+    if (SteamNetworking() == NULL) {
+        return false;
+    }
+    CSteamID remoteID;
+    bool result = SteamNetworking()->ReadP2PPacket(pubDest, cubDest, pcubMsgSize, &remoteID);
+    *psteamIDRemote = remoteID.ConvertToUint64();
+    return result;
+}
