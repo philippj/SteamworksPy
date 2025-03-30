@@ -265,10 +265,15 @@ SW_PY int SteamInit() {
     bool isInitSuccess = SteamAPI_Init();
     // Set the default status response
     int status = FAILED;
+    
     // Steamworks initialized with no problems
     if (isInitSuccess) {
         status = OK;
+    }else
+    {
+        return status;
     }
+    
     // The Steam client is not running
     if (!SteamAPI_IsSteamRunning()) {
         status = ERR_NO_CLIENT;
@@ -278,9 +283,11 @@ SW_PY int SteamInit() {
         status = ERR_NO_CONNECTION;
     }
     // Steam is connected and active, so load the stats and achievements
-    if (status == OK && SteamUserStats() != NULL) {
-        SteamUserStats()->RequestCurrentStats();
-    }
+    // FULLY DEPRECATED, WILL NOT COMPILE
+    //if (status == OK && SteamUserStats() != NULL) {
+        //SteamUserStats()->RequestCurrentStats();
+    //}
+    
     // Return the Steamworks status
     return status;
 }
@@ -992,7 +999,7 @@ SW_PY int GetAuthSessionTicket(char* buffer) {
         return 0;
     }
     uint32 size{};
-    SteamUser()->GetAuthSessionTicket(buffer, 1024, &size);
+    SteamUser()->GetAuthSessionTicket(buffer, 1024, &size, nullptr);
     return size;
 }
 
@@ -1060,7 +1067,7 @@ SW_PY bool RequestCurrentStats() {
     if (SteamUser() == NULL) {
         return false;
     }
-    return SteamUserStats()->RequestCurrentStats();
+    return true;
 }
 
 SW_PY bool SetAchievement(const char *name) {
@@ -1476,4 +1483,3 @@ SW_PY void MicroTxn_SetAuthorizationResponseCallback(MicroTxnAuthorizationRespon
     }
     microtxn.SetAuthorizationResponseCallback(callback);
 }
-
