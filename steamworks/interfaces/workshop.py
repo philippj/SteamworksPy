@@ -13,12 +13,14 @@ class SteamWorkshop(object):
     _ItemInstalled_t 			= CFUNCTYPE(None, ItemInstalled_t)
     _RemoteStorageSubscribePublishedFileResult_t 	= CFUNCTYPE(None, SubscriptionResult)
     _RemoteStorageUnsubscribePublishedFileResult_t 	= CFUNCTYPE(None, SubscriptionResult)
+    _SteamUGCQueryCompleted_t = CFUNCTYPE(None, SteamUGCQueryCompleted_t)
 
     _CreateItemResult			= None
     _SubmitItemUpdateResult 	= None
     _ItemInstalled 				= None
     _RemoteStorageSubscribePublishedFileResult 	= None
     _RemoteStorageUnsubscribePublishedFileResult = None
+    _SteamUGCQueryCompleted = None
 
 
     def __init__(self, steam: object):
@@ -376,3 +378,59 @@ class SteamWorkshop(object):
             }
 
         return {}
+
+
+    def CreateQueryUGCDetailsRequest(self, published_file_ids: list) -> int:
+        """Create UGC item details query request
+
+        :param published_file_ids: int list
+        :return: int
+        """
+        published_files_c = (c_uint64 * len(published_file_ids))()
+        for index, published_file_id in enumerate(published_file_ids):
+            published_files_c[index] = c_uint64(published_file_id)
+
+        return self.steam.Workshop_CreateQueryUGCDetailsRequest(published_files_c, len(published_file_ids))
+
+
+    def SetQueryUGCRequestCallback(self, callback: object) -> bool:
+        """Set callback for UGC query
+
+        :param callback: callable
+        :return: bool
+        """
+        self._SteamUGCQueryCompleted = SteamWorkshop._SteamUGCQueryCompleted_t(callback)
+        self.steam.Workshop_SetQueryCompletedCallback(self._SteamUGCQueryCompleted)
+        return True
+
+
+    def SendQueryUGCRequest(self, handle: int, callback: object = None, override_callback: bool = False) -> None:
+        """Create UGC item details query request
+
+        :param handle: query handle
+        :param callback: callable
+        :param override_callback: bool
+        :return:
+        """
+        if override_callback:
+            self.SetQueryUGCRequestCallback(callback)
+
+        elif callback and not self._SteamUGCQueryCompleted:
+            self.SetQueryUGCRequestCallback(callback)
+
+        if self._SteamUGCQueryCompleted is None:
+            raise SetupRequired('Call `SetQueryUGCRequestCallback` first or supply a `callback`')
+
+        self.steam.Workshop_SendQueryUGCRequest(handle)
+
+
+    def GetQueryUGCResult(self, handle: int, index: int) -> SteamUGCDetails_t:
+        """Create UGC item details query request
+
+        :param handle: query handle
+        :param index: int
+        :return: SteamUGCDetails_t
+        """
+        details = SteamUGCDetails_t()
+        self.steam.Workshop_GetQueryUGCResult(handle, index, byref(details))
+        return details

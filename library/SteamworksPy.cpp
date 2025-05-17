@@ -95,6 +95,7 @@ typedef void(*RemoteStorageSubscribeFileResultCallback_t)(SubscriptionResult);
 typedef void(*RemoteStorageUnsubscribeFileResultCallback_t)(SubscriptionResult);
 typedef void(*LeaderboardFindResultCallback_t)(LeaderboardFindResult_t);
 typedef void(*MicroTxnAuthorizationResponseCallback_t)(MicroTxnAuthorizationResponse_t);
+typedef void(*SteamUGCQueryCompletedCallback_t)(SteamUGCQueryCompleted_t);
 
 //-----------------------------------------------
 // Workshop Class
@@ -106,11 +107,13 @@ public:
     ItemInstalledCallback_t _pyItemInstalledCallback;
     RemoteStorageSubscribeFileResultCallback_t _pyItemSubscribedCallback;
     RemoteStorageUnsubscribeFileResultCallback_t _pyItemUnsubscribedCallback;
+    SteamUGCQueryCompletedCallback_t _pyQueryCompletedCallback;
 
     CCallResult <Workshop, CreateItemResult_t> _itemCreatedCallback;
     CCallResult <Workshop, SubmitItemUpdateResult_t> _itemUpdatedCallback;
     CCallResult <Workshop, RemoteStorageSubscribePublishedFileResult_t> _itemSubscribedCallback;
     CCallResult <Workshop, RemoteStorageUnsubscribePublishedFileResult_t> _itemUnsubscribedCallback;
+    CCallResult <Workshop, SteamUGCQueryCompleted_t> _queryCompletedCallback;
 
     CCallback <Workshop, ItemInstalled_t> _itemInstalledCallback;
 
@@ -140,6 +143,10 @@ public:
         _pyItemUnsubscribedCallback = callback;
     }
 
+    void SetQueryCompletedCallback(SteamUGCQueryCompletedCallback_t callback) {
+        _pyQueryCompletedCallback = callback;
+    }
+
     void CreateItem(AppId_t consumerAppId, EWorkshopFileType fileType) {
         //TODO: Check if fileType is a valid value?
         SteamAPICall_t createItemCall = SteamUGC()->CreateItem(consumerAppId, fileType);
@@ -159,6 +166,11 @@ public:
     void UnsubscribeItem(PublishedFileId_t publishedFileID) {
         SteamAPICall_t unsubscribeItemCall = SteamUGC()->UnsubscribeItem(publishedFileID);
         _itemUnsubscribedCallback.Set(unsubscribeItemCall, this, &Workshop::OnItemUnsubscribed);
+    }
+
+    void SendQueryRequest(UGCQueryHandle_t queryHandle) {
+        SteamAPICall_t queryRequestCall = SteamUGC()->SendQueryUGCRequest(queryHandle);
+        _queryCompletedCallback.Set(queryRequestCall, this, &Workshop::OnQueryCompleted);
     }
 
 private:
@@ -191,6 +203,12 @@ private:
         if (_pyItemUnsubscribedCallback != nullptr) {
             SubscriptionResult result{itemUnsubscribedResult->m_eResult, itemUnsubscribedResult->m_nPublishedFileId};
             _pyItemUnsubscribedCallback(result);
+        }
+    }
+
+    void OnQueryCompleted(SteamUGCQueryCompleted_t *queryCompletedResult, bool bIOFailure) {
+        if (_pyQueryCompletedCallback != nullptr) {
+            _pyQueryCompletedCallback(*queryCompletedResult);
         }
     }
 };
@@ -1455,6 +1473,31 @@ SW_PY void Workshop_SuspendDownloads(bool bSuspend) {
         return;
     }
     SteamUGC()->SuspendDownloads(bSuspend);
+}
+
+SW_PY UGCQueryHandle_t Workshop_CreateQueryUGCDetailsRequest(PublishedFileId_t * pvecPublishedFileID, uint32 unNumPublishedFileIDs) {
+    return SteamUGC()->CreateQueryUGCDetailsRequest(pvecPublishedFileID, unNumPublishedFileIDs);
+}
+
+SW_PY void Workshop_SetQueryCompletedCallback(SteamUGCQueryCompletedCallback_t callback) {
+    if (SteamUGC() == NULL) {
+        return;
+    }
+    workshop.SetQueryCompletedCallback(callback);
+}
+
+SW_PY void Workshop_SendQueryUGCRequest(UGCQueryHandle_t handle) {
+    if(SteamUGC() == NULL){
+        return;
+    }
+    workshop.SendQueryRequest(handle);
+}
+
+SW_PY bool Workshop_GetQueryUGCResult(UGCQueryHandle_t handle, uint32 index, SteamUGCDetails_t * pDetails) {
+    if(SteamUGC() == NULL){
+        return false;
+    }
+    return SteamUGC()->GetQueryUGCResult(handle, index, pDetails);
 }
 
 //-----------------------------------------------
