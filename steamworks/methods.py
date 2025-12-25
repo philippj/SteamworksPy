@@ -453,6 +453,14 @@ STEAMWORKS_METHODS = {
         'restype': None,
         'argtypes': [MAKE_CALLBACK(None, structs.SubscriptionResult)]
     },
+    'Workshop_GetAppDependencies': {
+        'restype': None,
+        'argtypes': [c_uint64]
+    },
+    'Workshop_SetGetAppDependenciesResultCallback': {
+        'restype': None,
+        'argtypes': [MAKE_CALLBACK(None, structs.GetAppDependenciesResult)]
+    },
     'Workshop_SuspendDownloads': {
         'restype': None,
         'argtypes': [c_bool]

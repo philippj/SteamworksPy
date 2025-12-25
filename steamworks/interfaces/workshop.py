@@ -11,6 +11,7 @@ class SteamWorkshop(object):
     _CreateItemResult_t 		= CFUNCTYPE(None, CreateItemResult_t)
     _SubmitItemUpdateResult_t 	= CFUNCTYPE(None, SubmitItemUpdateResult_t)
     _ItemInstalled_t 			= CFUNCTYPE(None, ItemInstalled_t)
+    _GetAppDependenciesResult_t = CFUNCTYPE(None, GetAppDependenciesResult)
     _RemoteStorageSubscribePublishedFileResult_t 	= CFUNCTYPE(None, SubscriptionResult)
     _RemoteStorageUnsubscribePublishedFileResult_t 	= CFUNCTYPE(None, SubscriptionResult)
     _SteamUGCQueryCompleted_t = CFUNCTYPE(None, SteamUGCQueryCompleted_t)
@@ -18,6 +19,7 @@ class SteamWorkshop(object):
     _CreateItemResult			= None
     _SubmitItemUpdateResult 	= None
     _ItemInstalled 				= None
+    _GetAppDependenciesResult = None
     _RemoteStorageSubscribePublishedFileResult 	= None
     _RemoteStorageUnsubscribePublishedFileResult = None
     _SteamUGCQueryCompleted = None
@@ -73,6 +75,17 @@ class SteamWorkshop(object):
         self.steam.Workshop_ClearItemInstalledCallback()
 
 
+    def SetGetAppDependenciesResultCallback(self, callback: object) -> bool:
+        """Set callback for item GetAppDependencies
+
+        :param callback: callable
+        :return: bool
+        """
+        self._GetAppDependenciesResult = self._GetAppDependenciesResult_t(callback)
+        self.steam.Workshop_SetGetAppDependenciesResultCallback(self._GetAppDependenciesResult)
+        return True
+
+
     def SetItemSubscribedCallback(self, callback: object) -> bool:
         """Set callback for item subscribed
 
@@ -111,6 +124,26 @@ class SteamWorkshop(object):
             self.SetItemCreatedCallback(callback)
 
         self.steam.Workshop_CreateItem(app_id, filetype.value)
+
+
+    def GetAppDependencies(self, published_file_id: int, callback: object = None, override_callback: bool = False) -> None:
+        """Get a list of AppID dependencies from a UGC (Workshop) item
+
+        :param published_file_id: int
+        :param callback: callable
+        :param override_callback: bool
+        :return:
+        """
+        if override_callback:
+            self.SetGetAppDependenciesResultCallback(callback)
+
+        elif callback and not self._GetAppDependenciesResult:
+            self.SetGetAppDependenciesResultCallback(callback)
+
+        if self._GetAppDependenciesResult is None:
+            raise SetupRequired('Call `SetGetAppDependenciesResultCallback` first or supply a `callback`')
+
+        self.steam.Workshop_GetAppDependencies(published_file_id)
 
 
     def SubscribeItem(self, published_file_id: int, callback: object = None, override_callback: bool = False) -> None:

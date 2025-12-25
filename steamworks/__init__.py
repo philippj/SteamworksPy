@@ -32,6 +32,8 @@ from steamworks.interfaces.workshop     import SteamWorkshop
 from steamworks.interfaces.microtxn     import SteamMicroTxn
 from steamworks.interfaces.input        import SteamInput
 
+is_nuitka = '__compiled__' in globals()
+
 os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
 
@@ -71,6 +73,8 @@ class STEAMWORKS(object):
                 cdll.LoadLibrary(os.path.join(os.getcwd(), 'libsteam_api.so')) #if i do this then linux works
             elif os.path.isfile(os.path.join(os.path.dirname(__file__), 'libsteam_api.so')):
                 cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), 'libsteam_api.so'))
+            elif is_nuitka and os.path.isfile(os.path.join(os.path.split(os.path.split(__file__)[0])[0], 'libsteam_api.so')):
+                cdll.LoadLibrary(os.path.join(os.path.split(os.path.split(__file__)[0])[0], 'libsteam_api.so'))
             else:
                 raise MissingSteamworksLibraryException(f'Missing library "libsteam_api.so"')
 
@@ -88,10 +92,15 @@ class STEAMWORKS(object):
             library_path = os.path.join(os.getcwd(), library_file_name)
         elif os.path.isfile(os.path.join(os.path.dirname(__file__), library_file_name)):
             library_path = os.path.join(os.path.dirname(__file__), library_file_name)
+        elif is_nuitka and os.path.isfile(os.path.join(os.path.split(os.path.split(__file__)[0])[0], library_file_name)):
+            library_path = os.path.join(os.path.split(os.path.split(__file__)[0])[0], library_file_name)
         else:
             raise MissingSteamworksLibraryException(f'Missing library {library_file_name}')
 
-        app_id_file = os.path.join(os.getcwd(), 'steam_appid.txt')
+        if is_nuitka and os.path.isfile(os.path.join(os.path.split(os.path.split(__file__)[0])[0], 'steam_appid.txt')):
+            app_id_file = os.path.join(os.path.split(os.path.split(__file__)[0])[0], 'steam_appid.txt')
+        else:
+            app_id_file = os.path.join(os.getcwd(), 'steam_appid.txt')
         if not os.path.isfile(app_id_file):
             raise FileNotFoundError(f'steam_appid.txt missing from {os.getcwd()}')
 
