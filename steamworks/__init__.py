@@ -13,6 +13,7 @@ __author__  = 'GP Garcia'
 import sys, os, time
 from ctypes import *
 from enum import Enum
+from pathlib import Path
 
 import steamworks.util 		as steamworks_util
 from steamworks.enums 		import *
@@ -34,25 +35,102 @@ from steamworks.interfaces.input        import SteamInput
 
 is_nuitka = '__compiled__' in globals()
 
-os.environ['LD_LIBRARY_PATH'] = os.getcwd()
-
 
 class STEAMWORKS(object):
     """
-        Primary STEAMWORKS class used for fundamental handling of the STEAMWORKS API
+    Primary STEAMWORKS class used for fundamental handling of the STEAMWORKS API
+
+    :param supported_platforms: Optional list of platforms to support (restricts initialization)
+    :param lib_path: Optional path to directory containing Steamworks libraries
+                     (libsteam_api.so/dylib/dll and SteamworksPy.so/dylib/dll)
+                     If not provided, searches current directory, package directory, and Nuitka fallback
     """
     _arch = steamworks_util.get_arch()
     _native_supported_platforms = ['linux', 'linux2', 'darwin', 'win32']
 
-    def __init__(self, supported_platforms: list = []) -> None:
+    def __init__(
+        self,
+        supported_platforms: list = [],
+        lib_path: str | Path | None = None
+    ) -> None:
         self._supported_platforms = supported_platforms
+        self._lib_path = lib_path
         self._loaded 	= False
         self._cdll 		= None
 
         self.app_id 	= 0
 
+        # Set LD_LIBRARY_PATH before loading libraries (Linux/macOS only)
+        if sys.platform in ['linux', 'linux2', 'darwin']:
+            self._setup_library_path()
+
         self._initialize()
 
+    def _get_library_search_paths(self) -> list[str]:
+        """
+        Build ordered list of directories to search for libraries.
+
+        Priority order:
+        1. Custom lib_path (if provided)
+        2. Current working directory
+        3. Package directory
+        4. Nuitka fallback (2 dirs up from __file__)
+
+        :return: List of directory paths to search
+        """
+        paths = []
+
+        # Priority 1: Custom lib_path if provided
+        if self._lib_path is not None:
+            resolved_path = str(Path(self._lib_path).resolve())
+            paths.append(resolved_path)
+
+        # Priority 2: Current working directory
+        paths.append(os.getcwd())
+
+        # Priority 3: Package directory
+        paths.append(os.path.dirname(__file__))
+
+        # Priority 4: Nuitka fallback (2 dirs up)
+        if is_nuitka:
+            nuitka_path = os.path.split(os.path.split(__file__)[0])[0]
+            paths.append(nuitka_path)
+
+        return paths
+
+    def _find_library(self, filename: str, search_paths: list[str]) -> str | None:
+        """
+        Search for library file in given paths.
+
+        :param filename: Library filename to find
+        :param search_paths: Ordered list of directories to search
+        :return: Absolute path to library if found, None otherwise
+        """
+        for path in search_paths:
+            full_path = os.path.join(path, filename)
+            if os.path.isfile(full_path):
+                return full_path
+        return None
+
+    def _setup_library_path(self) -> None:
+        """
+        Configure LD_LIBRARY_PATH environment variable for library loading.
+        Only needed on Linux/macOS.
+        """
+        # Build path list (custom path gets priority)
+        paths_to_add = []
+
+        if self._lib_path is not None:
+            paths_to_add.append(str(Path(self._lib_path).resolve()))
+
+        paths_to_add.append(os.getcwd())
+
+        # Preserve existing LD_LIBRARY_PATH
+        existing = os.environ.get('LD_LIBRARY_PATH', '')
+        if existing:
+            paths_to_add.append(existing)
+
+        os.environ['LD_LIBRARY_PATH'] = ':'.join(paths_to_add)
 
     def _initialize(self) -> bool:
         """Initialize module by loading STEAMWORKS library
@@ -66,15 +144,17 @@ class STEAMWORKS(object):
         if platform not in STEAMWORKS._native_supported_platforms:
             raise UnsupportedPlatformException(f'"{platform}" is not being supported')
 
+        # Get search paths for library loading
+        search_paths = self._get_library_search_paths()
+
+        # Determine library filenames based on platform
         library_file_name = ''
         if platform in ['linux', 'linux2']:
             library_file_name = 'SteamworksPy.so'
-            if os.path.isfile(os.path.join(os.getcwd(), 'libsteam_api.so')):
-                cdll.LoadLibrary(os.path.join(os.getcwd(), 'libsteam_api.so')) #if i do this then linux works
-            elif os.path.isfile(os.path.join(os.path.dirname(__file__), 'libsteam_api.so')):
-                cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), 'libsteam_api.so'))
-            elif is_nuitka and os.path.isfile(os.path.join(os.path.split(os.path.split(__file__)[0])[0], 'libsteam_api.so')):
-                cdll.LoadLibrary(os.path.join(os.path.split(os.path.split(__file__)[0])[0], 'libsteam_api.so'))
+            # Load Steam API library (required on Linux)
+            steam_api_path = self._find_library('libsteam_api.so', search_paths)
+            if steam_api_path:
+                cdll.LoadLibrary(steam_api_path)
             else:
                 raise MissingSteamworksLibraryException(f'Missing library "libsteam_api.so"')
 
@@ -88,21 +168,32 @@ class STEAMWORKS(object):
             # This case is theoretically unreachable
             raise UnsupportedPlatformException(f'"{platform}" is not being supported')
 
-        if os.path.isfile(os.path.join(os.getcwd(), library_file_name)):
-            library_path = os.path.join(os.getcwd(), library_file_name)
-        elif os.path.isfile(os.path.join(os.path.dirname(__file__), library_file_name)):
-            library_path = os.path.join(os.path.dirname(__file__), library_file_name)
-        elif is_nuitka and os.path.isfile(os.path.join(os.path.split(os.path.split(__file__)[0])[0], library_file_name)):
-            library_path = os.path.join(os.path.split(os.path.split(__file__)[0])[0], library_file_name)
-        else:
+        # Load SteamworksPy wrapper library
+        library_path = self._find_library(library_file_name, search_paths)
+        if not library_path:
             raise MissingSteamworksLibraryException(f'Missing library {library_file_name}')
 
-        if is_nuitka and os.path.isfile(os.path.join(os.path.split(os.path.split(__file__)[0])[0], 'steam_appid.txt')):
-            app_id_file = os.path.join(os.path.split(os.path.split(__file__)[0])[0], 'steam_appid.txt')
-        else:
-            app_id_file = os.path.join(os.getcwd(), 'steam_appid.txt')
-        if not os.path.isfile(app_id_file):
-            raise FileNotFoundError(f'steam_appid.txt missing from {os.getcwd()}')
+        # Find steam_appid.txt
+        # Check parent of lib_path first (if custom path provided), then search paths
+        paths_to_check = []
+        if self._lib_path is not None:
+            lib_parent = str(Path(self._lib_path).resolve().parent)
+            paths_to_check.append(lib_parent)
+            paths_to_check.append(str(Path(self._lib_path).resolve()))
+
+        for path in search_paths:
+            if path not in paths_to_check:
+                paths_to_check.append(path)
+
+        app_id_file = None
+        for path in paths_to_check:
+            candidate = os.path.join(path, 'steam_appid.txt')
+            if os.path.isfile(candidate):
+                app_id_file = candidate
+                break
+
+        if not app_id_file:
+            raise FileNotFoundError(f'steam_appid.txt missing. Searched: {", ".join(paths_to_check)}')
 
         with open(app_id_file, 'r') as f:
             self.app_id	= int(f.read())
