@@ -86,3 +86,31 @@ class MicroTxnAuthorizationResponse_t(Structure):
         ("orderId", c_uint64),
         ("authorized", c_bool)
     ]
+
+
+class GetAppDependenciesResult_t(Structure):
+    """Result from GetAppDependencies call
+
+    Returns app dependencies associated with a workshop item.
+    These are "soft" dependencies shown on the web.
+    """
+    _fields_ = [
+        ("result", c_int),                      # EResult
+        ("publishedFileId", c_uint64),          # PublishedFileId_t
+        ("rgAppIDs", c_uint32 * 32),            # Array of AppId_t (max 32)
+        ("numAppDependencies", c_uint32),       # Count returned in this struct
+        ("totalNumAppDependencies", c_uint32)   # Total dependencies found
+    ]
+
+
+class DownloadItemResult_t(Structure):
+    """Result from DownloadItem call
+
+    Callback fired when workshop item has been downloaded.
+    Contains the app ID associated with the workshop item.
+    """
+    _fields_ = [
+        ("appID", c_uint32),                    # AppId_t - associated app
+        ("publishedFileId", c_uint64),          # PublishedFileId_t
+        ("result", c_int)                       # EResult
+    ]

@@ -5,3 +5,4 @@
 !redist/windows/*.dll
 !redist/osx/*.dylib
 !redist/linux/*.so
+library/sdk/steam/
