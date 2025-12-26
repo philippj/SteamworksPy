@@ -10,4 +10,4 @@ The source files can be downloaded here (log-in required): https://partner.steam
 
 Unpack the archive and place the contents of:
 - /sdk/public/steam in SteamworksPy/library/sdk/steam
-- /sdk/redistributable_bin/%your_os% in SteamworksPy/library/sdk/redist
+- /sdk/redistributable_bin/%your_os% in SteamworksPy/library
