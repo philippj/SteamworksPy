@@ -96,6 +96,8 @@ typedef void(*RemoteStorageUnsubscribeFileResultCallback_t)(SubscriptionResult);
 typedef void(*LeaderboardFindResultCallback_t)(LeaderboardFindResult_t);
 typedef void(*MicroTxnAuthorizationResponseCallback_t)(MicroTxnAuthorizationResponse_t);
 typedef void(*SteamUGCQueryCompletedCallback_t)(SteamUGCQueryCompleted_t);
+typedef void(*GetAppDependenciesResultCallback_t)(GetAppDependenciesResult_t);
+typedef void(*DownloadItemResultCallback_t)(DownloadItemResult_t);
 
 //-----------------------------------------------
 // Workshop Class
@@ -108,12 +110,16 @@ public:
     RemoteStorageSubscribeFileResultCallback_t _pyItemSubscribedCallback;
     RemoteStorageUnsubscribeFileResultCallback_t _pyItemUnsubscribedCallback;
     SteamUGCQueryCompletedCallback_t _pyQueryCompletedCallback;
+    GetAppDependenciesResultCallback_t _pyGetAppDependenciesCallback;
+    DownloadItemResultCallback_t _pyDownloadItemCallback;
 
     CCallResult <Workshop, CreateItemResult_t> _itemCreatedCallback;
     CCallResult <Workshop, SubmitItemUpdateResult_t> _itemUpdatedCallback;
     CCallResult <Workshop, RemoteStorageSubscribePublishedFileResult_t> _itemSubscribedCallback;
     CCallResult <Workshop, RemoteStorageUnsubscribePublishedFileResult_t> _itemUnsubscribedCallback;
     CCallResult <Workshop, SteamUGCQueryCompleted_t> _queryCompletedCallback;
+    CCallResult <Workshop, GetAppDependenciesResult_t> _getAppDependenciesCallback;
+    CCallResult <Workshop, DownloadItemResult_t> _downloadItemCallback;
 
     CCallback <Workshop, ItemInstalled_t> _itemInstalledCallback;
 
@@ -147,6 +153,14 @@ public:
         _pyQueryCompletedCallback = callback;
     }
 
+    void SetGetAppDependenciesCallback(GetAppDependenciesResultCallback_t callback) {
+        _pyGetAppDependenciesCallback = callback;
+    }
+
+    void SetDownloadItemCallback(DownloadItemResultCallback_t callback) {
+        _pyDownloadItemCallback = callback;
+    }
+
     void CreateItem(AppId_t consumerAppId, EWorkshopFileType fileType) {
         //TODO: Check if fileType is a valid value?
         SteamAPICall_t createItemCall = SteamUGC()->CreateItem(consumerAppId, fileType);
@@ -171,6 +185,17 @@ public:
     void SendQueryRequest(UGCQueryHandle_t queryHandle) {
         SteamAPICall_t queryRequestCall = SteamUGC()->SendQueryUGCRequest(queryHandle);
         _queryCompletedCallback.Set(queryRequestCall, this, &Workshop::OnQueryCompleted);
+    }
+
+    void GetAppDependencies(PublishedFileId_t publishedFileID) {
+        SteamAPICall_t getAppDependenciesCall = SteamUGC()->GetAppDependencies(publishedFileID);
+        _getAppDependenciesCallback.Set(getAppDependenciesCall, this, &Workshop::OnGetAppDependencies);
+    }
+
+    bool DownloadItem(PublishedFileId_t publishedFileID, bool bHighPriority) {
+        SteamAPICall_t downloadItemCall = SteamUGC()->DownloadItem(publishedFileID, bHighPriority);
+        _downloadItemCallback.Set(downloadItemCall, this, &Workshop::OnDownloadItem);
+        return true;  // Returns true if successfully queued
     }
 
 private:
@@ -209,6 +234,18 @@ private:
     void OnQueryCompleted(SteamUGCQueryCompleted_t *queryCompletedResult, bool bIOFailure) {
         if (_pyQueryCompletedCallback != nullptr) {
             _pyQueryCompletedCallback(*queryCompletedResult);
+        }
+    }
+
+    void OnGetAppDependencies(GetAppDependenciesResult_t *result, bool bIOFailure) {
+        if (_pyGetAppDependenciesCallback != nullptr) {
+            _pyGetAppDependenciesCallback(*result);
+        }
+    }
+
+    void OnDownloadItem(DownloadItemResult_t *result, bool bIOFailure) {
+        if (_pyDownloadItemCallback != nullptr) {
+            _pyDownloadItemCallback(*result);
         }
     }
 };
@@ -1498,6 +1535,34 @@ SW_PY bool Workshop_GetQueryUGCResult(UGCQueryHandle_t handle, uint32 index, Ste
         return false;
     }
     return SteamUGC()->GetQueryUGCResult(handle, index, pDetails);
+}
+
+SW_PY void Workshop_SetGetAppDependenciesCallback(GetAppDependenciesResultCallback_t callback) {
+    if (SteamUGC() == NULL) {
+        return;
+    }
+    workshop.SetGetAppDependenciesCallback(callback);
+}
+
+SW_PY void Workshop_GetAppDependencies(PublishedFileId_t publishedFileID) {
+    if (SteamUGC() == NULL) {
+        return;
+    }
+    workshop.GetAppDependencies(publishedFileID);
+}
+
+SW_PY void Workshop_SetDownloadItemCallback(DownloadItemResultCallback_t callback) {
+    if (SteamUGC() == NULL) {
+        return;
+    }
+    workshop.SetDownloadItemCallback(callback);
+}
+
+SW_PY bool Workshop_DownloadItem(PublishedFileId_t publishedFileID, bool bHighPriority) {
+    if (SteamUGC() == NULL) {
+        return false;
+    }
+    return workshop.DownloadItem(publishedFileID, bHighPriority);
 }
 
 //-----------------------------------------------
