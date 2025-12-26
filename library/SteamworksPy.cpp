@@ -105,7 +105,6 @@ typedef void(*RemoteStorageUnsubscribeFileResultCallback_t)(SubscriptionResult);
 typedef void(*LeaderboardFindResultCallback_t)(LeaderboardFindResult_t);
 typedef void(*MicroTxnAuthorizationResponseCallback_t)(MicroTxnAuthorizationResponse_t);
 typedef void(*SteamUGCQueryCompletedCallback_t)(SteamUGCQueryCompleted_t);
-typedef void(*GetAppDependenciesResultCallback_t)(GetAppDependenciesResult_t);
 typedef void(*DownloadItemResultCallback_t)(DownloadItemResult_t);
 
 //-----------------------------------------------
@@ -120,7 +119,6 @@ public:
     RemoteStorageSubscribeFileResultCallback_t _pyItemSubscribedCallback;
     RemoteStorageUnsubscribeFileResultCallback_t _pyItemUnsubscribedCallback;
     SteamUGCQueryCompletedCallback_t _pyQueryCompletedCallback;
-    GetAppDependenciesResultCallback_t _pyGetAppDependenciesCallback;
     DownloadItemResultCallback_t _pyDownloadItemCallback;
 
     CCallResult <Workshop, CreateItemResult_t> _itemCreatedCallback;
@@ -129,7 +127,6 @@ public:
     CCallResult <Workshop, RemoteStorageSubscribePublishedFileResult_t> _itemSubscribedCallback;
     CCallResult <Workshop, RemoteStorageUnsubscribePublishedFileResult_t> _itemUnsubscribedCallback;
     CCallResult <Workshop, SteamUGCQueryCompleted_t> _queryCompletedCallback;
-    CCallResult <Workshop, GetAppDependenciesResult_t> _getAppDependenciesCallback;
     CCallResult <Workshop, DownloadItemResult_t> _downloadItemCallback;
 
     CCallback <Workshop, ItemInstalled_t> _itemInstalledCallback;
@@ -207,11 +204,6 @@ public:
         _queryCompletedCallback.Set(queryRequestCall, this, &Workshop::OnQueryCompleted);
     }
 
-    void GetAppDependencies(PublishedFileId_t publishedFileID) {
-        SteamAPICall_t getAppDependenciesCall = SteamUGC()->GetAppDependencies(publishedFileID);
-        _getAppDependenciesCallback.Set(getAppDependenciesCall, this, &Workshop::OnGetAppDependencies);
-    }
-
     bool DownloadItem(PublishedFileId_t publishedFileID, bool bHighPriority) {
         SteamAPICall_t downloadItemCall = SteamUGC()->DownloadItem(publishedFileID, bHighPriority);
         _downloadItemCallback.Set(downloadItemCall, this, &Workshop::OnDownloadItem);
@@ -270,12 +262,6 @@ private:
     void OnQueryCompleted(SteamUGCQueryCompleted_t *queryCompletedResult, bool bIOFailure) {
         if (_pyQueryCompletedCallback != nullptr) {
             _pyQueryCompletedCallback(*queryCompletedResult);
-        }
-    }
-
-    void OnGetAppDependencies(GetAppDependenciesResult_t *result, bool bIOFailure) {
-        if (_pyGetAppDependenciesCallback != nullptr) {
-            _pyGetAppDependenciesCallback(*result);
         }
     }
 
@@ -1592,13 +1578,6 @@ SW_PY void Workshop_SetGetAppDependenciesCallback(GetAppDependenciesResultCallba
         return;
     }
     workshop.SetGetAppDependenciesCallback(callback);
-}
-
-SW_PY void Workshop_GetAppDependencies(PublishedFileId_t publishedFileID) {
-    if (SteamUGC() == NULL) {
-        return;
-    }
-    workshop.GetAppDependencies(publishedFileID);
 }
 
 SW_PY void Workshop_SetDownloadItemCallback(DownloadItemResultCallback_t callback) {
